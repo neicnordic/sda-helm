@@ -1,0 +1,173 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "sda.fullname" . }}
+  labels:
+    app: {{ template "sda.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: {{ template "sda.fullname" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    role: database
+spec:
+  replicas: 1
+  updateStrategy: 
+    type: {{ .Values.updateStrategyType }}
+  revisionHistoryLimit: {{ default "3" .Values.revisionHistory }}
+  serviceName: {{ template "sda.fullname" . }}
+  selector:
+    matchLabels:
+      app: {{ template "sda.fullname" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "sda.fullname" . }}
+        role: database
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+{{- if .Values.podAnnotations }}
+{{ tpl .Values.podAnnotations . | indent 8 }}
+{{- end }}
+    spec:
+    {{- if .Values.rbacEnabled}}
+      serviceAccountName: {{ .Release.Name }}
+    {{- end }}
+      securityContext:
+        runAsUser: 70
+        fsGroup: 70
+    {{- if or .Values.persistence.volumePermissions .Values.externalPkiService.tlsPath }}
+      initContainers:
+      - name: init-data-chmod
+        image: busybox
+        command:
+          - /bin/sh
+          - -cx
+          - |
+            {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
+            mkdir -p /ega/data
+            chmod 700 /ega/data
+            find /ega -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 70:70
+            {{- end }}
+            {{- if .Values.externalPkiService.tlsPath }}
+            /bin/cp {{ .Values.externalPkiService.tlsPath }}/* /tls/ && chown 70:70 /tls/* && chmod 0400 /tls/*
+            {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
+        - name: data
+          mountPath: /ega
+        {{- end }}
+        {{- if .Values.externalPkiService.tlsPath }}
+        - name: tls-certs
+          mountPath: /tls
+        {{- end }}
+    {{- end }}
+      containers:
+      - name: postgresql
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        # command: ["sleep", "3600"]
+        securityContext:
+          allowPrivilegeEscalation: false
+        resources:
+{{ toYaml .Values.resources | trim | indent 10 }}
+        env:
+        - name: PGDATA
+          value: "{{ .Values.persistence.mountPath }}/data"
+        - name: DB_LEGA_IN_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}
+                key: pgInPasswd
+        - name: DB_LEGA_OUT_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}
+                key: pgOutPasswd
+        - name: PG_SERVER_CERT
+          value: /tls/server.crt
+        - name: PG_SERVER_KEY
+          value: /tls/server.key
+        {{- if .Values.default.verifyPeer }}
+        - name: PG_CA
+          value: /tls/ca.crt
+        - name: PG_VERIFY_PEER
+          value: "1"
+        {{- end }}
+        ports:
+        - containerPort: 5432
+          name: postgres
+          protocol: TCP
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -h
+            - localhost
+            - -U
+            - lega_out
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -h
+            - localhost
+            - -U
+            - lega_out
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        volumeMounts:
+        - name: data
+          mountPath: {{ .Values.persistence.mountPath }}
+        - name: tls-certs
+          mountPath: /tls
+      volumes:
+      - name: tls-certs
+      {{- if  .Values.externalPkiService.tlsPath }}
+        emptyDir:
+          medium: Memory
+          sizeLimit: 10Mi
+      {{- else }}
+        projected:
+          defaultMode: 0440
+          sources:
+          - secret:
+              name: {{ template "sda.fullname" . }}
+              items:
+              {{- if .Values.default.verifyPeer }}
+              - key: ca.crt
+                path: ca.crt
+              {{- end }}
+              - key: server.crt
+                path: server.crt
+              - key: server.key
+                path: server.key
+      {{- end }}
+      - name: data
+  {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim | quote }}
+  {{- else if not .Values.persistence.enabled }}
+        emptyDir: {}
+  {{- else if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app: {{ template "sda.fullname" . }}
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.storageSize }}
+    {{- if .Values.persistence.storageClass }}
+      storageClassName: {{ .Values.persistence.storageClass | quote}}
+    {{- end }}
+  {{- end -}}
