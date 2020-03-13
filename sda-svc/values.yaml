@@ -248,7 +248,7 @@ s3Inbox:
 
 sftpInbox:
   name: sftpInbox
-  repository: neicnordic/sftp-inbox
+  repository: neicnordic/sda-inbox-sftp
   imageTag: latest
   imagePullPolicy: Always
   replicaCount: 1
