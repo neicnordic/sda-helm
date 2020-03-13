@@ -1,0 +1,88 @@
+{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "sda.fullname" . }}-finalize
+  labels:
+    role: finalize
+    app: {{ template "sda.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: {{ .Release.Name }}-finalize
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
+  selector:
+    matchLabels:
+      app: {{ template "sda.name" . }}-finalize
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "sda.name" . }}-finalize
+        role: finalize
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
+        {{- if not .Values.global.confFile }}
+        checksum/config: {{ include (print $.Template.BasePath "/finalize-secrets.yaml") . | sha256sum }}
+        {{- end }}
+{{- if .Values.global.podAnnotations }}
+{{- tpl .Values.global.podAnnotations . | nindent 8 -}}
+{{- end }}
+{{- if .Values.finalize.annotations }}
+{{- tpl .Values.finalize.annotations . | nindent 8 -}}
+{{- end }}
+    spec:
+    {{- if .Values.global.rbacEnabled}}
+      serviceAccountName: {{ .Release.Name }}
+    {{- end }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: finalize
+        image: "{{ .Values.finalize.repository }}:{{ .Values.finalize.imageTag }}"
+        imagePullPolicy: {{ .Values.finalize.imagePullPolicy | quote }}
+        command: ["ega-finalize"]
+        args: ["--log", {{ .Values.global.log | quote }} {{- if .Values.global.confFile -}} , "--conf", "{{ template "confFile" . }}" {{- end -}}]
+        securityContext:
+          allowPrivilegeEscalation: false
+        env:
+        - name: BROKER_CACERTFILE
+          value:  "{{ template "tlsPath" . }}/ca.crt"
+        - name: BROKER_CERTFILE
+          value:  "{{ template "tlsPath" . }}/finalize.crt"
+        - name: BROKER_KEYFILE
+          value:  "{{ template "tlsPath" . }}/finalize.key"
+        - name: BROKER_VERIFY_HOSTNAME
+          value: {{ .Values.global.broker.verifyHostname | quote }}
+        - name: BROKER_VERIFY_PEER
+          value:  "yes"
+        {{- if not .Values.global.confFile }}
+        - name: BROKER_CONNECTION
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-finalize
+              key: mqConnection
+        - name: DB_CONNECTION
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-finalize
+              key: dbConnection
+        {{- end }}
+        resources:
+{{ toYaml .Values.finalize.resources | trim | indent 10 }}
+      {{- if not .Values.global.pkiService }}
+        volumeMounts:
+        - name: tls
+          mountPath: {{ template "tlsPath" . }}
+      volumes:
+        - name: tls
+          secret:
+            secretName: {{ template "sda.fullname" . }}-finalize-certs
+      {{- end }}
+      restartPolicy: Always
+{{- end }}
