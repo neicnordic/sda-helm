@@ -1,0 +1,153 @@
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not  .Values.global.deploymentType) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "sda.fullname" . }}-doa
+  labels:
+    role: doa
+    app: {{ template "sda.name" . }}-doa
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: "{{ .Values.doa.name }}"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.doa.replicaCount }}
+  revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
+  selector:
+    matchLabels:
+      app: {{ template "sda.name" . }}-doa
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "sda.name" . }}-doa
+        role: doa
+        release: {{ .Release.Name }}
+    spec:
+    {{- if .Values.global.rbacEnabled}}
+      serviceAccountName: {{ .Release.Name }}
+    {{- end }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: doa
+        image: "{{ .Values.doa.repository }}:{{ .Values.doa.imageTag }}"
+        imagePullPolicy: {{ .Values.doa.imagePullPolicy | quote }}
+        command: ["java", "-jar", "localega-doa.jar"]
+        securityContext:
+          allowPrivilegeEscalation: false
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: no-oss,LocalEGA
+        - name: DB_INSTANCE
+          value: {{ required "A valid database host is required" .Values.global.db.host | quote}}
+        - name: POSTGRES_DB
+          value: {{ required "A database name is required" .Values.global.db.name | quote }}
+        - name: POSTGRES_USER
+          value: {{ include "dbUserDoa" . | quote }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-doa
+                key: dbPassword
+      {{- if eq "S3Storage" .Values.global.archive.storageType }}
+        - name: S3_ENDPOINT
+          value: {{ required "A valid archive S3 URL entry is required!" .Values.global.archive.s3Url | quote }}
+        - name: S3_PORT
+          value: {{ .Values.global.archive.s3Port | quote }}
+        - name: S3_ACCESS_KEY
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-s3archive-keys
+                key: s3ArchiveAccessKey
+        - name: S3_SECRET_KEY
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-s3archive-keys
+                key: s3ArchiveSecretKey
+        - name: S3_REGION
+          value: {{ .Values.global.archive.s3Region }}
+        - name: S3_SECURE
+          value: "true"
+        - name: S3_BUCKET
+          value: {{ .Values.global.archive.s3Bucket | quote}}
+      {{- end }}
+        - name: JWT_PUBLIC_KEY_PATH
+          value: "{{ include "secretsPath" . }}/{{ .Values.global.elixir.pubKey }}"
+        - name: KEYSTORE_PATH
+          value: "/etc/ssl/certs/java/doa.p12"
+        - name: KEYSTORE_PASSWORD
+          value: {{ .Values.doa.keystorePass | quote }}
+        - name: ROOT_CERT_PATH
+          value: "/etc/ssl/certs/java/ca.crt"
+        - name: CERT_PATH
+          value: "/etc/ssl/certs/java/doa.crt"
+        - name: CERT_KEY
+          value: "/etc/ssl/certs/java/doa.key.der"
+        - name: CRYPT4GH_PRIVATE_KEY_PATH
+          value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.file }}"
+        - name: CRYPT4GH_PRIVATE_KEY_PASSWORD_PATH
+          value: "{{ template "c4ghPath" . }}/passphrase"
+        ports:
+        - name: doa
+          containerPort: {{ .Values.doa.port }}
+          protocol: TCP
+        livenessProbe:
+          tcpSocket:
+            port: doa
+          initialDelaySeconds: 120
+          periodSeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: doa
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        resources:
+{{ toYaml .Values.doa.resources | trim | indent 10 }}
+        volumeMounts:
+        - name: tls-certs
+          mountPath: "/etc/ssl/certs/java"
+      {{- if not .Values.global.confFile }}
+        - name: jwt-token
+          mountPath: {{ include "secretsPath" . }}
+        - name: c4gh-key
+          mountPath: {{ template "c4ghPath" . }}
+      {{- end }}
+      {{- if eq "FileStorage" .Values.global.archive.storageType }}
+        - name: archive
+          mountPath: {{ .Values.global.archive.volumePath | quote }}
+      {{- end }}
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: {{ template "sda.fullname" . }}-doa-certs
+            defaultMode: 0440
+      {{- if not .Values.global.confFile }}
+        - name: jwt-token
+          projected:
+            defaultMode: 0440
+            sources:
+            - secret:
+                name: {{ template "sda.fullname" . }}-doa
+                items:
+                  - key: {{ .Values.global.elixir.pubKey }}
+                    path: {{ .Values.global.elixir.pubKey }}
+        - name: c4gh-key
+          secret:
+            secretName: {{ template "sda.fullname" . }}-c4gh
+            defaultMode: 0440
+      {{- end }}
+      {{- if eq "FileStorage" .Values.global.archive.storageType }}
+        - name: archive
+          {{- if .Values.global.archive.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.archive.existingClaim }}
+        {{- else }}
+          nfs:
+            server: {{ required "An archive NFS server is required" .Values.global.archive.nfsServer | quote }}
+            path: {{ if .Values.global.archive.nfsPath }}{{ .Values.global.archive.nfsPath | quote }}{{ else }}{{ "/" }}{{ end }}
+        {{- end }}
+      {{- end }}
+{{- end }}

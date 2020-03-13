@@ -117,6 +117,9 @@ global:
     port: 5432
     sslMode: "verify-ca"
 
+  elixir:
+    pubKey: ""
+
   inbox:
     brokerRoutingKey: "files.inbox"
     servicePort: 9000
@@ -182,7 +185,7 @@ doa:
       cpu: "2000m"
   port: 8080
   servicePort: 8080
-  debug: 1234
+  debugPort: 1234
   logpath: "/tmp/logs"
   keystorePass: "changeit"
 # Extra annotations to attach to the service pods

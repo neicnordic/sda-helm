@@ -1,0 +1,20 @@
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not  .Values.global.deploymentType) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "sda.fullname" . }}-doa
+  labels:
+    app: {{ template "sda.fullname" . }}-doa
+spec:
+  ports:
+  - name: doa
+    port: {{ .Values.doa.servicePort }}
+    targetPort: doa
+    protocol: TCP
+  - name: debug
+    port: {{ .Values.doa.debugPort }}
+    targetPort: {{ .Values.doa.debugPort }}
+    protocol: TCP
+  selector:
+    app: {{ template "sda.fullname" . }}-doa
+{{- end }}
