@@ -1,0 +1,18 @@
+name: Helm linter
+
+on: [push]
+
+jobs:
+  lint_sda-db:
+    name: Lint sda-db
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install helm3
+      run: |
+        wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz -O - | tar -xz
+        sudo cp linux-amd64/helm /usr/local/bin/helm
+    - name: Lint sda-db
+      run: |
+        bash .github/ci_tests/lint_helper.sh
+        helm lint sda-db
