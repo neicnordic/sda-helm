@@ -1,0 +1,48 @@
+name: k3s deployment
+
+on: [push,pull_request]
+
+jobs:
+
+  deployment_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install k3s
+      run: curl -sfL https://get.k3s.io | sh -
+    - name: Fix permissions & copy config file
+      run: |
+        sudo chmod 666 /etc/rancher/k3s/* 
+        mkdir -p ~/.kube/ && cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+    - name: Install helm3
+      run: |
+        wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz -O - | tar -xz
+        sudo cp linux-amd64/helm /usr/local/bin/helm
+    - name: Wait for k3s to become ready
+      run: until kubectl -n kube-system get pods -lk8s-app=metrics-server -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True"; do echo "waiting for k3s to become ready"; sleep 10; done
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Clone and install deploy-init
+      run: |
+        git clone https://github.com/neicnordic/LocalEGA-deploy-init
+        pip3 install LocalEGA-deploy-init/
+        legainit --config-path LocalEGA-deploy-init/config
+    - name: Copy DB certs
+      run: |
+        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/server.crt
+        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/server.key
+    - name: Deploy SDA database
+      run: |
+        helm install postgres sda-db \
+        --set securityPolicy.create=false
+    - name: Wait for database to become ready
+      run: |
+        RETRY_TIMES=0
+        until kubectl get pods -lrole=database -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True";
+        do echo "waiting for database to become ready";
+        RETRY_TIMES=$((RETRY_TIMES+1));
+        if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
+        sleep 3;
+        done
