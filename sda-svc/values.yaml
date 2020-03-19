@@ -37,6 +37,11 @@ global:
 # Calico, Cilium, Kube-router, Romana and Weave Net
   networkPolicy:
     create: false
+    brokerNamespace: ""
+    databaseNamespace: ""
+    externalNamespace: ""
+    internalNamespace: ""
+
 
   persistence: 
     enabled: true
