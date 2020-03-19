@@ -1,0 +1,172 @@
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "sda.fullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "sda.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "sda.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "sda.finalize.fullname" -}}
+{{- if .Values.finalize.fullnameOverride -}}
+{{- .Values.finalize.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" .Release.Name .Values.finalize.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.finalize.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "sda.inbox.fullname" -}}
+{{- if .Values.inbox.fullnameOverride -}}
+{{- .Values.inbox.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" .Release.Name .Values.inbox.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.inbox.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "sda.ingest.fullname" -}}
+{{- if .Values.ingest.fullnameOverride -}}
+{{- .Values.ingest.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" .Release.Name .Values.ingest.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.ingest.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "sda.verify.fullname" -}}
+{{- if .Values.verify.fullnameOverride -}}
+{{- .Values.verify.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" .Release.Name .Values.verify.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.verify.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/**/}}
+
+{{- define "secretsPath" -}}
+  {{- .Values.global.secretsPath -}}
+{{- end -}}
+
+{{- define "c4ghPath" -}}
+{{- ternary .Values.global.secretsPath (printf "%s/%s" .Values.global.secretsPath .Values.global.c4ghPath) (empty .Values.global.c4ghPath) -}}
+{{- end -}}
+
+{{- define "tlsPath" -}}
+{{- ternary .Values.global.secretsPath (printf "%s/%s" .Values.global.secretsPath .Values.global.tlsPath) (empty .Values.global.tlsPath) -}}
+{{- end -}}
+
+{{- define "confFile" -}}
+  {{- if .Values.global.confFilePath -}}
+    {{- printf "%s%s/%s" .Values.global.secretsPath .Values.global.confFilePath .Values.global.confFile }}
+  {{- else }}
+    {{- printf "%s/%s" .Values.global.secretsPath .Values.global.confFile -}}
+  {{ end }}
+{{- end -}}
+
+{{- define "brokerVhost" -}}
+  {{ if or (eq "/" .Values.global.broker.vhost) (not .Values.global.broker.vhost) }}
+    {{- print "%2f" -}}
+  {{ else }}
+    {{-  .Values.global.broker.vhost -}}
+  {{ end }}
+{{- end -}}
+
+{{/**/}}
+{{- define "dbUserDoa" -}}
+{{- ternary "lega_out" .Values.credentials.doa.dbUser (empty .Values.credentials.doa.dbUser) -}}
+{{- end -}}
+{{- define "dbPassDoa" -}}
+{{- ternary .Values.global.db.passOutgest .Values.credentials.doa.dbPassword (empty .Values.credentials.doa.dbPassword) -}}
+{{- end -}}
+
+{{/**/}}
+{{- define "dbUserFinalize" -}}
+{{- ternary "lega_in" .Values.credentials.finalize.dbUser (empty .Values.credentials.finalize.dbUser) -}}
+{{- end -}}
+{{- define "dbPassFinalize" -}}
+{{- ternary .Values.global.db.passIngest .Values.credentials.finalize.dbPassword (empty .Values.credentials.finalize.dbPassword) -}}
+{{- end -}}
+{{- define "mqUserFinalize" -}}
+{{- ternary .Values.global.broker.username .Values.credentials.finalize.mqUser (empty .Values.credentials.finalize.mqUser) -}}
+{{- end -}}
+{{- define "mqPassFinalize" -}}
+{{- ternary .Values.global.broker.password .Values.credentials.finalize.mqPassword (empty .Values.credentials.finalize.mqPassword) -}}
+{{- end -}}
+
+{{/**/}}
+{{- define "dbUserIngest" -}}
+{{- ternary "lega_in" .Values.credentials.ingest.dbUser (empty .Values.credentials.ingest.dbUser) -}}
+{{- end -}}
+{{- define "dbPassIngest" -}}
+{{- ternary .Values.global.db.passIngest .Values.credentials.ingest.dbPassword (empty .Values.credentials.ingest.dbPassword) -}}
+{{- end -}}
+{{- define "mqUserIngest" -}}
+{{- ternary .Values.global.broker.username .Values.credentials.ingest.mqUser (empty .Values.credentials.ingest.mqUser) -}}
+{{- end -}}
+{{- define "mqPassIngest" -}}
+{{- ternary .Values.global.broker.password .Values.credentials.ingest.mqPassword (empty .Values.credentials.ingest.mqPassword) -}}
+{{- end -}}
+
+{{/**/}}
+{{- define "mqUserInbox" -}}
+{{- ternary .Values.global.broker.username .Values.credentials.inbox.mqUser (empty .Values.credentials.inbox.mqUser) -}}
+{{- end -}}
+{{- define "mqPassInbox" -}}
+{{- ternary .Values.global.broker.password .Values.credentials.inbox.mqPassword (empty .Values.credentials.inbox.mqPassword) -}}
+{{- end -}}
+
+{{/**/}}
+{{- define "dbUserVerify" -}}
+{{- ternary "lega_in" .Values.credentials.verify.dbUser (empty .Values.credentials.verify.dbUser) -}}
+{{- end -}}
+{{- define "dbPassVerify" -}}
+{{- ternary .Values.global.db.passIngest .Values.credentials.verify.dbPassword (empty .Values.credentials.verify.dbPassword) -}}
+{{- end -}}
+{{- define "mqUserVerify" -}}
+{{- ternary .Values.global.broker.username .Values.credentials.verify.mqUser (empty .Values.credentials.verify.mqUser) -}}
+{{- end -}}
+{{- define "mqPassVerify" -}}
+{{- ternary .Values.global.broker.password .Values.credentials.verify.mqPassword (empty .Values.credentials.verify.mqPassword) -}}
+{{- end -}}
+{{/**/}}
