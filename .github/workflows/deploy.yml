@@ -28,7 +28,7 @@ jobs:
       run: |
         git clone https://github.com/neicnordic/LocalEGA-deploy-init
         pip3 install LocalEGA-deploy-init/
-        legainit --config-path LocalEGA-deploy-init/config
+        legainit --cega --config-path LocalEGA-deploy-init/config
     - name: Copy DB certs
       run: |
         cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/server.crt
@@ -45,4 +45,48 @@ jobs:
         RETRY_TIMES=$((RETRY_TIMES+1));
         if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
         sleep 3;
+        done
+    - name: Get CEGA chart
+      run: git clone https://github.com/nbisweden/LocalEGA-helm
+    - name: Start CEGA services
+      run: |
+        cp -r LocalEGA-deploy-init/config LocalEGA-helm/ega-charts/cega/config
+        ls -la LocalEGA-helm/ega-charts/cega/config
+        cat LocalEGA-helm/ega-charts/cega/config/trace.yml
+        helm install cega LocalEGA-helm/ega-charts/cega -f LocalEGA-helm/ega-charts/cega/config/trace.yml \
+        --set podSecurityPolicy.create=false,\
+        persistence.enabled=false
+    - name: Wait for CEGA to become ready
+      run: |
+        RETRY_TIMES=0
+        until kubectl get pods -l app=cega-mq -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True" || [ $RETRY_TIMES -eq 20 ];
+        do echo "waiting for fake cega to become ready";
+        RETRY_TIMES=$((RETRY_TIMES+1));
+        if [ $RETRY_TIMES -eq 20 ]; then exit 1; fi
+        sleep 10;
+        done
+    - name: Copy MQ certs
+      run: |
+        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
+        cp LocalEGA-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
+        cp LocalEGA-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
+    - name: Deploy SDA message broker
+      run: |
+        CEGA_MQ_PASS=$(grep cega_mq_pass LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        helm install broker sda-mq \
+        --set securityPolicy.create=false,\
+        config.adminUser=admin,\
+        config.adminPasswordHash="DI0kJIvQHptGSBH2coZ25dsjjN9Z4uxp8hAyqtd9H7rb/SBO",\
+        config.shovel.host="cega-mq",\
+        config.shovel.user=lega,\
+        config.shovel.pass=$CEGA_MQ_PASS,\
+        config.shovel.vhost=lega
+    - name: Wait for broker to become ready
+      run: |
+        RETRY_TIMES=0
+        until kubectl get pods -lrole=broker -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True";
+        do echo "waiting for broker to become ready";
+        RETRY_TIMES=$((RETRY_TIMES+1));
+        if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
+        sleep 10;
         done
