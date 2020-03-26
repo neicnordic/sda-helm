@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sda-svc
 version: 0.1
-description: Components for Local EGA installation
+description: Components for Sensitive Data Archive (SDA) installation
 home: http://localega.readthedocs.io
 icon: https://neic.no/assets/images/logo.png
 sources:

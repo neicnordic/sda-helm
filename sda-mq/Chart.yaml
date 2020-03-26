@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sda-mq
 version: 0.1
-description: RabbitMQ component for Local EGA installation
+description: RabbitMQ component for Sensitive Data Archive (SDA) installation
 home: http://localega.readthedocs.io
 icon: https://neic.no/assets/images/logo.png
 sources:

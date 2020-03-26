@@ -1,4 +1,4 @@
-# Default values for localega.
+# Default values for SDA services.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
