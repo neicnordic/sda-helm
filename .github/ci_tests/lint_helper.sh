@@ -2,5 +2,8 @@
 set -e
 
 ## create empty files so the linter won't give an false error
-touch sda-db/files/ca.crt
-touch sda-db/files/server.crt
+
+if [ $1 = "sda-db" ] || [ $1 = "sda-mq" ]; then
+touch $1/files/ca.crt
+touch $1/files/server.crt
+fi
