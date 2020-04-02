@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "sda.fullname" . }}
+  labels:
+    app: {{ template "sda.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: {{ template "sda.fullname" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    role: broker
+spec:
+  replicas: 1
+  updateStrategy: 
+    type: {{ .Values.updateStrategyType }}
+  revisionHistoryLimit: {{ default "3" .Values.revisionHistory }}
+  serviceName: {{ template "sda.fullname" . }}
+  selector:
+    matchLabels:
+      app: {{ template "sda.fullname" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "sda.fullname" . }}
+        role: broker
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+{{- if .Values.podAnnotations }}
+{{ tpl .Values.podAnnotations . | indent 8 }}
+{{- end }}
+    spec:
+    {{- if .Values.rbacEnabled}}
+      serviceAccountName: {{ .Release.Name }}
+    {{- end }}
+      securityContext:
+        runAsUser: 100
+        fsGroup: 101
+    {{- if .Values.persistence.volumePermissions }}
+      initContainers:
+      - name: init-data-chmod
+        image: busybox
+        command:
+          - /bin/sh
+          - cx
+          - |
+            {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
+            mkdir -p {{ .Values.persistence.mountPath }}/data
+            chmod 700 {{ .Values.persistence.mountPath }}/data
+            find {{ .Values.persistence.mountPath }} -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 100:101
+            {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
+        - name: data
+          mountPath: /ega
+        {{- end }}
+    {{- end }}
+      containers:
+      - name: broker
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        securityContext:
+          allowPrivilegeEscalation: false
+        resources:
+{{ toYaml .Values.resources | trim | indent 10 }}
+        env:
+        - name: MQ_USER
+          value: {{ required "The admin username is required" .Values.config.adminUser | quote }}
+        - name: MQ_PASSWORD_HASH
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}
+              key: password_hash
+        - name: CEGA_CONNECTION
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}
+              key: shovel_connection
+        - name: MQ_CA
+          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/ca.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/ca.crt"{{ end }}
+        - name: MQ_SERVER_CERT
+          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/server.crt"{{ end }}
+        - name: MQ_SERVER_KEY
+          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.key" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/server.key"{{ end }}
+        - name: MQ_VERIFY
+          value: {{ include "verifyPeer" . }}
+        - name: MQ_VHOST
+          value: {{ include "vhost" . | quote }}
+        ports:
+        - containerPort: 15672
+          name: management
+          protocol: TCP
+        - containerPort: 5671
+          name: amqp
+        readinessProbe:
+          tcpSocket:
+            port: amqp
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        volumeMounts:
+        - name: data
+          mountPath: "/var/lib/rabbitmq/mnesia"
+        {{- if not .Values.externalPkiService.tlsPath }}
+        - name: tls-certs
+          mountPath: /etc/rabbitmq/tls
+        {{- end }}
+      volumes:
+      {{- if not .Values.externalPkiService.tlsPath }}
+      - name: tls-certs
+        projected:
+          defaultMode: 0440
+          sources:
+          - secret:
+              name: {{ template "sda.fullname" . }}
+              items:
+              - key: ca.crt
+                path: ca.crt
+              - key: server.crt
+                path: server.crt
+              - key: server.key
+                path: server.key
+      {{- end }}
+      - name: data
+  {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim | quote }}
+  {{- else if not .Values.persistence.enabled }}
+        emptyDir: {}
+  {{- else if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app: {{ template "sda.fullname" . }}
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.storageSize }}
+    {{- if .Values.persistence.storageClass }}
+      storageClassName: {{ .Values.persistence.storageClass | quote}}
+    {{- end }}
+  {{- end -}}

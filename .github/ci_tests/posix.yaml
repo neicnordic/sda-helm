@@ -1,0 +1,29 @@
+global:
+  c4ghPath: c4gh
+  jwtPath: jwt
+  tlsPath: tls
+  podSecurityPolicy:
+    create: false
+  archive:
+    s3Url: "https://minio"
+    s3Bucket: "inbox"
+  broker:
+    host: "broker-sda-mq"
+    exchange: "lega"
+    port: 5671
+    verifyHostname: false
+    password: "admin"
+    username: "admin"
+  cega:
+    host: "cega-users"
+    user: "legatest"
+  db:
+    host: "sda-db"
+  elixir:
+    pubKey: "token.pub"
+  inbox:
+    storageType: FileStorage
+    path: "/ega/inbox"
+    user: "lega"
+    existingClaim: inbox-volume
+  log: debug
