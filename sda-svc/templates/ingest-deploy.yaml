@@ -74,9 +74,9 @@ spec:
         - name: BROKER_KEYFILE
           value: "{{ template "tlsPath" . }}/ingest.key"
         - name: BROKER_VERIFY_HOSTNAME
-          value: {{ .Values.global.broker.verifyHostname | quote }}
+          value: "false"
         - name: BROKER_VERIFY_PEER
-          value: "yes"
+          value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: INBOX_STORAGE_DRIVER
       {{- if eq "S3Storage" .Values.global.inbox.storageType }}
           value: S3Storage
