@@ -124,16 +124,8 @@ global:
     pubKey: ""
 
   inbox:
-    brokerRoutingKey: "files.inbox"
     servicePort: 9000
-    storageType: "S3Storage" # S3Storage or FileStorage
-  # The six lines below is only used with S3 backend
-    s3Url: ""
-    s3Bucket: ""
-    s3Region: "us-east-1"
-    s3ChunkSize: 15 # Chunk size in MB > 5
-    s3AccessKey: ""
-    s3SecretKey: ""
+    storageType: "FileStorage"
   # These lines below are only used with FileStorage
     path: "/ega/inbox"
     user: "lega"
