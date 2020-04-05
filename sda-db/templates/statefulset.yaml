@@ -126,7 +126,13 @@ spec:
           mountPath: {{ .Values.persistence.mountPath }}
         - name: tls-certs
           mountPath: /tls
+        - name: tmp
+          mountPath: /tmp
       volumes:
+      - name: tmp
+        emptyDir:
+          medium: Memory
+          sizeLimit: 100Mi
       - name: tls-certs
       {{- if  .Values.externalPkiService.tlsPath }}
         emptyDir:
