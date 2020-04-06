@@ -46,9 +46,9 @@ spec:
           - -cx
           - |
             {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
-            mkdir -p /ega/data
-            chmod 700 /ega/data
-            find /ega -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 70:70
+            mkdir -p {{ .Values.persistence.mountPath }}/data
+            chmod 700 {{ .Values.persistence.mountPath }}/data
+            find {{ .Values.persistence.mountPath }} -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 70:70
             {{- end }}
             {{- if .Values.externalPkiService.tlsPath }}
             /bin/cp {{ .Values.externalPkiService.tlsPath }}/* /tls/ && chown 70:70 /tls/* && chmod 0400 /tls/*
@@ -58,7 +58,7 @@ spec:
         volumeMounts:
         {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
         - name: data
-          mountPath: /ega
+          mountPath: {{ .Values.persistence.mountPath }}
         {{- end }}
         {{- if .Values.externalPkiService.tlsPath }}
         - name: tls-certs
@@ -75,8 +75,8 @@ spec:
         resources:
 {{ toYaml .Values.resources | trim | indent 10 }}
         env:
-        - name: PGDATA
-          value: "{{ .Values.persistence.mountPath }}/data"
+        - name: PGVOLUME
+          value: "{{ .Values.persistence.mountPath }}"
         - name: DB_LEGA_IN_PASSWORD
           valueFrom:
               secretKeyRef:
