@@ -47,6 +47,7 @@ spec:
           - |
             {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
             mkdir -p {{ .Values.persistence.mountPath }}/data
+            mkdir -p {{ .Values.persistence.mountPath }}/ssl
             chmod 700 {{ .Values.persistence.mountPath }}/data
             find {{ .Values.persistence.mountPath }} -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 100:101
             {{- end }}
@@ -55,7 +56,7 @@ spec:
         volumeMounts:
         {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
         - name: data
-          mountPath: /ega
+          mountPath: {{ .Values.persistence.mountPath }}
         {{- end }}
     {{- end }}
       containers:
@@ -80,11 +81,11 @@ spec:
               name: {{ template "sda.fullname" . }}
               key: shovel_connection
         - name: MQ_CA
-          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/ca.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/ca.crt"{{ end }}
+          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/ca.crt" .Values.externalPkiService.tlsPath }}{{ else }}{{ printf "%s/ssl/ca.crt" .Values.persistence.mountPath }}{{ end }}
         - name: MQ_SERVER_CERT
-          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/server.crt"{{ end }}
+          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.crt" .Values.externalPkiService.tlsPath }}{{ else }}{{ printf "%s/ssl/server.crt" .Values.persistence.mountPath }}{{ end }}
         - name: MQ_SERVER_KEY
-          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.key" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/server.key"{{ end }}
+          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.key" .Values.externalPkiService.tlsPath }}{{ else }}{{ printf "%s/ssl/server.key" .Values.persistence.mountPath }}{{ end }}
         - name: MQ_VERIFY
           value: {{ include "verifyPeer" . }}
         - name: MQ_VHOST
@@ -102,10 +103,10 @@ spec:
           periodSeconds: 15
         volumeMounts:
         - name: data
-          mountPath: "/var/lib/rabbitmq/mnesia"
+          mountPath: "{{ .Values.persistence.mountPath }}/mnesia"
         {{- if not .Values.externalPkiService.tlsPath }}
         - name: tls-certs
-          mountPath: /etc/rabbitmq/tls
+          mountPath: "{{ .Values.persistence.mountPath }}/ssl"
         {{- end }}
       volumes:
       {{- if not .Values.externalPkiService.tlsPath }}
