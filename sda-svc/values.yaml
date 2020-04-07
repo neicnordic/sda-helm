@@ -120,6 +120,9 @@ global:
     port: 5432
     sslMode: "verify-full"
 
+  doa:
+    servicePort: 443
+
   elixir:
     pubKey: ""
 
@@ -178,8 +181,6 @@ doa:
     limits:
       memory: "1024Mi"
       cpu: "2000m"
-  port: 8080
-  servicePort: 443
   debugPort: 1234
   logpath: "/tmp/logs"
   keystorePass: "changeit"

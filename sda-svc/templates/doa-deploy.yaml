@@ -5,7 +5,7 @@ metadata:
   name: {{ template "sda.fullname" . }}-doa
   labels:
     role: doa
-    app: {{ template "sda.name" . }}-doa
+    app: {{ template "sda.fullname" . }}-doa
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     component: "{{ .Values.doa.name }}"
     release: {{ .Release.Name }}
@@ -15,12 +15,12 @@ spec:
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
   selector:
     matchLabels:
-      app: {{ template "sda.name" . }}-doa
+      app: {{ template "sda.fullname" . }}-doa
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "sda.name" . }}-doa
+        app: {{ template "sda.fullname" . }}-doa
         role: doa
         release: {{ .Release.Name }}
     spec:
@@ -73,9 +73,15 @@ spec:
           value: "true"
         - name: S3_BUCKET
           value: {{ .Values.global.archive.s3Bucket | quote}}
+        {{- if .Values.global.archive.s3CaFile }}
+        - name: S3_ROOT_CERT_PATH
+          value: "/etc/ssl/certs/java/ca.crt"
+        {{- end }}
       {{- end }}
-        - name: JWT_PUBLIC_KEY_PATH
+      {{- if .Values.global.elixir.pubKey }}
+        - name: PASSPORT_PUBLIC_KEY_PATH
           value: "{{ include "secretsPath" . }}/{{ .Values.global.elixir.pubKey }}"
+      {{- end }}
         - name: KEYSTORE_PATH
           value: "/etc/ssl/certs/java/doa.p12"
         - name: KEYSTORE_PASSWORD
@@ -92,7 +98,7 @@ spec:
           value: "{{ template "c4ghPath" . }}/passphrase"
         ports:
         - name: doa
-          containerPort: {{ .Values.doa.port }}
+          containerPort: 8080
           protocol: TCP
         livenessProbe:
           tcpSocket:
@@ -110,8 +116,10 @@ spec:
         - name: tls-certs
           mountPath: "/etc/ssl/certs/java"
       {{- if not .Values.global.confFile }}
+      {{- if .Values.global.elixir.pubKey }}
         - name: jwt-token
           mountPath: {{ include "secretsPath" . }}
+      {{- end }}
         - name: c4gh-key
           mountPath: {{ template "c4ghPath" . }}
       {{- end }}
@@ -125,6 +133,7 @@ spec:
             secretName: {{ template "sda.fullname" . }}-doa-certs
             defaultMode: 0440
       {{- if not .Values.global.confFile }}
+      {{- if .Values.global.elixir.pubKey }}
         - name: jwt-token
           projected:
             defaultMode: 0440
@@ -134,6 +143,7 @@ spec:
                 items:
                   - key: {{ .Values.global.elixir.pubKey }}
                     path: {{ .Values.global.elixir.pubKey }}
+      {{- end }}
         - name: c4gh-key
           secret:
             secretName: {{ template "sda.fullname" . }}-c4gh

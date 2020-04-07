@@ -8,12 +8,8 @@ metadata:
 spec:
   ports:
   - name: doa
-    port: {{ .Values.doa.servicePort }}
+    port: {{ .Values.global.doa.servicePort }}
     targetPort: doa
-    protocol: TCP
-  - name: debug
-    port: {{ .Values.doa.debugPort }}
-    targetPort: {{ .Values.doa.debugPort }}
     protocol: TCP
   selector:
     app: {{ template "sda.fullname" . }}-doa

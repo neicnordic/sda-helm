@@ -63,6 +63,7 @@ Parameter | Description | Default
 `global.db.passOutgest` | Password used for `data out` services. |`""`
 `global.db.port` | Port that the database is listening on. |`5432`
 `global.db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. |`verify-full`
+`global.doa.serviceport` | Port that the DOA service is accessible on | `443`
 `global.elixir.pubKey` | Public key used to verify Elixir JWT. | `""`
 `global.inbox.brokerRoutingKey` | Routing key the inbox uses when publishing messages. | `files.inbox"`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `9000`
