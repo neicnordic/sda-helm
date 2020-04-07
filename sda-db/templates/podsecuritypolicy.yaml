@@ -12,6 +12,7 @@ spec:
   privileged: false
   allowPrivilegeEscalation: false
   defaultAllowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
   hostNetwork: false
   hostPID: false
   hostIPC: false

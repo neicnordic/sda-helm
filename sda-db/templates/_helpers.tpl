@@ -31,9 +31,9 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "pgInPassword" -}}
-    {{- ternary (randAlphaNum 12) .Values.default.pg_in_password (empty .Values.default.pg_in_password) -}}
+    {{- ternary (randAlphaNum 12) .Values.global.pg_in_password (empty .Values.global.pg_in_password) -}}
 {{- end -}}
 
 {{- define "pgOutPassword" -}}
-    {{- ternary (randAlphaNum 12) .Values.default.pg_out_password (empty .Values.default.pg_out_password) -}}
+    {{- ternary (randAlphaNum 12) .Values.global.pg_out_password (empty .Values.global.pg_out_password) -}}
 {{- end -}}
