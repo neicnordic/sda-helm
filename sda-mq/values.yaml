@@ -1,9 +1,9 @@
 config:
   adminUser: ""
   adminPasswordHash: null
-  verifyPeer: false
+  verifyPeer: true
 # if a different vhost than the default `/` is to be used
-  vhost: ""
+  vhost: "/"
 
 # Upstream shovel recipient
   shovel:
@@ -43,7 +43,6 @@ networkPolicy:
 ##   set, choosing the default provisioner.
 persistence: 
   enabled: true
-  mountPath: /ega
   storageSize: 8Gi
   storageClass: null
   existingClaim: null

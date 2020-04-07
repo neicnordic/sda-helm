@@ -37,7 +37,7 @@ spec:
       securityContext:
         runAsUser: 100
         fsGroup: 101
-    {{- if .Values.persistence.volumePermissions }}
+    {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
       initContainers:
       - name: init-data-chmod
         image: busybox
@@ -45,18 +45,12 @@ spec:
           - /bin/sh
           - cx
           - |
-            {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
-            mkdir -p {{ .Values.persistence.mountPath }}/data
-            chmod 700 {{ .Values.persistence.mountPath }}/data
-            find {{ .Values.persistence.mountPath }} -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 100:101
-            {{- end }}
+            find /data -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 100:101
         securityContext:
           allowPrivilegeEscalation: false
         volumeMounts:
-        {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
         - name: data
-          mountPath: /ega
-        {{- end }}
+          mountPath: /data
     {{- end }}
       containers:
       - name: broker
@@ -79,8 +73,10 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}
               key: shovel_connection
+      {{- if .Values.config.verifyPeer }}
         - name: MQ_CA
           value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/ca.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/ca.crt"{{ end }}
+      {{- end }}
         - name: MQ_SERVER_CERT
           value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/server.crt"{{ end }}
         - name: MQ_SERVER_KEY
@@ -102,7 +98,7 @@ spec:
           periodSeconds: 15
         volumeMounts:
         - name: data
-          mountPath: "/var/lib/rabbitmq/mnesia"
+          mountPath: "/var/lib/rabbitmq/"
         {{- if not .Values.externalPkiService.tlsPath }}
         - name: tls-certs
           mountPath: /etc/rabbitmq/tls

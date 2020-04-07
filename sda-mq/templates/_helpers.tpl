@@ -34,7 +34,7 @@ Create chart name and version as used by the chart label.
   {{ if hasPrefix "/" .Values.config.vhost }}
     {{- .Values.config.vhost -}}
   {{ else }}
-    {{- .Values.config.vhost -}}
+    {{- printf "/%s" .Values.config.vhost -}}
   {{ end }}
 {{- end -}}
 
