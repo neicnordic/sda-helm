@@ -46,9 +46,9 @@ spec:
           - -cx
           - |
             {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
-            mkdir -p /ega/data
-            chmod 700 /ega/data
-            find /ega -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 70:70
+            mkdir -p /psql/data
+            chmod 700 /psql/data
+            find /psql -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 70:70
             {{- end }}
             {{- if .Values.externalPkiService.tlsPath }}
             /bin/cp {{ .Values.externalPkiService.tlsPath }}/* /tls/ && chown 70:70 /tls/* && chmod 0400 /tls/*
@@ -58,7 +58,7 @@ spec:
         volumeMounts:
         {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
         - name: data
-          mountPath: /ega
+          mountPath: /psql
         {{- end }}
         {{- if .Values.externalPkiService.tlsPath }}
         - name: tls-certs
@@ -75,8 +75,6 @@ spec:
         resources:
 {{ toYaml .Values.resources | trim | indent 10 }}
         env:
-        - name: PGDATA
-          value: "{{ .Values.persistence.mountPath }}/data"
         - name: DB_LEGA_IN_PASSWORD
           valueFrom:
               secretKeyRef:
@@ -91,7 +89,7 @@ spec:
           value: /tls/server.crt
         - name: PG_SERVER_KEY
           value: /tls/server.key
-        {{- if .Values.default.verifyPeer }}
+        {{- if .Values.global.verifyPeer }}
         - name: PG_CA
           value: /tls/ca.crt
         - name: PG_VERIFY_PEER
@@ -139,7 +137,7 @@ spec:
           - secret:
               name: {{ template "sda.fullname" . }}
               items:
-              {{- if .Values.default.verifyPeer }}
+              {{- if .Values.global.verifyPeer }}
               - key: ca.crt
                 path: ca.crt
               {{- end }}
