@@ -127,7 +127,7 @@ global:
     pubKey: ""
 
   inbox:
-    servicePort: 9000
+    servicePort: 2222
     storageType: "FileStorage"
   # These lines below are only used with FileStorage
     path: "/ega/inbox"

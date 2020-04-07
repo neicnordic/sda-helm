@@ -66,7 +66,7 @@ Parameter | Description | Default
 `global.doa.serviceport` | Port that the DOA service is accessible on | `443`
 `global.elixir.pubKey` | Public key used to verify Elixir JWT. | `""`
 `global.inbox.brokerRoutingKey` | Routing key the inbox uses when publishing messages. | `files.inbox"`
-`global.inbox.servicePort` | The port that the inbox is accessible via. | `9000`
+`global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
 `global.inbox.storageType` | Storage type for the inbox. |`FileStorage`
 `global.inbox.path` | Path to the mounted `FileStorage` volume. |`/ega/archive`
 `global.inbox.user` | Path to the mounted `FileStorage` volume. |`lega`

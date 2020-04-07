@@ -72,8 +72,6 @@ spec:
           value: {{ include "mqUserInbox" . | quote }}
         - name: BROKER_VHOST
           value: {{ include "brokerVhost" . | quote }}
-        - name: INBOX_PORT
-          value: "8080"
         - name: CEGA_ENDPOINT
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/%s?idType=username" | quote }}
         - name: CEGA_ENDPOINT_CREDS
@@ -91,18 +89,18 @@ spec:
           value: "true"
         ports:
         - name: inbox
-          containerPort: 8080
+          containerPort: 2222
           protocol: TCP
         livenessProbe:
           tcpSocket:
-            port: 8080
+            port: 2222
           initialDelaySeconds: 120
-          periodSeconds: 30
+          periodSeconds: 5
         readinessProbe:
           tcpSocket:
-            port: 8080
+            port: 2222
           initialDelaySeconds: 30
-          periodSeconds: 1
+          periodSeconds: 5
         volumeMounts:
         - name: inbox
           mountPath: "/ega/inbox"
