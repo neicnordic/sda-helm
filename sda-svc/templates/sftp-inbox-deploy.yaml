@@ -6,7 +6,7 @@ metadata:
   name: {{ template "sda.fullname" . }}-inbox
   labels:
     role: inbox
-    app: {{ template "sda.name" . }}
+    app: {{ template "sda.fullname" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     component: {{ .Release.Name }}-inbox
     release: {{ .Release.Name }}
@@ -16,15 +16,15 @@ spec:
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
   selector:
     matchLabels:
-      app: {{ template "sda.name" . }}-inbox
+      app: {{ template "sda.fullname" . }}-inbox
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "sda.name" . }}-inbox
+        app: {{ template "sda.fullname" . }}-inbox
         role: inbox
         release: {{ .Release.Name }}
-        type: sft-inbox
+        type: sftp-inbox
       annotations:
         {{- if not .Values.global.confFile }}
         checksum/config: {{ include (print $.Template.BasePath "/sftp-inbox-secrets.yaml") . | sha256sum }}
@@ -72,8 +72,6 @@ spec:
           value: {{ include "mqUserInbox" . | quote }}
         - name: BROKER_VHOST
           value: {{ include "brokerVhost" . | quote }}
-        - name: INBOX_PORT
-          value: {{ .Values.sftpInbox.port | quote }}
         - name: CEGA_ENDPOINT
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/%s?idType=username" | quote }}
         - name: CEGA_ENDPOINT_CREDS
@@ -91,18 +89,18 @@ spec:
           value: "true"
         ports:
         - name: inbox
-          containerPort: {{ .Values.sftpInbox.port }}
+          containerPort: 2222
           protocol: TCP
         livenessProbe:
           tcpSocket:
-            port: 8080
+            port: 2222
           initialDelaySeconds: 120
-          periodSeconds: 30
+          periodSeconds: 5
         readinessProbe:
           tcpSocket:
-            port: 8080
+            port: 2222
           initialDelaySeconds: 30
-          periodSeconds: 1
+          periodSeconds: 5
         volumeMounts:
         - name: inbox
           mountPath: "/ega/inbox"

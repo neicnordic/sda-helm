@@ -18,7 +18,7 @@ global:
 
 # Deployment can be split into `external` and `internal` components
 # by setting deploymentType to the desired type
-# if left undefined (default) or `all`, all services are deployed.
+# if left undefined or `all`, all services are deployed.
   deploymentType: "all"
 
   ingress:
@@ -96,7 +96,7 @@ global:
     host: ""
     exchange: ""
     port: 5671
-    verifyHostname: false
+    verifyPeer: true
     vhost: "/"
 # This 
     password: ""
@@ -118,22 +118,17 @@ global:
     passIngest: ""
     passOutgest: ""
     port: 5432
-    sslMode: "verify-ca"
+    sslMode: "verify-full"
+
+  doa:
+    servicePort: 443
 
   elixir:
     pubKey: ""
 
   inbox:
-    brokerRoutingKey: "files.inbox"
-    servicePort: 9000
-    storageType: "S3Storage" # S3Storage or FileStorage
-  # The six lines below is only used with S3 backend
-    s3Url: ""
-    s3Bucket: ""
-    s3Region: "us-east-1"
-    s3ChunkSize: 15 # Chunk size in MB > 5
-    s3AccessKey: ""
-    s3SecretKey: ""
+    servicePort: 2222
+    storageType: "FileStorage"
   # These lines below are only used with FileStorage
     path: "/ega/inbox"
     user: "lega"
@@ -186,8 +181,6 @@ doa:
     limits:
       memory: "1024Mi"
       cpu: "2000m"
-  port: 8080
-  servicePort: 8080
   debugPort: 1234
   logpath: "/tmp/logs"
   keystorePass: "changeit"
@@ -245,8 +238,6 @@ s3Inbox:
     limits:
       memory: "1024Mi"
       cpu: "1000m"
-  port: 8000
-  servicePort: 8000
 # Extra annotations to attach to the service pods
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
@@ -265,8 +256,6 @@ sftpInbox:
     limits:
       memory: "256Mi"
       cpu: "250m"
-  port: 9000
-  servicePort: 9000
   keystorePass: "changeit"
   nodeHostname: ""
 # Extra annotations to attach to the pod

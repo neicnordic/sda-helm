@@ -58,9 +58,9 @@ spec:
         - name: BROKER_KEYFILE
           value:  "{{ template "tlsPath" . }}/finalize.key"
         - name: BROKER_VERIFY_HOSTNAME
-          value: {{ .Values.global.broker.verifyHostname | quote }}
+          value: "false"
         - name: BROKER_VERIFY_PEER
-          value:  "yes"
+          value: {{ .Values.global.broker.verifyPeer | quote }}
         {{- if not .Values.global.confFile }}
         - name: BROKER_CONNECTION
           valueFrom:

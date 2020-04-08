@@ -74,9 +74,9 @@ spec:
         - name: BROKER_KEYFILE
           value:  "{{ template "tlsPath" . }}/verify.key"
         - name: BROKER_VERIFY_HOSTNAME
-          value: {{ .Values.global.broker.verifyHostname | quote }}
+          value: "false"
         - name: BROKER_VERIFY_PEER
-          value:  "yes"
+          value: {{ .Values.global.broker.verifyPeer | quote }}
         {{- if not .Values.global.confFile }}
         - name: C4GH_FILE_FILEPATH
           value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.file }}"

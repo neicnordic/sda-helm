@@ -102,13 +102,15 @@ jobs:
         helm repo update
     - name: Install minio
       run: |
-        kubectl create secret generic minio-certs --from-file=LocalEGA-deploy-init/config/certs/s3.ca.crt --from-file=LocalEGA-deploy-init/config/certs/s3.ca.key
+        cp LocalEGA-deploy-init/config/certs/s3.ca.crt public.crt
+        cp LocalEGA-deploy-init/config/certs/s3.ca.key private.key
+        kubectl create secret generic minio-certs --from-file=public.crt --from-file=private.key
         MINIO_ACCESS=$(grep s3_archive_access_key LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         MINIO_SECRET=$(grep s3_archive_secret_key LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install minio \
         --set accessKey=$MINIO_ACCESS,secretKey=$MINIO_SECRET,\
-        tls.enabled=true,tls.publicCrt=s3.ca.crt,tls.privateKey=s3.ca.key,tls.certSecret=minio-certs,\
-        persistence.enabled=false,service.port=443 stable/minio --version 4.0.0
+        tls.enabled=true,tls.certSecret=minio-certs,\
+        persistence.enabled=false,service.port=443 stable/minio --version 5.0.0
     - name: Wait for minio to become ready
       run: |
         RETRY_TIMES=0
