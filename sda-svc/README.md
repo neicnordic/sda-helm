@@ -65,14 +65,24 @@ Parameter | Description | Default
 `global.db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. |`verify-full`
 `global.doa.serviceport` | Port that the DOA service is accessible on | `443`
 `global.elixir.pubKey` | Public key used to verify Elixir JWT. | `""`
+`global.elixir.jwkPath` | Path on the oicdHost where the jwk definitions can be found. | `/oidc/jwk`
+`global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org"`
 `global.inbox.brokerRoutingKey` | Routing key the inbox uses when publishing messages. | `files.inbox"`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
-`global.inbox.storageType` | Storage type for the inbox. |`FileStorage`
+`global.inbox.storageType` | Storage type for the inbox, available options are `S3Storage` and `FileStorage`. |`FileStorage`
 `global.inbox.path` | Path to the mounted `FileStorage` volume. |`/ega/archive`
 `global.inbox.user` | Path to the mounted `FileStorage` volume. |`lega`
 `global.inbox.nfsServer` | URL or IP addres to a NFS server. |`""`
 `global.inbox.nfsPath` | Path on the NFS server for the archive. |`""`
 `global.inbox.existingClaim` | Existing volume to use for the `fileStorage` inbox. | `""`
+`global.inbox.s3Url` | URL to S3 archive instance. |`""`
+`global.inbox.s3Bucket` | S3 archive bucket. |`""`
+`global.inbox.s3Region` | S3 archive region. |`us-east-1`
+`global.inbox.s3ChunkSize` | S3 chunk size in MB. |`15`
+`global.inbox.s3AccessKey` | Access key to S3 archive . |`""`
+`global.inbox.s3SecretKey` | Secret key to S3 archive. |`""`
+`global.inbox.s3CaFile` | CA certificate to use if the S3 archive is internal. |`""`
+`global.inbox.s3ReadyPath` | Endpoint to verify that the archive is respondig. |`""`
 
 ### Credentials
 
@@ -116,6 +126,11 @@ Parameter | Description | Default
 `ingest.imagePullPolicy` | inbox container image pull policy | `Always`
 `ingest.replicaCount` | desired number of ingest workers | `1`
 `ingest.annotations` | Specific annotation for ingest | `{}`
+`s3Inbox.repository` | inbox container image repository | `neicnordic/sda-s3proxy`
+`s3Inbox.imageTag` | inbox container image version | `latest`
+`s3Inbox.imagePullPolicy` | inbox container image pull policy | `Always`
+`s3Inbox.replicaCount`| desired number of verify containers | `1`
+`s3Inbox.annotations` | Specific annotation for verify | `{}`
 `sftpInbox.repository` | inbox container image repository | `neicnordic/sda-inbox-sftp`
 `sftpInbox.imageTag` | inbox container image version | `latest`
 `sftpInbox.imagePullPolicy` | inbox container image pull policy | `Always`

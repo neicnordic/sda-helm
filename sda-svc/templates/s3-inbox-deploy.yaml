@@ -1,0 +1,176 @@
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+{{- if eq "S3Storage" .Values.global.inbox.storageType }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "sda.fullname" . }}-s3inbox
+  labels:
+    role: inbox
+    app: {{ template "sda.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: {{ .Release.Name }}-inbox
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
+  selector:
+    matchLabels:
+      app: {{ template "sda.fullname" . }}-inbox
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "sda.fullname" . }}-inbox
+        role: inbox
+        release: {{ .Release.Name }}
+      annotations:
+        {{- if not .Values.global.confFile }}
+        checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/s3-inbox-secrets.yaml") . | sha256sum }}
+        {{- end }}
+{{- if .Values.global.podAnnotations }}
+{{- tpl .Values.global.podAnnotations . | nindent 8 -}}
+{{- end }}
+{{- if .Values.s3Inbox.annotations }}
+{{- tpl .Values.s3Inbox.annotations . | nindent 8 -}}
+{{- end }}
+    spec:
+    {{- if .Values.global.rbacEnabled }}
+      serviceAccountName: {{ .Release.Name }}
+    {{- end }}
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+      containers:
+      - name: s3inbox
+        image: "{{ .Values.s3Inbox.repository }}:{{ .Values.s3Inbox.imageTag }}"
+        imagePullPolicy: {{ .Values.s3Inbox.imagePullPolicy | quote }}
+        args: ["--log", {{ .Values.global.log | quote }}]
+        securityContext:
+          allowPrivilegeEscalation: false
+        env:
+      {{- if not .Values.global.confFile }}
+        - name: AWS_ACCESSKEY
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-inbox
+                key: s3InboxAccessKey
+        - name: AWS_SECRETKEY
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-inbox
+                key: s3InboxSecretKey
+        - name: BROKER_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-inbox
+                key: mqPassword
+        - name: BROKER_USER
+          value: {{ include "mqUserInbox" . | quote }}
+      {{- end }}
+        - name: AWS_URL
+          value: {{ .Values.global.inbox.s3Url | quote }}
+      {{- if .Values.global.inbox.s3CaFile }}
+        - name: AWS_CACERT
+          value: "{{ include "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}"
+      {{- end }}
+        - name: AWS_REGION
+          value: {{ .Values.global.inbox.s3Region | quote }}
+        - name: AWS_BUCKET
+          value: {{ .Values.global.inbox.s3Bucket | quote }}
+      {{- if .Values.global.inbox.s3ReadyPath }}
+        - name: AWS_READYPATH
+          value: {{ .Values.global.inbox.s3ReadyPath }}
+      {{- end }}
+        - name: BROKER_HOST
+          value: {{ required "A valid  MQ host is required" .Values.global.broker.host | quote }}
+        - name: BROKER_PORT
+          value: {{ .Values.global.broker.port | quote }}
+        - name: BROKER_VHOST
+          value: {{ .Values.global.broker.vhost | quote }}
+        - name: BROKER_EXCHANGE
+          value: {{ .Values.global.broker.exchange | quote }}
+        - name: BROKER_ROUTINGKEY
+          value: "files.inbox"
+        - name: BROKER_SSL
+          value: "true"
+        - name: BROKER_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+        - name: BROKER_VERIFYPEER
+          value: {{ .Values.global.broker.verifyPeer | quote}}
+      {{- if .Values.global.broker.verifyPeer }}
+        - name: BROKER_CLIENTCERT
+          value: {{ include "tlsPath" . }}/inbox.crt
+        - name: BROKER_CLIENTKEY
+          value: {{ include "tlsPath" . }}/inbox.key
+      {{- end }}
+        - name: SERVER_CERT
+          value: {{ include "tlsPath" . }}/inbox.crt
+        - name: SERVER_KEY
+          value: {{ include "tlsPath" . }}/inbox.key
+        {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
+        - name: SERVER_JWTPUBKEYPATH
+          value: {{ include "jwtPath" . }}
+        {{- end }}
+        {{- if and .Values.global.elixir.oidcdHost .Values.global.elixir.jwkPath }}
+        - name: SERVER_JWTPUBKEYURL
+          value: "{{ .Values.global.elixir.oidcdHost }}{{ .Values.global.elixir.jwkPath }}"
+        {{- end }}
+        - name: SERVER_LOG_LEVEL
+          value: {{ .Values.global.log }}
+        ports:
+        - name: inbox
+          containerPort: 8000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        resources:
+{{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
+        volumeMounts:
+      {{- if not .Values.global.pkiService }}
+        - name: tls
+          mountPath: {{ include "tlsPath" . }}
+      {{- end }}
+      {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
+        - name: jwt
+          mountPath: {{ include "jwtPath" . }}
+      {{- end }}
+      volumes:
+      {{- if not .Values.global.pkiService }}
+        - name: tls
+          secret:
+            defaultMode: 0440
+            secretName: {{ template "sda.fullname" . }}-inbox-certs
+      {{- end }}
+      {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
+        - name: jwt
+          projected:
+            defaultMode: 0440
+            sources:
+            - secret:
+                name: {{ template "sda.fullname" . }}-inbox
+                items:
+                {{- if .Values.global.auth.pubKey }}
+                  - key: {{ .Values.global.auth.pubKey }}
+                    path: {{ .Values.global.auth.pubKey }}
+                {{- end }}
+                {{- if .Values.global.elixir.pubKey }}
+                  - key: {{ .Values.global.elixir.pubKey }}
+                    path: {{ .Values.global.elixir.pubKey }}
+                {{- end }}
+      {{- end }}
+      restartPolicy: Always
+{{- end }}
+{{- end }}
