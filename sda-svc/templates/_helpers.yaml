@@ -30,6 +30,19 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "sda.auth.fullname" -}}
+{{- if .Values.auth.fullnameOverride -}}
+{{- .Values.auth.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" .Release.Name .Values.auth.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.auth.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "sda.finalize.fullname" -}}
 {{- if .Values.finalize.fullnameOverride -}}
 {{- .Values.finalize.fullnameOverride | trunc 63 | trimSuffix "-" -}}

@@ -16,8 +16,10 @@ Parameter | Description | Default
 `global.tlsPath` |  | `""`
 `global.deploymentType` | Deployment can be split into `external` and `internal` components, available options are `all`, `external` and `internal`. | `all`
 `global.ingress.deploy` |  | `false`
+`global.ingress.hostName.auth` |  | `""`
 `global.ingress.hostName.doa` |  | `""`
 `global.ingress.hostName.s3Inbox` |  | `""`
+`global.ingress.secretNames.auth` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
 `global.ingress.secretNames.doa` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
 `global.ingress.secretNames.s3Inbox` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
 `global.ingress.issuer` | If cert-manager is set up to request certificates to the ingress endpoints, the configured issuer can be specified to automate certificate configuration for the ingress endpoint. | `""`
@@ -45,6 +47,10 @@ Parameter | Description | Default
 `global.archive.volumeMode` | File mode on the `FileStorage` volume. |`2750`
 `global.archive.nfsServer` | URL or IP addres to a NFS server. |`""`
 `global.archive.nfsPath` | Path on the NFS server for the archive. |`""`
+`global.auth.jwtAlg` | Keytype to sign the JWT, available options are RS265 & ES256, Must match the keytype |`"ES256"`
+`global.auth.jwtKey` | Private key used to sign the JWT. |`""`
+`global.auth.jwtPub` | Public key ues to verify the JWT. |`""`
+`global.auth.useTLS` | Run a TLS secured server. |`true`
 `global.broker.host` | Domain name or IP address to the message broker. |`""`
 `global.broker.exchange` | Exchange to publish messages to. |`""`
 `global.broker.port` | Port for the message broker. |`5671`
@@ -111,6 +117,11 @@ Parameter | Description | Default
 
 Parameter | Description | Default
 --------- | ----------- | -------
+`auth.replicaCount` | desired number of replicas | `1`
+`auth.repository` | dataedge container image repository | `neicnordic/sda-auth`
+`auth.imageTag` | dataedge container image version | `"latest"`
+`autha.imagePullPolicy` | dataedge container image pull policy | `Always`
+`auth.annotations` | Specific annotation for doa | `{}`
 `doa.replicaCount` | desired number of replicas | `1`
 `doa.repository` | dataedge container image repository | `neicnordic/sda-doa`
 `doa.imageTag` | dataedge container image version | `"latest"`
