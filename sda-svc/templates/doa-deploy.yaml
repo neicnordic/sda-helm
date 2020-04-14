@@ -96,6 +96,8 @@ spec:
           value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.file }}"
         - name: CRYPT4GH_PRIVATE_KEY_PASSWORD_PATH
           value: "{{ template "c4ghPath" . }}/passphrase"
+        - name: OPENID_CONFIGURATION_URL
+          value: "{{ .Values.global.elixir.oidcdHost }}/oidc/.well-known/openid-configuration"
         ports:
         - name: doa
           containerPort: 8080
