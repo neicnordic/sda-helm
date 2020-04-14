@@ -1,0 +1,48 @@
+global:
+  c4ghPath: c4gh
+  jwtPath: jwt
+  tlsPath: tls
+  podSecurityPolicy:
+    create: false
+  archive:
+    s3Url: "https://minio"
+    s3Bucket: "archive"
+    s3AccessKey: idDQBxLpXoM8l88l
+    s3SecretKey: ABd6XCIvNWj7JULbrqBf8tB7q9BoHJSc
+  auth:
+    elixirID: DfCieZLuBU
+    elixirSecret: DfCieZLuBU
+    jwtKey: jwt.key
+    jwtPub: token.pub
+    useTLS: False
+  broker:
+    host: "broker-sda-mq"
+    exchange: "lega"
+    vhost: "/"
+    password: "admin"
+    username: "admin"
+  cega:
+    host: "cega-users"
+    user: "legatest"
+    password: 3iSGc5loLN7hu2EwT2Z2CzCT26iUrk3t
+  c4gh:
+    file: c4gh.key
+    passphrase: oaagCP1YgAZeEyl2eJAkHv9lkcWXWFgm
+  db:
+    host: "postgres-sda-db"
+    passIngest: "lega_in"
+    passOutgest: "lega_out"
+  elixir:
+    pubKey: token.pub
+    oidcdHost: "http://oidc-server"
+    jwkPath: ""
+  inbox:
+    storageType: S3Storage
+    # existingClaim: test
+    s3Url: "https://minio"
+    s3Bucket: "archive"
+    s3AccessKey: idDQBxLpXoM8l88l
+    s3SecretKey: ABd6XCIvNWj7JULbrqBf8tB7q9BoHJSc
+    s3CaFile: ca.crt
+    s3ReadyPath: "/minio/health/ready"
+  log: debug
