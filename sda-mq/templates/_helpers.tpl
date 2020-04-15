@@ -30,14 +30,6 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "vhost" -}}
-  {{ if hasPrefix "/" .Values.config.vhost }}
-    {{- .Values.config.vhost -}}
-  {{ else }}
-    {{- printf "/%s" .Values.config.vhost -}}
-  {{ end }}
-{{- end -}}
-
 {{- define "verifyPeer" -}}
   {{ if .Values.config.verifyPeer }}
     {{-  print "verify_peer" -}}

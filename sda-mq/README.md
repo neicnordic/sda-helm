@@ -9,7 +9,7 @@ Parameter | Description | Default
 `config.adminUser` | Username of admin user |`""`
 `config.adminPasswordHash` | Passwordhash for admin user. |`""`
 `config.verifyPeer` | Require client certificates. |`true`
-`config.vhost` | default vhost |`"/"`
+`config.vhost` | default vhost is '/' unless specifically named |`""`
 `config.shovel.host` | Hostname of federated server |`""`
 `config.shovel.pass` | Password to federated server |`""`
 `config.shovel.port` | Port that federated server listens on |`5671`
