@@ -83,8 +83,10 @@ spec:
           value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.key" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/server.key"{{ end }}
         - name: MQ_VERIFY
           value: {{ include "verifyPeer" . }}
+      {{- if .Values.config.vhost }}
         - name: MQ_VHOST
-          value: {{ include "vhost" . | quote }}
+          value: {{ .Values.config.vhost | quote }}
+      {{- end }}
         ports:
         - containerPort: 15672
           name: management

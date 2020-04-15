@@ -3,7 +3,7 @@ config:
   adminPasswordHash: null
   verifyPeer: true
 # if a different vhost than the default `/` is to be used
-  vhost: "/"
+  vhost: ""
 
 # Upstream shovel recipient
   shovel:
@@ -22,7 +22,7 @@ externalPkiService:
 image:
   repository: neicnordic/sda-mq
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # utilize network isolation
 # Make sure you’ve configured a network provider with network policy support.
