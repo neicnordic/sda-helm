@@ -47,7 +47,7 @@ Parameter | Description | Default
 `global.archive.volumeMode` | File mode on the `FileStorage` volume. |`2750`
 `global.archive.nfsServer` | URL or IP addres to a NFS server. |`""`
 `global.archive.nfsPath` | Path on the NFS server for the archive. |`""`
-`global.auth.jwtAlg` | Keytype to sign the JWT, available options are RS265 & ES256, Must match the keytype |`"ES256"`
+`global.auth.jwtAlg` | Key type to sign the JWT, available options are RS265 & ES256, Must match the key type |`"ES256"`
 `global.auth.jwtKey` | Private key used to sign the JWT. |`""`
 `global.auth.jwtPub` | Public key ues to verify the JWT. |`""`
 `global.auth.useTLS` | Run a TLS secured server. |`true`
@@ -71,24 +71,24 @@ Parameter | Description | Default
 `global.db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. |`verify-full`
 `global.doa.serviceport` | Port that the DOA service is accessible on | `443`
 `global.elixir.pubKey` | Public key used to verify Elixir JWT. | `""`
-`global.elixir.jwkPath` | Path on the oicdHost where the jwk definitions can be found. | `/oidc/jwk`
+`global.elixir.jwkPath` | Path on the oicd Host where the JWK definitions can be found. | `/oidc/jwk`
 `global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org"`
 `global.inbox.brokerRoutingKey` | Routing key the inbox uses when publishing messages. | `files.inbox"`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
 `global.inbox.storageType` | Storage type for the inbox, available options are `S3Storage` and `FileStorage`. |`FileStorage`
-`global.inbox.path` | Path to the mounted `FileStorage` volume. |`/ega/archive`
+`global.inbox.path` | Path to the mounted `FileStorage` volume. |`/ega/inbox`
 `global.inbox.user` | Path to the mounted `FileStorage` volume. |`lega`
 `global.inbox.nfsServer` | URL or IP addres to a NFS server. |`""`
-`global.inbox.nfsPath` | Path on the NFS server for the archive. |`""`
+`global.inbox.nfsPath` | Path on the NFS server for the inbox. |`""`
 `global.inbox.existingClaim` | Existing volume to use for the `fileStorage` inbox. | `""`
-`global.inbox.s3Url` | URL to S3 archive instance. |`""`
-`global.inbox.s3Bucket` | S3 archive bucket. |`""`
-`global.inbox.s3Region` | S3 archive region. |`us-east-1`
+`global.inbox.s3Url` | URL to S3 inbox instance. |`""`
+`global.inbox.s3Bucket` | S3 inbox bucket. |`""`
+`global.inbox.s3Region` | S3 inbox region. |`us-east-1`
 `global.inbox.s3ChunkSize` | S3 chunk size in MB. |`15`
-`global.inbox.s3AccessKey` | Access key to S3 archive . |`""`
-`global.inbox.s3SecretKey` | Secret key to S3 archive. |`""`
-`global.inbox.s3CaFile` | CA certificate to use if the S3 archive is internal. |`""`
-`global.inbox.s3ReadyPath` | Endpoint to verify that the archive is respondig. |`""`
+`global.inbox.s3AccessKey` | Access key to S3 inbox . |`""`
+`global.inbox.s3SecretKey` | Secret key to S3 inbox. |`""`
+`global.inbox.s3CaFile` | CA certificate to use if the S3 inbox is internal. |`""`
+`global.inbox.s3ReadyPath` | Endpoint to verify that the inbox is respondig. |`""`
 
 ### Credentials
 
@@ -121,36 +121,36 @@ Parameter | Description | Default
 `auth.repository` | dataedge container image repository | `neicnordic/sda-auth`
 `auth.imageTag` | dataedge container image version | `"latest"`
 `autha.imagePullPolicy` | dataedge container image pull policy | `Always`
-`auth.annotations` | Specific annotation for doa | `{}`
+`auth.annotations` | Specific annotation for the auth pod | `{}`
 `doa.replicaCount` | desired number of replicas | `1`
 `doa.repository` | dataedge container image repository | `neicnordic/sda-doa`
 `doa.imageTag` | dataedge container image version | `"latest"`
 `doa.imagePullPolicy` | dataedge container image pull policy | `Always`
 `doa.keystorePass` | keystore password | `changeit`
-`doa.annotations` | Specific annotation for doa | `{}`
+`doa.annotations` | Specific annotation for the doa pod | `{}`
 `finalize.repository` | inbox container image repository | `neicnordic/sda-base`
 `finalize.imageTag` | inbox container image version | `latest`
 `finalize.imagePullPolicy` | inbox container image pull policy | `Always`
-`finalize.annotations` | Specific annotation for finalize | `{}`
+`finalize.annotations` | Specific annotation for the finalize pod | `{}`
 `ingest.repository` | inbox container image repository | `neicnordic/sda-base`
 `ingest.imageTag` | inbox container image version | `latest`
 `ingest.imagePullPolicy` | inbox container image pull policy | `Always`
 `ingest.replicaCount` | desired number of ingest workers | `1`
-`ingest.annotations` | Specific annotation for ingest | `{}`
-`s3Inbox.repository` | inbox container image repository | `neicnordic/sda-s3proxy`
-`s3Inbox.imageTag` | inbox container image version | `latest`
-`s3Inbox.imagePullPolicy` | inbox container image pull policy | `Always`
-`s3Inbox.replicaCount`| desired number of verify containers | `1`
-`s3Inbox.annotations` | Specific annotation for verify | `{}`
-`sftpInbox.repository` | inbox container image repository | `neicnordic/sda-inbox-sftp`
-`sftpInbox.imageTag` | inbox container image version | `latest`
-`sftpInbox.imagePullPolicy` | inbox container image pull policy | `Always`
-`sftpInbox.replicaCount`| desired number of sftpInbox containers | `1`
-`sftpInbox.keystorePass` | sftpInbox keystore password | `changeit`
+`ingest.annotations` | Specific annotation for the ingest pod | `{}`
+`s3Inbox.repository` | S3inbox container image repository | `neicnordic/sda-s3proxy`
+`s3Inbox.imageTag` | S3inbox container image version | `latest`
+`s3Inbox.imagePullPolicy` | S3inbox container image pull policy | `Always`
+`s3Inbox.replicaCount`| desired number of S3inbox containers | `1`
+`s3Inbox.annotations` | Specific annotation for the S3inbox pod | `{}`
+`sftpInbox.repository` | sftp inbox container image repository | `neicnordic/sda-inbox-sftp`
+`sftpInbox.imageTag` | sftp inbox container image version | `latest`
+`sftpInbox.imagePullPolicy` | sftp inbox container image pull policy | `Always`
+`sftpInbox.replicaCount`| desired number of sftp inbox containers | `1`
+`sftpInbox.keystorePass` | sftp inbox keystore password | `changeit`
 `sftpInbox.nodeHostname` | Node name if the sftp inbox  needs to be deployed on a specific node | `""`
-`sftpInbox.annotations` | Specific annotation for sftpInbox | `{}`
+`sftpInbox.annotations` | Specific annotation for the sftp inbox pod | `{}`
 `verify.repository` | inbox container image repository | `neicnordic/sda-base`
 `verify.imageTag` | inbox container image version | `latest`
 `verify.imagePullPolicy` | inbox container image pull policy | `Always`
 `verify.replicaCount`| desired number of verify containers | `1`
-`verify.annotations` | Specific annotation for verify | `{}`
+`verify.annotations` | Specific annotation for the verify pod | `{}`
