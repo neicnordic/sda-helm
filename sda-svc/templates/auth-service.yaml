@@ -1,0 +1,16 @@
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not  .Values.global.deploymentType) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "sda.fullname" . }}-auth
+  labels:
+    app: {{ template "sda.fullname" . }}-auth
+spec:
+  ports:
+  - name: auth
+    port: {{ ternary 80 443 ( empty .Values.global.auth.useTLS ) }}
+    targetPort: auth
+    protocol: TCP
+  selector:
+    app: {{ template "sda.fullname" . }}-auth
+{{- end }}

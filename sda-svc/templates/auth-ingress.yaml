@@ -1,9 +1,9 @@
 {{- if and (not .Values.global.confFile) (or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType)) (not .Values.global.deploymentType)) }}
-{{- if .Values.global.ingress.deploy }}
+{{- if and .Values.global.ingress.deploy (eq "S3Storage" .Values.global.inbox.storageType) }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "sda.fullname" . }}-doa-ingress
+  name: {{ template "sda.fullname" . }}-auth-ingress
   labels:
     app: {{ template "sda.fullname" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
@@ -21,16 +21,16 @@ metadata:
     {{- end }}
 spec:
   rules:
-  - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.doa }}
+  - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
     http:
       paths:
         - path: "/"
           backend:
-            serviceName: {{ template "sda.fullname" . }}-doa
-            servicePort: 8080
+            serviceName: {{ template "sda.fullname" . }}-auth
+            servicePort: {{ ternary 80 443 ( empty .Values.global.auth.useTLS ) }}
   tls:
   - hosts:
-    - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.doa }}
-    secretName: {{ if .Values.global.ingress.secretNames.doa }}{{ .Values.global.ingress.secretNames.doa }}{{- else }}"{{ template "sda.fullname" . }}-ingress-doa"{{- end }}
+    - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
+    secretName: {{ if .Values.global.ingress.secretNames.auth }}{{ .Values.global.ingress.secretNames.auth }}{{- else }}"{{ template "sda.fullname" . }}-ingress-auth"{{- end }}
 {{- end }}
 {{- end }}

@@ -1,9 +1,9 @@
 {{- if and (not .Values.global.confFile) (or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType)) (not .Values.global.deploymentType)) }}
-{{- if .Values.global.ingress.deploy }}
+{{- if and (eq "S3Storage" .Values.global.inbox.storageType) .Values.global.ingress.deploy }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "sda.fullname" . }}-doa-ingress
+  name: {{ template "sda.fullname" . }}-inbox-ingress
   labels:
     app: {{ template "sda.fullname" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
@@ -21,16 +21,16 @@ metadata:
     {{- end }}
 spec:
   rules:
-  - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.doa }}
+  - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.s3Inbox }}
     http:
       paths:
         - path: "/"
           backend:
-            serviceName: {{ template "sda.fullname" . }}-doa
-            servicePort: 8080
+            serviceName: {{ template "sda.fullname" . }}-inbox
+            servicePort: 443
   tls:
   - hosts:
-    - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.doa }}
-    secretName: {{ if .Values.global.ingress.secretNames.doa }}{{ .Values.global.ingress.secretNames.doa }}{{- else }}"{{ template "sda.fullname" . }}-ingress-doa"{{- end }}
+    - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.s3Inbox }}
+    secretName: {{ if .Values.global.ingress.secretNames.s3Inbox }}{{ .Values.global.ingress.secretNames.s3Inbox }}{{- else }}{{ template "sda.fullname" . }}-ingress-inbox{{- end }}
 {{- end }}
 {{- end }}
