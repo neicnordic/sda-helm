@@ -45,7 +45,6 @@ spec:
       - name: doa
         image: "{{ .Values.doa.repository }}:{{ .Values.doa.imageTag }}"
         imagePullPolicy: {{ .Values.doa.imagePullPolicy | quote }}
-        command: ["java", "-jar", "localega-doa.jar"]
         securityContext:
           allowPrivilegeEscalation: false
         env:
@@ -93,21 +92,25 @@ spec:
           value: "{{ include "secretsPath" . }}/{{ .Values.global.elixir.pubKey }}"
       {{- end }}
         - name: KEYSTORE_PATH
-          value: "/etc/ssl/certs/java/doa.p12"
+          value: {{ ternary "/etc/ssl/certs/java/doa.p12" (printf "%s/doa.p12" .Values.global.secretsPath ) (empty .Values.global.pkiService) }}
         - name: KEYSTORE_PASSWORD
           value: {{ .Values.doa.keystorePass | quote }}
         - name: ROOT_CERT_PATH
-          value: "/etc/ssl/certs/java/ca.crt"
+          value: {{ ternary "/etc/ssl/certs/java/ca.crt" (printf "%s/ca.crt" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
         - name: CERT_PATH
-          value: "/etc/ssl/certs/java/doa.crt"
+          value: {{ ternary "/etc/ssl/certs/java/doa.crt" (printf "%s/doa.crt" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
         - name: CERT_KEY
-          value: "/etc/ssl/certs/java/doa.key.der"
+          value: {{ ternary "/etc/ssl/certs/java/doa.key.der" (printf "%s/doa.der" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
         - name: CRYPT4GH_PRIVATE_KEY_PATH
           value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.file }}"
         - name: CRYPT4GH_PRIVATE_KEY_PASSWORD_PATH
           value: "{{ template "c4ghPath" . }}/passphrase"
         - name: OPENID_CONFIGURATION_URL
           value: "{{ .Values.global.elixir.oidcdHost }}/oidc/.well-known/openid-configuration"
+      {{- if .Values.global.pkiService }}
+        - name: PKI_PATH
+          value: {{ include "secretsPath" . }}
+      {{- end }}
         ports:
         - name: doa
           containerPort: 8080
@@ -125,8 +128,10 @@ spec:
         resources:
 {{ toYaml .Values.doa.resources | trim | indent 10 }}
         volumeMounts:
+      {{- if not .Values.global.pkiService }}
         - name: tls-certs
           mountPath: "/etc/ssl/certs/java"
+      {{- end }}
       {{- if not .Values.global.confFile }}
       {{- if .Values.global.elixir.pubKey }}
         - name: jwt-token
@@ -140,10 +145,12 @@ spec:
           mountPath: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
       volumes:
+      {{- if not .Values.global.pkiService }}
         - name: tls-certs
           secret:
             secretName: {{ template "sda.fullname" . }}-doa-certs
             defaultMode: 0440
+      {{- end }}
       {{- if not .Values.global.confFile }}
       {{- if .Values.global.elixir.pubKey }}
         - name: jwt-token
