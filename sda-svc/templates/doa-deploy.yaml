@@ -24,6 +24,9 @@ spec:
         role: doa
         release: {{ .Release.Name }}
       annotations:
+        {{- if not .Values.global.confFile }}
+        checksum/secret: {{ include (print $.Template.BasePath "/doa-secrets.yaml") . | sha256sum }}
+        {{- end }}
 {{- if .Values.global.podAnnotations }}
 {{- toYaml .Values.global.podAnnotations | nindent 8 -}}
 {{- end }}
