@@ -125,14 +125,23 @@ spec:
           containerPort: {{ ternary 8080 8443 ( empty .Values.global.auth.useTLS ) }}
           protocol: TCP
         livenessProbe:
-          tcpSocket:
+          httpGet:
             port: auth
+            path: /
+            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.auth.useTLS ) }}
+            httpHeaders:
+            - name: Host
+              value: {{ .Values.global.ingress.hostName.auth }}
           initialDelaySeconds: 10
           periodSeconds: 5
         readinessProbe:
-          tcpSocket:
+          httpGet:
             port: auth
-          initialDelaySeconds: 30
+            path: /
+            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.auth.useTLS ) }}
+            httpHeaders:
+            - name: Host
+              value: {{ .Values.global.ingress.hostName.auth }}
           periodSeconds: 5
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
