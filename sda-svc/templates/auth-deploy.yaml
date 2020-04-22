@@ -74,7 +74,7 @@ spec:
               key: cegaSecret
       {{- else }}
         - name: CONF_FILE_PATH
-          value: {{ printf "%s/%s" include "confFile" .Values.global.confFile }}
+          value: {{ include "confFile" . }}
       {{- end }}
         - name: ELIXIR_REDIRECT_URI
           value: "https://{{ .Values.global.ingress.hostName.auth }}/elixir/login"
@@ -95,7 +95,7 @@ spec:
         - name: CEGA_AUTH_URL
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/" | quote }}
         - name: JWT_PRIVATE_KEY
-          value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtkey }}"
+          value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtKey }}"
         - name: JWT_SIGNATURE_ALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
         - name: BIND_ADDRESS
@@ -115,8 +115,10 @@ spec:
           value: "{{ template "tlsPath" . }}/auth.crt"
         - name: KEY_FILE
           value: "{{ template "tlsPath" . }}/auth.key"
+        {{- if .Values.global.auth.cacert }}
         - name: CA_CERTS
           value: "{{ template "tlsPath" . }}/ca.crt"
+        {{- end }}
         {{- end }}
         ports:
         - name: auth
@@ -139,12 +141,12 @@ spec:
         - name: tls
           mountPath: {{ include "tlsPath" . }}
       {{- end }}
-      {{- if .Values.global.auth.jwtkey }}
+      {{- if and .Values.global.auth.jwtkey .Values.global.jwtPath }}
         - name: jwt
           mountPath: {{ include "jwtPath" . }}
       {{- end }}
       volumes:
-      {{- if and .Values.global.auth.jwtKey }}
+      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
         - name: jwt
           projected:
             defaultMode: 0440
