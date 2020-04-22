@@ -127,17 +127,20 @@ spec:
         - name: inbox
           containerPort: 8000
           protocol: TCP
+        - name: liveness-port
+          containerPort: 8001
+          protocol: TCP
         livenessProbe:
           httpGet:
             path: /live
-            port: 8001
-          initialDelaySeconds: 30
-          periodSeconds: 30
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /ready
-            port: 8001
-          initialDelaySeconds: 30
+            port: liveness-port
+          failureThreshold: 1
           periodSeconds: 5
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
