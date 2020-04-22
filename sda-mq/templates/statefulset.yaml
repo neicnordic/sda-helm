@@ -28,7 +28,7 @@ spec:
       annotations:
         checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
 {{- if .Values.podAnnotations }}
-{{ tpl .Values.podAnnotations . | indent 8 }}
+{{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
     {{- if .Values.rbacEnabled}}

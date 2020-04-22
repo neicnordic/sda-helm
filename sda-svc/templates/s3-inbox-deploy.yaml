@@ -30,10 +30,10 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/s3-inbox-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
-{{- tpl .Values.global.podAnnotations . | nindent 8 -}}
+{{- toYaml .Values.global.podAnnotations | nindent 8 -}}
 {{- end }}
 {{- if .Values.s3Inbox.annotations }}
-{{- tpl .Values.s3Inbox.annotations . | nindent 8 -}}
+{{- toYaml .Values.s3Inbox.annotations | nindent 8 -}}
 {{- end }}
     spec:
     {{- if .Values.global.rbacEnabled }}

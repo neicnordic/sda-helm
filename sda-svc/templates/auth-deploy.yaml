@@ -24,6 +24,13 @@ spec:
         app: {{ template "sda.fullname" . }}-auth
         role: auth
         release: {{ .Release.Name }}
+      annotations:
+{{- if .Values.global.podAnnotations }}
+{{- toYaml .Values.global.podAnnotations | nindent 8 -}}
+{{- end }}
+{{- if .Values.auth.annotations }}
+{{- toYaml .Values.auth.annotations | nindent 8 -}}
+{{- end }}
     spec:
     {{- if .Values.global.rbacEnabled}}
       serviceAccountName: {{ .Release.Name }}
