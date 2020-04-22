@@ -17,7 +17,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: "/"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     {{- if .Values.global.ingress.issuer }}
-    certmanager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
+    cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
 spec:
   rules:
