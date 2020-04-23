@@ -37,7 +37,7 @@ spec:
       securityContext:
         runAsUser: 70
         fsGroup: 70
-    {{- if or .Values.persistence.volumePermissions .Values.externalPkiService.tlsPath }}
+    {{- if or .Values.persistence.volumePermissions }}
       initContainers:
       - name: init-data-chmod
         image: busybox
@@ -50,9 +50,6 @@ spec:
             chmod 700 /psql/data
             find /psql -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 70:70
             {{- end }}
-            {{- if .Values.externalPkiService.tlsPath }}
-            /bin/cp {{ .Values.externalPkiService.tlsPath }}/* /tls/ && chown 70:70 /tls/* && chmod 0400 /tls/*
-            {{- end }}
         securityContext:
           allowPrivilegeEscalation: false
         volumeMounts:
@@ -60,16 +57,11 @@ spec:
         - name: data
           mountPath: /psql
         {{- end }}
-        {{- if .Values.externalPkiService.tlsPath }}
-        - name: tls-certs
-          mountPath: /tls
-        {{- end }}
     {{- end }}
       containers:
       - name: postgresql
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-        # command: ["sleep", "3600"]
         securityContext:
           allowPrivilegeEscalation: false
         resources:
@@ -93,7 +85,11 @@ spec:
         - name: PG_CA
           value: {{ .Values.persistence.mountPath }}/tls/CA.crt
         - name: PG_VERIFY_PEER
-          value: "1"
+          value: {{ ternary 1 0 (.Values.global.verifyPeer) | quote }}
+        {{- end }}
+        {{- if .Values.externalPkiService.tlsPath }}
+        - name: PKI_VOLUME_PATH
+          value: {{.Values.externalPkiService.tlsPath }}
         {{- end }}
         ports:
         - containerPort: 5432
@@ -122,15 +118,13 @@ spec:
         volumeMounts:
         - name: data
           mountPath: {{ .Values.persistence.mountPath }}
+      {{- if not .Values.externalPkiService.tlsPath }}
         - name: tls-certs
-          mountPath: /tls
+          mountPath: {{ .Values.persistence.mountPath }}/tls
+      {{- end }}
       volumes:
+    {{- if not .Values.externalPkiService.tlsPath }}
       - name: tls-certs
-      {{- if  .Values.externalPkiService.tlsPath }}
-        emptyDir:
-          medium: Memory
-          sizeLimit: 10Mi
-      {{- else }}
         projected:
           defaultMode: 0440
           sources:
