@@ -16,6 +16,6 @@ Parameter | Description | Default
 
 Certificates should be placed in the `files` folder and named accordingly.
 
-- ca.crt, root ca certificate.
-- server.crt, serer certificate.
-- server.key, server key.
+- CA.crt, root ca certificate.
+- pg.crt, serer certificate.
+- pg.key, server key.

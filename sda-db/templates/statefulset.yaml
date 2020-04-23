@@ -86,12 +86,12 @@ spec:
                 name: {{ template "sda.fullname" . }}
                 key: pgOutPasswd
         - name: PG_SERVER_CERT
-          value: /tls/server.crt
+          value: {{ .Values.persistence.mountPath }}/tls/pg.crt
         - name: PG_SERVER_KEY
-          value: /tls/server.key
+          value: {{ .Values.persistence.mountPath }}/tls/pg.key
         {{- if .Values.global.verifyPeer }}
         - name: PG_CA
-          value: /tls/ca.crt
+          value: {{ .Values.persistence.mountPath }}/tls/CA.crt
         - name: PG_VERIFY_PEER
           value: "1"
         {{- end }}
@@ -138,14 +138,14 @@ spec:
               name: {{ template "sda.fullname" . }}
               items:
               {{- if .Values.global.verifyPeer }}
-              - key: ca.crt
-                path: ca.crt
+              - key: CA.crt
+                path: CA.crt
               {{- end }}
-              - key: server.crt
-                path: server.crt
-              - key: server.key
-                path: server.key
-      {{- end }}
+              - key: pg.crt
+                path: pg.crt
+              - key: pg.key
+                path: pg.key
+    {{- end }}
       - name: data
   {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
         persistentVolumeClaim:
