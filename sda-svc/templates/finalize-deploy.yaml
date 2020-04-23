@@ -82,6 +82,7 @@ spec:
       volumes:
         - name: tls
           secret:
+            defaultMode: 0440
             secretName: {{ template "sda.fullname" . }}-finalize-certs
       {{- end }}
       restartPolicy: Always

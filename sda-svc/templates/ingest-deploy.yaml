@@ -148,6 +148,7 @@ spec:
       {{- if not .Values.global.pkiService }}
         - name: tls
           secret:
+            defaultMode: 0440
             secretName: {{ template "sda.fullname" . }}-ingest-certs
       {{- end }}
       {{- if eq "FileStorage" .Values.global.archive.storageType }}
