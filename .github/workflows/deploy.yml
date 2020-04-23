@@ -290,6 +290,8 @@ jobs:
         for n in doa finalize ingest verify inbox
           do cp LocalEGA-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
+        cp LocalEGA-deploy-init/config/certs/res.ca.crt sda-svc/files/auth.crt
+        cp LocalEGA-deploy-init/config/certs/res.ca.key sda-svc/files/auth.key
     - name: Deploy the SDA stack
       run: |
         CEGA_USERS_PASS=$(grep cega_users_pass LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
@@ -310,7 +312,7 @@ jobs:
     - name: Wait for SDA stack to become ready
       run: |
         RETRY_TIMES=0
-        for p in doa finalize inbox ingest verify
+        for p in auth doa finalize inbox ingest verify
         do
         until kubectl get pods -lrole=$p -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True"
         do echo "waiting for $p to become ready"
