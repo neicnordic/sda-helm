@@ -31,9 +31,9 @@ jobs:
         legainit --cega --config-path LocalEGA-deploy-init/config
     - name: Copy DB certs
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-db/files/ca.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/server.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/server.key
+        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
+        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
+        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
     - name: Deploy SDA database
       run: |
         DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
@@ -191,9 +191,9 @@ jobs:
                  --svc-config .github/ci_tests/svc.conf
     - name: Copy DB certs
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-db/files/ca.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/server.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/server.key
+        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
+        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
+        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
     - name: Deploy SDA database
       run: |
         helm install postgres sda-db \
