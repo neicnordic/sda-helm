@@ -27,7 +27,7 @@ spec:
         - path: "/"
           backend:
             serviceName: {{ template "sda.fullname" . }}-doa
-            servicePort: 8080
+            servicePort: 443
   tls:
   - hosts:
     - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.doa }}
