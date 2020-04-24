@@ -67,11 +67,11 @@ spec:
               name: {{ template "sda.fullname" . }}-inbox
               key: mqPassword
         - name: BROKER_PORT
-          value: {{.Values.global.broker.port | quote }}
+          value: {{ .Values.global.broker.port | quote }}
         - name: BROKER_USERNAME
           value: {{ include "mqUserInbox" . | quote }}
         - name: BROKER_VHOST
-          value: {{ include "brokerVhost" . | quote }}
+          value: {{ .Values.global.broker.vhost | quote }}
         - name: CEGA_ENDPOINT
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/%s?idType=username" | quote }}
         - name: CEGA_ENDPOINT_CREDS
