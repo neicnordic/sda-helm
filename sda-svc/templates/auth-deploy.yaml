@@ -1,4 +1,4 @@
-{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 {{- if eq "S3Storage" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
@@ -109,7 +109,7 @@ spec:
         - name: SECRET_KEY
           value: {{ randAlphaNum 12 | quote }}
         - name: ENABLE_TLS
-          value:  {{ toString .Values.global.auth.useTLS | camelcase | quote }}
+          value: {{ toString .Values.global.auth.useTLS | camelcase | quote }}
         {{- if .Values.global.auth.useTLS }}
         - name: CERT_FILE
           value: "{{ template "tlsPath" . }}/auth.crt"

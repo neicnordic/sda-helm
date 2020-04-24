@@ -1,4 +1,4 @@
-{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 {{- if eq "FileStorage" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
@@ -60,7 +60,7 @@ spec:
         - name: LOGGING_LEVEL_SE_NBIS_LEGA_INBOX
           value: {{ .Values.global.log | quote }}
         - name: BROKER_HOST
-          value: {{ required "A valid  MQ host is required" .Values.global.broker.host | quote }}
+          value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
         - name: BROKER_PASSWORD
           valueFrom:
             secretKeyRef:

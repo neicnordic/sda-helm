@@ -1,4 +1,4 @@
-{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 {{- if eq "S3Storage" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
@@ -90,7 +90,7 @@ spec:
           value: {{ .Values.global.inbox.s3ReadyPath }}
       {{- end }}
         - name: BROKER_HOST
-          value: {{ required "A valid  MQ host is required" .Values.global.broker.host | quote }}
+          value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
         - name: BROKER_PORT
           value: {{ .Values.global.broker.port | quote }}
         - name: BROKER_VHOST

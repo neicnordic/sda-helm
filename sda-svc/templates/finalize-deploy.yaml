@@ -1,4 +1,4 @@
-{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -52,11 +52,11 @@ spec:
           allowPrivilegeEscalation: false
         env:
         - name: BROKER_CACERTFILE
-          value:  "{{ template "tlsPath" . }}/ca.crt"
+          value: "{{ template "tlsPath" . }}/ca.crt"
         - name: BROKER_CERTFILE
-          value:  "{{ template "tlsPath" . }}/finalize.crt"
+          value: "{{ template "tlsPath" . }}/finalize.crt"
         - name: BROKER_KEYFILE
-          value:  "{{ template "tlsPath" . }}/finalize.key"
+          value: "{{ template "tlsPath" . }}/finalize.key"
         - name: BROKER_VERIFY_HOSTNAME
           value: "false"
         - name: BROKER_VERIFY_PEER
