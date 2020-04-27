@@ -1,4 +1,4 @@
-{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 {{- if eq "S3Storage" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
@@ -30,10 +30,10 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/s3-inbox-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
-{{- tpl .Values.global.podAnnotations . | nindent 8 -}}
+{{- toYaml .Values.global.podAnnotations | nindent 8 -}}
 {{- end }}
 {{- if .Values.s3Inbox.annotations }}
-{{- tpl .Values.s3Inbox.annotations . | nindent 8 -}}
+{{- toYaml .Values.s3Inbox.annotations | nindent 8 -}}
 {{- end }}
     spec:
     {{- if .Values.global.rbacEnabled }}
@@ -69,6 +69,9 @@ spec:
                 key: mqPassword
         - name: BROKER_USER
           value: {{ include "mqUserInbox" . | quote }}
+      {{- else }}
+        - name: SERVER_CONFFILE
+          value: {{ include "confFile" .}}
       {{- end }}
         - name: AWS_URL
           value: {{ .Values.global.inbox.s3Url | quote }}
@@ -76,8 +79,10 @@ spec:
         - name: AWS_CACERT
           value: "{{ include "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}"
       {{- end }}
+      {{- if .Values.global.inbox.s3Region }}
         - name: AWS_REGION
           value: {{ .Values.global.inbox.s3Region | quote }}
+      {{- end }}
         - name: AWS_BUCKET
           value: {{ .Values.global.inbox.s3Bucket | quote }}
       {{- if .Values.global.inbox.s3ReadyPath }}
@@ -85,7 +90,7 @@ spec:
           value: {{ .Values.global.inbox.s3ReadyPath }}
       {{- end }}
         - name: BROKER_HOST
-          value: {{ required "A valid  MQ host is required" .Values.global.broker.host | quote }}
+          value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
         - name: BROKER_PORT
           value: {{ .Values.global.broker.port | quote }}
         - name: BROKER_VHOST
@@ -99,7 +104,7 @@ spec:
         - name: BROKER_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
         - name: BROKER_VERIFYPEER
-          value: {{ .Values.global.broker.verifyPeer | quote}}
+          value: {{ .Values.global.broker.verifyPeer | quote }}
       {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
           value: {{ include "tlsPath" . }}/inbox.crt
@@ -110,10 +115,8 @@ spec:
           value: {{ include "tlsPath" . }}/inbox.crt
         - name: SERVER_KEY
           value: {{ include "tlsPath" . }}/inbox.key
-        {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
         - name: SERVER_JWTPUBKEYPATH
           value: {{ include "jwtPath" . }}
-        {{- end }}
         {{- if and .Values.global.elixir.oidcdHost .Values.global.elixir.jwkPath }}
         - name: SERVER_JWTPUBKEYURL
           value: "{{ .Values.global.elixir.oidcdHost }}{{ .Values.global.elixir.jwkPath }}"
@@ -124,17 +127,20 @@ spec:
         - name: inbox
           containerPort: 8000
           protocol: TCP
+        - name: liveness-port
+          containerPort: 8001
+          protocol: TCP
         livenessProbe:
           httpGet:
             path: /live
-            port: 8001
-          initialDelaySeconds: 30
-          periodSeconds: 30
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /ready
-            port: 8001
-          initialDelaySeconds: 30
+            port: liveness-port
+          failureThreshold: 1
           periodSeconds: 5
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}

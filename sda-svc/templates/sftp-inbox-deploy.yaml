@@ -1,4 +1,4 @@
-{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 {{- if eq "FileStorage" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
@@ -60,18 +60,18 @@ spec:
         - name: LOGGING_LEVEL_SE_NBIS_LEGA_INBOX
           value: {{ .Values.global.log | quote }}
         - name: BROKER_HOST
-          value: {{ required "A valid  MQ host is required" .Values.global.broker.host | quote }}
+          value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
         - name: BROKER_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-inbox
               key: mqPassword
         - name: BROKER_PORT
-          value: {{.Values.global.broker.port | quote }}
+          value: {{ .Values.global.broker.port | quote }}
         - name: BROKER_USERNAME
           value: {{ include "mqUserInbox" . | quote }}
         - name: BROKER_VHOST
-          value: {{ include "brokerVhost" . | quote }}
+          value: {{ .Values.global.broker.vhost | quote }}
         - name: CEGA_ENDPOINT
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/%s?idType=username" | quote }}
         - name: CEGA_ENDPOINT_CREDS

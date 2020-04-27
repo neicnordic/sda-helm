@@ -1,4 +1,4 @@
-{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -29,10 +29,10 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/finalize-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
-{{- tpl .Values.global.podAnnotations . | nindent 8 -}}
+{{- toYaml .Values.global.podAnnotations | nindent 8 -}}
 {{- end }}
 {{- if .Values.finalize.annotations }}
-{{- tpl .Values.finalize.annotations . | nindent 8 -}}
+{{- toYaml .Values.finalize.annotations | nindent 8 -}}
 {{- end }}
     spec:
     {{- if .Values.global.rbacEnabled}}
@@ -42,6 +42,20 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+    {{- if .Values.global.pkiPermissions }}
+      initContainers:
+      - name: tls-init
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args: ["/bin/cp /tls-certs/* /tls/ && chown 1000:1000 /tls/* && chmod 0600 /tls/*"]
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /tls-certs
+        - name: tls
+          mountPath: /tls
+    {{- end }}
       containers:
       - name: finalize
         image: "{{ .Values.finalize.repository }}:{{ .Values.finalize.imageTag }}"
@@ -52,11 +66,11 @@ spec:
           allowPrivilegeEscalation: false
         env:
         - name: BROKER_CACERTFILE
-          value:  "{{ template "tlsPath" . }}/ca.crt"
+          value: "{{ template "tlsPath" . }}/ca.crt"
         - name: BROKER_CERTFILE
-          value:  "{{ template "tlsPath" . }}/finalize.crt"
+          value: "{{ template "tlsPath" . }}/finalize.crt"
         - name: BROKER_KEYFILE
-          value:  "{{ template "tlsPath" . }}/finalize.key"
+          value: "{{ template "tlsPath" . }}/finalize.key"
         - name: BROKER_VERIFY_HOSTNAME
           value: "false"
         - name: BROKER_VERIFY_PEER
@@ -75,14 +89,21 @@ spec:
         {{- end }}
         resources:
 {{ toYaml .Values.finalize.resources | trim | indent 10 }}
-      {{- if not .Values.global.pkiService }}
+    {{- if not .Values.global.pkiService }}
         volumeMounts:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
       volumes:
-        - name: tls
+        - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
+            defaultMode: 0440
             secretName: {{ template "sda.fullname" . }}-finalize-certs
+      {{- if .Values.global.pkiPermissions }}
+        - name: tls
+          emptyDir:
+            medium: Memory
+            sizeLimit: 10Mi
       {{- end }}
+    {{- end }}
       restartPolicy: Always
 {{- end }}

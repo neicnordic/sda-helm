@@ -14,7 +14,7 @@ global:
     elixirSecret: DfCieZLuBU
     jwtKey: jwt.key
     jwtPub: token.pub
-    useTLS: False
+    useTLS: true
   broker:
     host: "broker-sda-mq"
     exchange: "lega"
@@ -45,4 +45,7 @@ global:
     s3SecretKey: ABd6XCIvNWj7JULbrqBf8tB7q9BoHJSc
     s3CaFile: ca.crt
     s3ReadyPath: "/minio/health/ready"
+  ingress:
+    hostName:
+      auth: sda-sda-svc-auth
   log: debug

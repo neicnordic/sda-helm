@@ -27,7 +27,7 @@ spec:
     ports:
     - protocol: UDP
       port: 53
-{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) )  (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1

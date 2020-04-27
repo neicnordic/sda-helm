@@ -1,4 +1,4 @@
-{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 {{- if eq "S3Storage" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
@@ -24,6 +24,16 @@ spec:
         app: {{ template "sda.fullname" . }}-auth
         role: auth
         release: {{ .Release.Name }}
+      annotations:
+        {{- if not .Values.global.confFile }}
+        checksum/secret: {{ include (print $.Template.BasePath "/auth-secrets.yaml") . | sha256sum }}
+        {{- end }}
+{{- if .Values.global.podAnnotations }}
+{{- toYaml .Values.global.podAnnotations | nindent 8 -}}
+{{- end }}
+{{- if .Values.auth.annotations }}
+{{- toYaml .Values.auth.annotations | nindent 8 -}}
+{{- end }}
     spec:
     {{- if .Values.global.rbacEnabled}}
       serviceAccountName: {{ .Release.Name }}
@@ -64,7 +74,7 @@ spec:
               key: cegaSecret
       {{- else }}
         - name: CONF_FILE_PATH
-          value: {{ printf "%s/%s" include "confFile" .Values.global.confFile }}
+          value: {{ include "confFile" . }}
       {{- end }}
         - name: ELIXIR_REDIRECT_URI
           value: "https://{{ .Values.global.ingress.hostName.auth }}/elixir/login"
@@ -85,7 +95,7 @@ spec:
         - name: CEGA_AUTH_URL
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/" | quote }}
         - name: JWT_PRIVATE_KEY
-          value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtkey }}"
+          value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtKey }}"
         - name: JWT_SIGNATURE_ALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
         - name: BIND_ADDRESS
@@ -99,28 +109,39 @@ spec:
         - name: SECRET_KEY
           value: {{ randAlphaNum 12 | quote }}
         - name: ENABLE_TLS
-          value:  {{ toString .Values.global.auth.useTLS | camelcase | quote }}
+          value: {{ toString .Values.global.auth.useTLS | camelcase | quote }}
         {{- if .Values.global.auth.useTLS }}
         - name: CERT_FILE
           value: "{{ template "tlsPath" . }}/auth.crt"
         - name: KEY_FILE
           value: "{{ template "tlsPath" . }}/auth.key"
+        {{- if .Values.global.auth.cacert }}
         - name: CA_CERTS
           value: "{{ template "tlsPath" . }}/ca.crt"
+        {{- end }}
         {{- end }}
         ports:
         - name: auth
           containerPort: {{ ternary 8080 8443 ( empty .Values.global.auth.useTLS ) }}
           protocol: TCP
         livenessProbe:
-          tcpSocket:
+          httpGet:
             port: auth
+            path: /
+            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.auth.useTLS ) }}
+            httpHeaders:
+            - name: Host
+              value: {{ .Values.global.ingress.hostName.auth }}
           initialDelaySeconds: 10
           periodSeconds: 5
         readinessProbe:
-          tcpSocket:
+          httpGet:
             port: auth
-          initialDelaySeconds: 30
+            path: /
+            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.auth.useTLS ) }}
+            httpHeaders:
+            - name: Host
+              value: {{ .Values.global.ingress.hostName.auth }}
           periodSeconds: 5
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
@@ -129,12 +150,12 @@ spec:
         - name: tls
           mountPath: {{ include "tlsPath" . }}
       {{- end }}
-      {{- if .Values.global.auth.jwtkey }}
+      {{- if and .Values.global.auth.jwtkey .Values.global.jwtPath }}
         - name: jwt
           mountPath: {{ include "jwtPath" . }}
       {{- end }}
       volumes:
-      {{- if and .Values.global.auth.jwtKey }}
+      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
         - name: jwt
           projected:
             defaultMode: 0440

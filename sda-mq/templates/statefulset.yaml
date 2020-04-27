@@ -28,7 +28,7 @@ spec:
       annotations:
         checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
 {{- if .Values.podAnnotations }}
-{{ tpl .Values.podAnnotations . | indent 8 }}
+{{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
     {{- if .Values.rbacEnabled}}
@@ -43,7 +43,7 @@ spec:
         image: busybox
         command:
           - /bin/sh
-          - cx
+          - -cx
           - |
             find /data -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 100:101
         securityContext:

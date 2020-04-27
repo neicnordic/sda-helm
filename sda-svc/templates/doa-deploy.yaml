@@ -1,4 +1,4 @@
-{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not  .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,6 +23,16 @@ spec:
         app: {{ template "sda.fullname" . }}-doa
         role: doa
         release: {{ .Release.Name }}
+      annotations:
+        {{- if not .Values.global.confFile }}
+        checksum/secret: {{ include (print $.Template.BasePath "/doa-secrets.yaml") . | sha256sum }}
+        {{- end }}
+{{- if .Values.global.podAnnotations }}
+{{- toYaml .Values.global.podAnnotations | nindent 8 -}}
+{{- end }}
+{{- if .Values.doa.annotations }}
+{{- toYaml .Values.doa.annotations | nindent 8 -}}
+{{- end }}
     spec:
     {{- if .Values.global.rbacEnabled}}
       serviceAccountName: {{ .Release.Name }}
@@ -35,7 +45,6 @@ spec:
       - name: doa
         image: "{{ .Values.doa.repository }}:{{ .Values.doa.imageTag }}"
         imagePullPolicy: {{ .Values.doa.imagePullPolicy | quote }}
-        command: ["java", "-jar", "localega-doa.jar"]
         securityContext:
           allowPrivilegeEscalation: false
         env:
@@ -77,27 +86,34 @@ spec:
         - name: S3_ROOT_CERT_PATH
           value: "/etc/ssl/certs/java/ca.crt"
         {{- end }}
+      {{ else }}
+        - name: ARCHIVE_PATH
+          value: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
       {{- if .Values.global.elixir.pubKey }}
         - name: PASSPORT_PUBLIC_KEY_PATH
           value: "{{ include "secretsPath" . }}/{{ .Values.global.elixir.pubKey }}"
       {{- end }}
         - name: KEYSTORE_PATH
-          value: "/etc/ssl/certs/java/doa.p12"
+          value: {{ ternary "/etc/ssl/certs/java/doa.p12" (printf "%s/doa.p12" .Values.global.secretsPath ) (empty .Values.global.pkiService) }}
         - name: KEYSTORE_PASSWORD
           value: {{ .Values.doa.keystorePass | quote }}
         - name: ROOT_CERT_PATH
-          value: "/etc/ssl/certs/java/ca.crt"
+          value: {{ ternary "/etc/ssl/certs/java/ca.crt" (printf "%s/ca.crt" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
         - name: CERT_PATH
-          value: "/etc/ssl/certs/java/doa.crt"
+          value: {{ ternary "/etc/ssl/certs/java/doa.crt" (printf "%s/doa.crt" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
         - name: CERT_KEY
-          value: "/etc/ssl/certs/java/doa.key.der"
+          value: {{ ternary "/etc/ssl/certs/java/doa.key.der" (printf "%s/doa.der" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
         - name: CRYPT4GH_PRIVATE_KEY_PATH
           value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.file }}"
         - name: CRYPT4GH_PRIVATE_KEY_PASSWORD_PATH
           value: "{{ template "c4ghPath" . }}/passphrase"
         - name: OPENID_CONFIGURATION_URL
           value: "{{ .Values.global.elixir.oidcdHost }}/oidc/.well-known/openid-configuration"
+      {{- if .Values.global.pkiService }}
+        - name: PKI_PATH
+          value: {{ include "secretsPath" . }}
+      {{- end }}
         ports:
         - name: doa
           containerPort: 8080
@@ -115,8 +131,10 @@ spec:
         resources:
 {{ toYaml .Values.doa.resources | trim | indent 10 }}
         volumeMounts:
+      {{- if not .Values.global.pkiService }}
         - name: tls-certs
           mountPath: "/etc/ssl/certs/java"
+      {{- end }}
       {{- if not .Values.global.confFile }}
       {{- if .Values.global.elixir.pubKey }}
         - name: jwt-token
@@ -130,10 +148,12 @@ spec:
           mountPath: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
       volumes:
+      {{- if not .Values.global.pkiService }}
         - name: tls-certs
           secret:
             secretName: {{ template "sda.fullname" . }}-doa-certs
             defaultMode: 0440
+      {{- end }}
       {{- if not .Values.global.confFile }}
       {{- if .Values.global.elixir.pubKey }}
         - name: jwt-token
