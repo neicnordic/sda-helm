@@ -86,6 +86,9 @@ spec:
         - name: S3_ROOT_CERT_PATH
           value: "/etc/ssl/certs/java/ca.crt"
         {{- end }}
+      {{ else }}
+        - name: ARCHIVE_PATH
+          value: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
       {{- if .Values.global.elixir.pubKey }}
         - name: PASSPORT_PUBLIC_KEY_PATH
