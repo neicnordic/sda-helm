@@ -71,6 +71,7 @@ global:
 
 # If an external PKI infrastructure is used set this to true
   pkiService: false
+  pkiPermissions: true
 
 # Assume RBAC is enabled in the cluster
   rbacEnabled: true

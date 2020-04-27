@@ -42,6 +42,20 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+    {{- if .Values.global.pkiPermissions }}
+      initContainers:
+      - name: tls-init
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args: ["/bin/cp /tls-certs/* /tls/ && chown 1000:1000 /tls/* && chmod 0600 /tls/*"]
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /tls-certs
+        - name: tls
+          mountPath: /tls
+    {{- end }}
       containers:
       - name: verify
         image: "{{ .Values.verify.repository }}:{{ .Values.verify.imageTag }}"
@@ -124,12 +138,18 @@ spec:
           mountPath: {{ .Values.global.archive.volumePath | quote }}
         {{- end }}
       volumes:
-      {{- if not .Values.global.pkiService }}
-        - name: tls
+    {{- if not .Values.global.pkiService }}
+        - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440
             secretName: {{ template "sda.fullname" . }}-verify-certs
+      {{- if .Values.global.pkiPermissions }}
+        - name: tls
+          emptyDir:
+            medium: Memory
+            sizeLimit: 10Mi
       {{- end }}
+    {{- end }}
       {{- if not .Values.global.confFile }}
         - name: c4gh
           secret:

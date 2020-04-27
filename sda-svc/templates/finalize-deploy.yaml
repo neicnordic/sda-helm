@@ -42,6 +42,20 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+    {{- if .Values.global.pkiPermissions }}
+      initContainers:
+      - name: tls-init
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args: ["/bin/cp /tls-certs/* /tls/ && chown 1000:1000 /tls/* && chmod 0600 /tls/*"]
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /tls-certs
+        - name: tls
+          mountPath: /tls
+    {{- end }}
       containers:
       - name: finalize
         image: "{{ .Values.finalize.repository }}:{{ .Values.finalize.imageTag }}"
@@ -75,15 +89,21 @@ spec:
         {{- end }}
         resources:
 {{ toYaml .Values.finalize.resources | trim | indent 10 }}
-      {{- if not .Values.global.pkiService }}
+    {{- if not .Values.global.pkiService }}
         volumeMounts:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
       volumes:
-        - name: tls
+        - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440
             secretName: {{ template "sda.fullname" . }}-finalize-certs
+      {{- if .Values.global.pkiPermissions }}
+        - name: tls
+          emptyDir:
+            medium: Memory
+            sizeLimit: 10Mi
       {{- end }}
+    {{- end }}
       restartPolicy: Always
 {{- end }}
