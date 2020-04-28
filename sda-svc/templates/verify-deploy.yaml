@@ -161,9 +161,14 @@ spec:
       {{- end }}
       {{- if eq "FileStorage" .Values.global.archive.storageType }}
         - name: archive
+        {{- if .Values.global.archive.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.archive.existingClaim }}
+        {{- else }}
           nfs:
             server: {{ required "An archive NFS server is required" .Values.global.archive.nfsServer | quote }}
             path: {{ if .Values.global.archive.nfsPath }}{{ .Values.global.archive.nfsPath | quote }}{{ else }}{{ "/" }}{{ end }}
+        {{- end }}
       {{- end }}
       restartPolicy: Always
 {{- end }}
