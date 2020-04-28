@@ -5,8 +5,8 @@ global:
   podSecurityPolicy:
     create: false
   archive:
-    s3Url: "https://minio"
-    s3Bucket: "inbox"
+    storageType: FileStorage
+    existingClaim: archive-volume
   broker:
     host: "broker-sda-mq"
     exchange: "lega"
