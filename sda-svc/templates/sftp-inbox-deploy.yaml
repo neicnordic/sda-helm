@@ -91,9 +91,13 @@ spec:
         - name: inbox
           containerPort: 2222
           protocol: TCP
+        - name: liveness-port
+          containerPort: 8080
+          protocol: TCP
         livenessProbe:
-          tcpSocket:
-            port: 2222
+          httpGet:
+            path: /healthcheck
+            port: liveness-port
           initialDelaySeconds: 120
           periodSeconds: 5
         readinessProbe:
