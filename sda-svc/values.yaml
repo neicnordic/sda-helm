@@ -93,6 +93,7 @@ global:
     s3Port: 443
   # The two lines below is only used with FileStorage
     volumePath: "/ega/archive"
+    volumeUser: lega
     volumeMode: 2750
     nfsServer: ""
     nfsPath: ""

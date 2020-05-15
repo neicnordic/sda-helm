@@ -88,7 +88,7 @@ spec:
         {{- end }}
       {{ else }}
         - name: ARCHIVE_PATH
-          value: {{ .Values.global.archive.volumePath | quote }}
+          value: "{{ .Values.global.archive.volumePath }}/{{ .Values.global.archive.volumeUser }}"
       {{- end }}
       {{- if .Values.global.elixir.pubKey }}
         - name: PASSPORT_PUBLIC_KEY_PATH
