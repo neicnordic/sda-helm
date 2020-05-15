@@ -114,6 +114,8 @@ spec:
         - name: PKI_PATH
           value: {{ include "secretsPath" . }}
       {{- end }}
+        - name: LOG_PATH
+          value: "/logs"
         ports:
         - name: doa
           containerPort: 8080
@@ -131,6 +133,10 @@ spec:
         resources:
 {{ toYaml .Values.doa.resources | trim | indent 10 }}
         volumeMounts:
+        - name: logs
+          mountPath: "/logs"
+        - name: tmp
+          mountPath: "/tmp"
       {{- if not .Values.global.pkiService }}
         - name: tls-certs
           mountPath: "/etc/ssl/certs/java"
@@ -148,6 +154,10 @@ spec:
           mountPath: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
       volumes:
+        - name: logs
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
       {{- if not .Values.global.pkiService }}
         - name: tls-certs
           secret:
