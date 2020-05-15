@@ -87,6 +87,8 @@ spec:
           value: "PKCS12"
         - name: USE_SSL
           value: "true"
+        - name: LOG_PATH
+          value: "/logs"
         ports:
         - name: inbox
           containerPort: 2222
@@ -104,6 +106,10 @@ spec:
         volumeMounts:
         - name: inbox
           mountPath: "/ega/inbox"
+        - name: logs
+          mountPath: "/logs"
+        - name: tmp
+          mountPath: "/tmp"
         - name: tls
           mountPath: "/etc/ssl/certs/java"
       volumes:
