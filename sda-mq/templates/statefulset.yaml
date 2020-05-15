@@ -10,7 +10,7 @@ metadata:
     heritage: {{ .Release.Service }}
     role: broker
 spec:
-  replicas: 1
+  replicas: 3
   updateStrategy: 
     type: {{ .Values.updateStrategyType }}
   revisionHistoryLimit: {{ default "3" .Values.revisionHistory }}
@@ -31,6 +31,16 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: "app"
+                  operator: In
+                  values:
+                  - {{ template "sda.fullname" . }}
+            topologyKey: "kubernetes.io/hostname"
     {{- if .Values.rbacEnabled}}
       serviceAccountName: {{ .Release.Name }}
     {{- end }}
