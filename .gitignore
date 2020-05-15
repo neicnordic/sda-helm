@@ -1,0 +1,6 @@
+*.key
+*.crt
+*.der
+*.p12
+cacerts
+install.yaml
