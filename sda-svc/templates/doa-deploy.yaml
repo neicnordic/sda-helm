@@ -56,6 +56,8 @@ spec:
           value: {{ required "A database name is required" .Values.global.db.name | quote }}
         - name: POSTGRES_USER
           value: {{ include "dbUserDoa" . | quote }}
+        - name: SSL_MODE
+          value: {{ .Values.global.db.sslMode | quote }}
         - name: POSTGRES_PASSWORD
           valueFrom:
               secretKeyRef:
