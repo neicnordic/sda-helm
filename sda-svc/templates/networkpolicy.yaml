@@ -51,7 +51,7 @@ spec:
         matchLabels:
           role: broker
     ports:
-    - protocol: tcp
+    - protocol: TCP
       port: 5432
     {{- if .Values.global.networkPolicy.databaseNamespace }}
     - namespaceSelector:
@@ -62,7 +62,7 @@ spec:
         matchLabels:
           role: database
     ports:
-    - protocol: tcp
+    - protocol: TCP
       port: 5432
 ---
 {{- end }}
