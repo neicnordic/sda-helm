@@ -100,8 +100,6 @@ spec:
           value: {{ required "S3 inbox bucket missing" .Values.global.inbox.s3Bucket }}
         - name: INBOX_S3_REGION
           value: {{ default "us-east-1" .Values.global.inbox.s3Region }}
-        - name: INBOX_S3_CHUNK_SIZE
-          value: {{ .Values.global.inbox.s3ChunkSize | mul 1048576 | quote }}
       {{- else }}
           value: "FileStorage"
         - name: INBOX_LOCATION

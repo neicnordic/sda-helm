@@ -151,7 +151,6 @@ global:
   # These lines below are only used with S3Storage
     s3Url: ""
     s3Bucket: "inbox"
-    s3ChunkSize: 15 # Chunk size in MB > 5
     s3AccessKey: null
     s3SecretKey: null
     s3CaFile: null
