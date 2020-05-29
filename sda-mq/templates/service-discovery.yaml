@@ -1,0 +1,33 @@
+{{- if .Values.ha.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "sda.fullname" . }}-discovery
+  #name: rabbitmq
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "sda.fullname" . }}
+    component: {{ template "sda.fullname" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  clusterIP: None
+  ports:
+    - name: http
+      protocol: TCP
+      port: 15672
+      targetPort: http
+    - name: amqp
+      protocol: TCP
+      port: 5671
+      targetPort: amqp
+    - name: epmd
+      protocol: TCP
+      port: 4369
+      targetPort: epmd
+  publishNotReadyAddresses: true
+  selector:
+    app: {{ template "sda.fullname" . }}
+    release: {{ .Release.Name }}
+  type: ClusterIP
+{{- end }}
