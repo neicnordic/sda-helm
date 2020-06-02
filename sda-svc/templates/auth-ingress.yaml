@@ -19,6 +19,7 @@ metadata:
     {{- if .Values.global.ingress.issuer }}
     cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
+    nginx.ingress.kubernetes.io/limit-rpm: "60"
 spec:
   rules:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
