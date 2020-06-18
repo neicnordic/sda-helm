@@ -118,6 +118,9 @@ global:
     host: ""
     ip: ""
     durable: true
+    external: false
+    host: ""
+    ip: ""
     exchange: ""
     host: ""
     password: ""
