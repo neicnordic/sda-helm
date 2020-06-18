@@ -29,7 +29,9 @@ image:
 # There are a number of network providers that support NetworkPolicy, including:
 # Calico, Cilium, Kube-router, Romana and Weave Net
 networkPolicy:
-  create: false
+  create: true
+  internalNamespace: "sda-internal"
+
 # App labels that are allowed to connect to the database
 # This should be a multi-line string mapping directly to the a map of
 # the podselector of the network policy

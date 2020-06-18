@@ -31,20 +31,26 @@ spec:
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: {{ template "sda.fullname" . }}
+  name: int-broker-policy
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
     matchLabels:
-      app: {{ template "sda.fullname" . }}
+      role: database
   policyTypes:
   - Ingress
-  ingress:
-    - ports:
-      - port: postgres
-    - from:
-      - podSelector:
-          matchLabels:
-{{ .Values.networkPolicy.matchLabels | trim | indent 12 }}
+  Ingress:
+  - to:
+    {{- if .Values.networkPolicy.internalNamespace }}
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Values.networkPolicy.internalNamespace }}
+    {{- end }}
+    - podSelector:
+        matchLabels:
+          networkpolicy: int-service
+    ports:
+    - protocol: TCP
+      port: 5432
 ---
 {{- end }}

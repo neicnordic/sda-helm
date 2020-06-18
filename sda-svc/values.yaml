@@ -44,11 +44,11 @@ global:
 # There are a number of network providers that support NetworkPolicy, including:
 # Calico, Cilium, Kube-router, Romana and Weave Net
   networkPolicy:
-    create: false
-    brokerNamespace: ""
-    databaseNamespace: ""
-    externalNamespace: ""
-    internalNamespace: ""
+    create: true
+    brokerNamespace: "mq"
+    databaseNamespace: "db"
+    externalNamespace: "sda-external"
+    internalNamespace: "sda-internal"
 
 
   persistence: 
@@ -105,7 +105,9 @@ global:
     useTLS: true
 
   broker:
+    external: false
     host: ""
+    ip: ""
     exchange: ""
     port: 5671
     verifyPeer: true
@@ -125,7 +127,9 @@ global:
     passphrase: ""
 
   db:
+    external: false
     host: ""
+    ip: ""
     name: "lega"
     passIngest: ""
     passOutgest: ""
@@ -157,6 +161,7 @@ global:
     s3CaFile: null
     s3ReadyPath: ""
     s3region: ""
+    allowedips: false
 
 ##################################
 # service specific credentials

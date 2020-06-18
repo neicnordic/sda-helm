@@ -1,4 +1,4 @@
-{{- if .Values.global.networkPolicy.create }}
+{{ if .Values.global.networkPolicy.create }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -32,27 +32,22 @@ spec:
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: {{ template "sda.fullname" . }}-verify
+  name: db-policy
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
     matchLabels:
-      app: {{ template "sda.name" . }}-verify
+      role: verify
+      role: ingest
+      role: finalize
   policyTypes:
   - Egress
   egress:
   - to:
-    {{- if .Values.global.networkPolicy.brokerNamespace }}
-    - namespaceSelector:
-        matchLabels:
-          name: {{ .Values.global.networkPolicy.brokerNamespace }}
-    {{- end }}
-    - podSelector:
-        matchLabels:
-          role: broker
-    ports:
-    - protocol: TCP
-      port: 5432
+  {{- if .Values.global.db.external }}
+    - ipBlock:
+        cidr: {{ .Values.global.db.ip }}/32
+  {{- else }}
     {{- if .Values.global.networkPolicy.databaseNamespace }}
     - namespaceSelector:
         matchLabels:
@@ -61,10 +56,60 @@ spec:
     - podSelector:
         matchLabels:
           role: database
+  {{- end }}
     ports:
     - protocol: TCP
       port: 5432
 ---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: broker-policy
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      role: verify
+      role: ingest
+      role: finalize
+      role: inbox
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+  {{- if .Values.global.broker.external }}
+    - ipBlock:
+        cidr: {{ .Values.global.broker.ip }}/32
+  {{- else }}
+    {{- if .Values.global.networkPolicy.brokerNamespace }}
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Values.global.networkPolicy.brokerNamespace }}
+    {{- end }}
+    - podSelector:
+        matchLabels:
+          role: broker
+  {{- end }}
+    ports:
+    - protocol: TCP
+      port: 5672
+{{- if .Values.global.inbox.ingressips }}
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: inbox-ingress-policy
+  namespace: {{ .Release.Namespace }}
+spec:
+    matchLabels:
+      role: inbox
+  policyTypes:
+  - Ingress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: {{ .Values.global.inbox.ingressips }}
 {{- end }}
-
+---
+{{- end }}
 {{- end }}
