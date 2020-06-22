@@ -118,6 +118,8 @@ spec:
       {{- end }}
         - name: LOG_PATH
           value: "/logs"
+        - name: OUTBOX_ENABLED
+          value: "false"
         ports:
         - name: doa
           containerPort: 8080
