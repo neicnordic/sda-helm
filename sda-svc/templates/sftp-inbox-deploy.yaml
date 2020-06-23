@@ -113,6 +113,10 @@ spec:
         - name: tls
           mountPath: "/etc/ssl/certs/java"
       volumes:
+        - name: logs
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
         - name: inbox
       {{- if .Values.global.inbox.existingClaim }}
           persistentVolumeClaim:
