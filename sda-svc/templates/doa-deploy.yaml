@@ -10,6 +10,7 @@ metadata:
     component: "{{ .Values.doa.name }}"
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    database: allowtraffic
 spec:
   replicas: {{ .Values.doa.replicaCount }}
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
@@ -23,6 +24,7 @@ spec:
         app: {{ template "sda.fullname" . }}-doa
         role: doa
         release: {{ .Release.Name }}
+        database: allowtraffic
       annotations:
         {{- if not .Values.global.confFile }}
         checksum/secret: {{ include (print $.Template.BasePath "/doa-secrets.yaml") . | sha256sum }}

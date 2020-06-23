@@ -10,6 +10,8 @@ metadata:
     component: {{ .Release.Name }}-finalize
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    database: allowtraffic
+    broker: allowtraffic
 spec:
   replicas: 1
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
@@ -23,6 +25,8 @@ spec:
         app: {{ template "sda.name" . }}-finalize
         role: finalize
         release: {{ .Release.Name }}
+        database: allowtraffic
+        broker: allowtraffic
       annotations:
         checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
         {{- if not .Values.global.confFile }}

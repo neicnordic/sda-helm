@@ -31,6 +31,8 @@ image:
 networkPolicy:
   create: true
   internalNamespace: "sda-internal"
+  externalClusterServices: false
+  externalClusterIp: ""
 
 # App labels that are allowed to connect to the database
 # This should be a multi-line string mapping directly to the a map of

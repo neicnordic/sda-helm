@@ -23,7 +23,7 @@ spec:
   - to:
     - namespaceSelector:
         matchLabels:
-          name: kube-system
+          kube-system: networkpolicy
     ports:
     - protocol: UDP
       port: 53
@@ -31,7 +31,7 @@ spec:
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: int-broker-policy
+  name: broker-policy
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
@@ -39,18 +39,23 @@ spec:
       role: broker
   policyTypes:
   - Ingress
-  Ingress:
-  - to:
-    {{- if .Values.networkPolicy.internalNamespace }}
-    - namespaceSelector:
-        matchLabels:
-          name: {{ .Values.networkPolicy.internalNamespace }}
-    {{- end }}
+  ingress:
+  - from:
+  {{- if .Values.externalClusterServices }}
+    - ipBlock:
+        cidr: {{ .Values.externalClusterIp }}
+  {{- else }}
     - podSelector:
         matchLabels:
-          networkpolicy: int-service
+          broker: allowtraffic
+    {{- if .Values.networkPolicy.internalNamespace }}
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: {{ .Values.networkPolicy.internalNamespace }}
+    {{- end }}
+  {{- end }}
     ports:
     - protocol: TCP
-      port: 5672
+      port: {{ .Values.service.port }}
 ---
 {{- end }}

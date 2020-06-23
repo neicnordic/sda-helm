@@ -133,11 +133,12 @@ global:
     name: "lega"
     passIngest: ""
     passOutgest: ""
-    port: 5432
+    servicePort: 5432
     sslMode: "verify-full"
 
   doa:
-    servicePort: 443
+    servicePort: 8080
+    ingressips: "0.0.0.0/0"
 
   elixir:
     pubKey: ""
@@ -162,6 +163,7 @@ global:
     s3ReadyPath: ""
     s3region: ""
     allowedips: false
+    ingressips: "0.0.0.0/0"
 
 ##################################
 # service specific credentials

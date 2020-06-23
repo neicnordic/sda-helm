@@ -22,6 +22,9 @@ image:
 networkPolicy:
   create: true
   internalNamespace: "sda-internal"
+  externalNamespace: "sda-external"
+  externalClusterServices: false
+  externalClusterIp: ""
 # App labels that are allowed to connect to the database
 # This should be a multi-line string mapping directly to the a map of
 # the podselector of the network policy
@@ -49,7 +52,7 @@ persistence:
   #  "key": "value"
 
 # if a port other than the default 5432 is used in the pod set the value here.
-# port: 5432
+#port: 5432
 
 # RBAC is assumed to be enabled in the cluster
 rbacEnabled: true

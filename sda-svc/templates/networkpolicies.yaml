@@ -23,7 +23,7 @@ spec:
   - to:
     - namespaceSelector:
         matchLabels:
-          name: kube-system
+          networkpolicy: kube-system
     ports:
     - protocol: UDP
       port: 53
@@ -37,9 +37,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      role: verify
-      role: ingest
-      role: finalize
+      database: allowtraffic
   policyTypes:
   - Egress
   egress:
@@ -48,18 +46,18 @@ spec:
     - ipBlock:
         cidr: {{ .Values.global.db.ip }}/32
   {{- else }}
-    {{- if .Values.global.networkPolicy.databaseNamespace }}
-    - namespaceSelector:
-        matchLabels:
-          name: {{ .Values.global.networkPolicy.databaseNamespace }}
-    {{- end }}
     - podSelector:
         matchLabels:
           role: database
+    {{- if .Values.global.networkPolicy.databaseNamespace }}
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: database
+    {{- end }}
   {{- end }}
     ports:
     - protocol: TCP
-      port: 5432
+      port: {{ .Values.global.db.servicePort }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -69,10 +67,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      role: verify
-      role: ingest
-      role: finalize
-      role: inbox
+      broker: allowtraffic
   policyTypes:
   - Egress
   egress:
@@ -81,35 +76,52 @@ spec:
     - ipBlock:
         cidr: {{ .Values.global.broker.ip }}/32
   {{- else }}
-    {{- if .Values.global.networkPolicy.brokerNamespace }}
-    - namespaceSelector:
-        matchLabels:
-          name: {{ .Values.global.networkPolicy.brokerNamespace }}
-    {{- end }}
     - podSelector:
         matchLabels:
           role: broker
+    {{- if .Values.global.networkPolicy.brokerNamespace }}
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: broker
+    {{- end }}
   {{- end }}
     ports:
     - protocol: TCP
-      port: 5672
-{{- if .Values.global.inbox.ingressips }}
+      port: {{ .Values.global.broker.port }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: inbox-ingress-policy
+  name: doa-ingress
   namespace: {{ .Release.Namespace }}
 spec:
+  podSelector:
+    matchLabels:
+      role: doa
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: {{ .Values.global.doa.ingressips }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.global.doa.servicePort }}
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: inbox-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
     matchLabels:
       role: inbox
-  policyTypes:
-  - Ingress
-  egress:
-  - to:
+  ingress:
+  - from:
     - ipBlock:
         cidr: {{ .Values.global.inbox.ingressips }}
-{{- end }}
----
+    ports:
+    - protocol: TCP
+      port: {{ .Values.global.inbox.servicePort }}
+
 {{- end }}
 {{- end }}
