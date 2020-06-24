@@ -54,6 +54,14 @@ spec:
           networkpolicy: {{ .Values.networkPolicy.internalNamespace }}
     {{- end }}
   {{- end }}
+    - podSelector:
+        matchLabels:
+          broker: allowtraffic
+    {{- if .Values.networkPolicy.externalNamespace }}
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: {{ .Values.networkPolicy.externalNamespace }}
+    {{- end }}
     ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
