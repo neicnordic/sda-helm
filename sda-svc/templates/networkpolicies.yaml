@@ -27,7 +27,6 @@ spec:
     ports:
     - protocol: UDP
       port: 53
-{{- if or (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -89,6 +88,7 @@ spec:
     - protocol: TCP
       port: {{ .Values.global.broker.port }}
 ---
+{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
@@ -106,6 +106,8 @@ spec:
     - protocol: TCP
       port: {{ .Values.global.doa.servicePort }}
 ---
+{{- end }}
+{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
