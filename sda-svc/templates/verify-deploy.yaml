@@ -125,6 +125,10 @@ spec:
         resources:
 {{ toYaml .Values.verify.resources | trim | indent 10 }}
         volumeMounts:
+        {{- if (.Values.global.log | lower) eq "debug" }}
+        - name: tmp
+          mountPath: /tmp
+        {{- end }}
         {{- if not .Values.global.confFile }}
         - name: c4gh
           mountPath: {{ template "c4ghPath" . }}
@@ -138,6 +142,11 @@ spec:
           mountPath: {{ .Values.global.archive.volumePath | quote }}
         {{- end }}
       volumes:
+    {{- if (.Values.global.log | lower) eq "debug" }}
+        - name: tmp
+          emptyDir:
+            medium: Memory
+    {{- end }}
     {{- if not .Values.global.pkiService }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:

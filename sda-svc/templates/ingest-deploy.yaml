@@ -144,6 +144,10 @@ spec:
         resources:
 {{ toYaml .Values.ingest.resources | trim | indent 10 }}
         volumeMounts:
+      {{- if (.Values.global.log | lower) eq "debug" }}
+        - name: tmp
+          mountPath: /tmp
+      {{- end }}
       {{- if not .Values.global.pkiService }}
         - name: tls
           mountPath: "{{ template "tlsPath" . }}"
@@ -157,6 +161,11 @@ spec:
           mountPath: {{ .Values.global.inbox.path | quote }}
       {{- end }}
       volumes:
+    {{- if (.Values.global.log | lower) eq "debug" }}
+        - name: tmp
+          emptyDir:
+            medium: Memory
+    {{- end }}
     {{- if not .Values.global.pkiService }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
