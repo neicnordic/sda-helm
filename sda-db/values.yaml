@@ -20,10 +20,8 @@ image:
 # There are a number of network providers that support NetworkPolicy, including:
 # Calico, Cilium, Kube-router, Romana and Weave Net
 networkPolicy:
-  create: true
-  internalNamespace: "sda-internal"
-  externalNamespace: "sda-external"
-  externalClusterServices: false
+  create: false
+  twoClusterSetup: false
   externalClusterIp: ""
 # App labels that are allowed to connect to the database
 # This should be a multi-line string mapping directly to the a map of
