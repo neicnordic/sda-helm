@@ -30,6 +30,9 @@ image:
 # Calico, Cilium, Kube-router, Romana and Weave Net
 networkPolicy:
   create: false
+  twoClusterSetup: false
+  externalClusterIp: ""
+
 # App labels that are allowed to connect to the database
 # This should be a multi-line string mapping directly to the a map of
 # the podselector of the network policy

@@ -23,7 +23,7 @@ spec:
   - to:
     - namespaceSelector:
         matchLabels:
-          name: kube-system
+          kube-system: networkpolicy
     ports:
     - protocol: UDP
       port: 53
@@ -31,20 +31,29 @@ spec:
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: {{ template "sda.fullname" . }}
+  name: db-policy
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
     matchLabels:
-      app: {{ template "sda.fullname" . }}
+      role: database
   policyTypes:
   - Ingress
   ingress:
-    - ports:
-      - port: postgres
-    - from:
-      - podSelector:
-          matchLabels:
-{{ .Values.networkPolicy.matchLabels | trim | indent 12 }}
+  - from:
+  {{- if .Values.twoClusterSetup }}
+    - ipBlock:
+        cidr: {{ .Values.externalClusterIp }}
+  {{- else }}
+    - podSelector:
+        matchLabels:
+          broker: allowtraffic
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: sda-internal
+  {{- end }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.service.port }}
 ---
 {{- end }}

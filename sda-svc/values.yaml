@@ -45,10 +45,10 @@ global:
 # Calico, Cilium, Kube-router, Romana and Weave Net
   networkPolicy:
     create: false
-    brokerNamespace: ""
-    databaseNamespace: ""
-    externalNamespace: ""
-    internalNamespace: ""
+    brokerNamespace: "mq"
+    databaseNamespace: "db"
+    externalNamespace: "sda-external"
+    internalNamespace: "sda-internal"
 
 
   persistence: 
@@ -105,7 +105,9 @@ global:
     useTLS: true
 
   broker:
+    external: false
     host: ""
+    ip: ""
     exchange: ""
     port: 5671
     verifyPeer: true
@@ -125,15 +127,18 @@ global:
     passphrase: ""
 
   db:
+    external: false
     host: ""
+    ip: ""
     name: "lega"
     passIngest: ""
     passOutgest: ""
-    port: 5432
+    servicePort: 5432
     sslMode: "verify-full"
 
   doa:
-    servicePort: 443
+    servicePort: 8080
+    ingressips: "0.0.0.0/0"
 
   elixir:
     pubKey: ""
@@ -157,6 +162,8 @@ global:
     s3CaFile: null
     s3ReadyPath: ""
     s3region: ""
+    allowedips: false
+    ingressips: "0.0.0.0/0"
 
 ##################################
 # service specific credentials

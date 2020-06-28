@@ -1,0 +1,129 @@
+{{ if .Values.global.networkPolicy.create }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-access
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          networkpolicy: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: db-policy
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      database: allowtraffic
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+  {{- if .Values.global.db.external }}
+    - ipBlock:
+        cidr: {{ .Values.global.db.ip }}/32
+  {{- else }}
+    - podSelector:
+        matchLabels:
+          role: database
+    {{- if .Values.global.networkPolicy.databaseNamespace }}
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: database
+    {{- end }}
+  {{- end }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.global.db.servicePort }}
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: broker-policy
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      broker: allowtraffic
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+  {{- if .Values.global.broker.external }}
+    - ipBlock:
+        cidr: {{ .Values.global.broker.ip }}/32
+  {{- else }}
+    - podSelector:
+        matchLabels:
+          role: broker
+    {{- if .Values.global.networkPolicy.brokerNamespace }}
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: broker
+    {{- end }}
+  {{- end }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.global.broker.port }}
+---
+{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: doa-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      role: doa
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: {{ .Values.global.doa.ingressips }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.global.doa.servicePort }}
+---
+{{- end }}
+{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: inbox-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      role: inbox
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: {{ .Values.global.inbox.ingressips }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.global.inbox.servicePort }}
+
+{{- end }}
+{{- end }}
