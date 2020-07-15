@@ -28,7 +28,7 @@ spec:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
     http:
       paths:
-        - path: "/{{. Values.global.ingress.path}}"
+        - path: "/{{ .Values.global.ingress.path}}"
           backend:
             serviceName: {{ template "sda.fullname" . }}-auth
             servicePort: {{ ternary 80 443 ( empty .Values.global.auth.useTLS ) }}
