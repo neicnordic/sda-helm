@@ -24,6 +24,7 @@ global:
 
   ingress:
     deploy: false
+    masterMinion: false
     hostName:
       auth: ""
       doa: ""
