@@ -29,7 +29,7 @@ spec:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.s3Inbox }}
     http:
       paths:
-        - path: "/"
+        - path: "/{{. Values.global.ingress.path}}"
           backend:
             serviceName: {{ template "sda.fullname" . }}-inbox
             servicePort: 443
