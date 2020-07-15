@@ -21,6 +21,9 @@ metadata:
     {{- if .Values.global.ingress.issuer }}
     cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
+    {{- if .Values.global.ingress.masterMinion }}
+    nginx.org/mergeable-ingress-type: minion
+    {{- end }}
 spec:
   rules:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.s3Inbox }}
@@ -30,7 +33,7 @@ spec:
           backend:
             serviceName: {{ template "sda.fullname" . }}-inbox
             servicePort: 443
-  {{- if eq "true" .Values.global.ingress.masterMinion }}
+  {{- if not .Values.global.ingress.masterMinion }}
   tls:
   - hosts:
     - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.s3Inbox }}
