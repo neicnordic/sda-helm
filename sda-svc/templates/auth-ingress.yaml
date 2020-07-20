@@ -20,18 +20,23 @@ metadata:
     cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
     nginx.ingress.kubernetes.io/limit-rpm: "60"
+    {{- if .Values.global.ingress.masterMinion }}
+    nginx.org/mergeable-ingress-type: minion
+    {{- end }}
 spec:
   rules:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
     http:
       paths:
-        - path: "/"
+        - path: "/{{ .Values.global.ingress.path}}"
           backend:
             serviceName: {{ template "sda.fullname" . }}-auth
             servicePort: {{ ternary 80 443 ( empty .Values.global.auth.useTLS ) }}
+  {{- if not .Values.global.ingress.masterMinion }}
   tls:
   - hosts:
     - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
     secretName: {{ if .Values.global.ingress.secretNames.auth }}{{ .Values.global.ingress.secretNames.auth }}{{- else }}"{{ template "sda.fullname" . }}-ingress-auth"{{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}
