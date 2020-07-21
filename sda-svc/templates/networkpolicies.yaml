@@ -36,7 +36,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      database: allowtraffic
+      {{ .Values.global.networkPolicy.databaseNamespace }}: allowtraffic
   policyTypes:
   - Egress
   egress:
@@ -51,7 +51,7 @@ spec:
     {{- if .Values.global.networkPolicy.databaseNamespace }}
       namespaceSelector:
         matchLabels:
-          networkpolicy: database
+          networkpolicy: {{ .Values.global.networkPolicy.databaseNamespace }}
     {{- end }}
   {{- end }}
     ports:
@@ -66,7 +66,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      broker: allowtraffic
+      {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
   policyTypes:
   - Egress
   egress:
@@ -81,7 +81,7 @@ spec:
     {{- if .Values.global.networkPolicy.brokerNamespace }}
       namespaceSelector:
         matchLabels:
-          networkpolicy: broker
+          networkpolicy: {{ .Values.global.networkPolicy.brokerNamespace }}
     {{- end }}
   {{- end }}
     ports:

@@ -29,6 +29,7 @@ image:
 # There are a number of network providers that support NetworkPolicy, including:
 # Calico, Cilium, Kube-router, Romana and Weave Net
 networkPolicy:
+  nsprefix: ""
   create: false
   twoClusterSetup: false
   externalClusterIp: ""
