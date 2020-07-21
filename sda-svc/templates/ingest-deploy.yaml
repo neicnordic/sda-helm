@@ -10,8 +10,8 @@ metadata:
     component: {{ .Release.Name }}-ingest
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    database: allowtraffic
-    broker: allowtraffic
+    {{ .Values.global.networkPolicy.databaseNamespace }}: allowtraffic
+    {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
 spec:
   replicas: 1
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
@@ -25,8 +25,8 @@ spec:
         app: {{ template "sda.name" . }}-ingest
         role: ingest
         release: {{ .Release.Name }}
-        database: allowtraffic
-        broker: allowtraffic
+        {{ .Values.global.networkPolicy.databaseNamespace }}: allowtraffic
+        {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
         {{- if not .Values.global.confFile }}
         checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}

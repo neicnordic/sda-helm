@@ -47,14 +47,14 @@ spec:
   {{- else }}
     - podSelector:
         matchLabels:
-          broker: allowtraffic
+          {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       namespaceSelector:
         matchLabels:
           networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-internal
   {{- end }}
     - podSelector:
         matchLabels:
-          broker: allowtraffic
+          {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       namespaceSelector:
         matchLabels:
           networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-external
