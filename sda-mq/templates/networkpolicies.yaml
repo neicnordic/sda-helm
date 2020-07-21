@@ -47,7 +47,7 @@ spec:
   {{- else }}
     - podSelector:
         matchLabels:
-          {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
+          {{ .Values.networkPolicy.nsprefix }}broker: allowtraffic
       namespaceSelector:
         matchLabels:
           networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-internal
@@ -57,7 +57,7 @@ spec:
           {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       namespaceSelector:
         matchLabels:
-          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-external
+          {{ .Values.networkPolicy.nsprefix }}broker: allowtraffic
     ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
