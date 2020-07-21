@@ -47,7 +47,7 @@ spec:
   {{- else }}
     - podSelector:
         matchLabels:
-          {{ .Values.networkPolicy.nsprefix }}database: allowtraffic
+          {{ .Values.networkPolicy.nsprefix }}db: allowtraffic
       namespaceSelector:
         matchLabels:
           networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-internal
