@@ -51,7 +51,7 @@ spec:
     {{- if .Values.global.networkPolicy.databaseNamespace }}
       namespaceSelector:
         matchLabels:
-          networkpolicy: database
+          networkpolicy: {{ .Values.global.networkPolicy.databaseNamespace }}
     {{- end }}
   {{- end }}
     ports:
@@ -81,7 +81,7 @@ spec:
     {{- if .Values.global.networkPolicy.brokerNamespace }}
       namespaceSelector:
         matchLabels:
-          networkpolicy: broker
+          networkpolicy: {{ .Values.global.networkPolicy.brokerNamespace }}
     {{- end }}
   {{- end }}
     ports:

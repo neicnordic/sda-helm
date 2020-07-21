@@ -41,23 +41,23 @@ spec:
   - Ingress
   ingress:
   - from:
-  {{- if .Values.twoClusterSetup }}
+  {{- if .Values.networkPolicy.twoClusterSetup }}
     - ipBlock:
-        cidr: {{ .Values.externalClusterIp }}
+        cidr: {{ .Values.networkPolicy.externalClusterIp }}
   {{- else }}
     - podSelector:
         matchLabels:
           broker: allowtraffic
       namespaceSelector:
         matchLabels:
-          networkpolicy: sda-internal
+          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-internal
   {{- end }}
     - podSelector:
         matchLabels:
           broker: allowtraffic
       namespaceSelector:
         matchLabels:
-          networkpolicy: sda-external
+          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-external
     ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
