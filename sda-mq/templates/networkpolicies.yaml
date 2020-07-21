@@ -54,10 +54,10 @@ spec:
   {{- end }}
     - podSelector:
         matchLabels:
-          {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
+          {{ .Values.networkPolicy.nsprefix }}broker: allowtraffic
       namespaceSelector:
         matchLabels:
-          {{ .Values.networkPolicy.nsprefix }}broker: allowtraffic
+          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-internal
     ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
