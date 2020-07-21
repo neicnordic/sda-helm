@@ -57,7 +57,7 @@ spec:
           {{ .Values.networkPolicy.nsprefix }}mq: allowtraffic
       namespaceSelector:
         matchLabels:
-          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-internal
+          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-external
     ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
