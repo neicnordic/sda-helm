@@ -14,7 +14,7 @@ metadata:
 {{- end }}
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: "/"
+    nginx.ingress.kubernetes.io/rewrite-target: {{ if .Values.global.ingress.masterMinion }}"/$2"{{- else }}"/"{{- end }}
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/limit-rpm: "60"
     {{- if .Values.global.ingress.issuer }}
@@ -28,7 +28,7 @@ spec:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.doa }}
     http:
       paths:
-        - path: "/{{ .Values.global.ingress.path}}"
+        - path: {{ if .Values.global.ingress.masterMinion }}"/{{ .Values.global.ingress.path}}(/|$)(.*)"{{- else }}"/"{{- end }}
           backend:
             serviceName: {{ template "sda.fullname" . }}-doa
             servicePort: 443
