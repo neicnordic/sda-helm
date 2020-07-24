@@ -122,12 +122,15 @@ spec:
                 path: server.key
       {{- end }}
       - name: data
-  {{- if and ( and .Values.persistence.enabled .Values.persistence.existingClaim ) (not .Values.persistence.nfs) }}
+  {{- if .Values.persistence.enabled }}
+    {{- if and .Values.persistence.existingClaim (not .Values.persistence.nfs) }}
         persistentVolumeClaim:
           claimName: {{ .Values.persistence.existingClaim | quote }}
-  {{- else if not .Values.persistence.enabled }}
-        emptyDir: {}
-  {{- else if and ( and .Values.persistence.enabled (not .Values.persistence.existingClaim) ) (not .Values.persistence.nfs) }}
+    {{- else if and (not .Values.persistence.existingClaim) .Values.persistence.nfs }}
+        nfs:
+          server: {{ required "An MQ NFS server is required" .Values.persistence.nfsServer | quote }}
+          path: {{ if .Values.persistence.nfsPath }}{{ .Values.persistence.nfsPath | quote}}{{ else }}{{ "/" }}{{ end }}
+    {{- else if and (not .Values.persistence.existingClaim) (not .Values.persistence.nfs) }}
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -143,8 +146,7 @@ spec:
     {{- if .Values.persistence.storageClass }}
       storageClassName: {{ .Values.persistence.storageClass | quote}}
     {{- end }}
-  {{- else if and .Values.persistence.enabled .Values.persistence.nfs }}
-        nfs:
-          server: {{ required "An MQ NFS server is required" .Values.persistence.nfsServer | quote }}
-          path: {{ if .Values.persistence.nfsPath }}{{ .Values.persistence.nfsPath | quote}}{{ else }}{{ "/" }}{{ end }}
+    {{- end }}
+  {{- else if not .Values.persistence.enabled }}
+        emptyDir: {}
   {{- end -}}
