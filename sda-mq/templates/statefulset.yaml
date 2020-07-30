@@ -57,10 +57,9 @@ spec:
       securityContext:
         runAsUser: 100
         fsGroup: 101
-    {{- if or .Values.persistence.volumePermissions .Values.persistence.enabled }}
+    {{- if or .Values.ha.enabled (and .Values.persistence.volumePermissions .Values.persistence.enabled) }}
       initContainers:
-    {{- end }}
-    {{- if .Values.ha.enabled }}
+      {{- if .Values.ha.enabled }}
       - name: erlang
         image: busybox
         command:
@@ -78,8 +77,8 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
-     {{- end }}
-    {{- if .Values.persistence.volumePermissions }}
+       {{- end }}
+       {{- if and .Values.persistence.volumePermissions .Values.persistence.enabled }}
       - name: init-data-chmod
         image: busybox
         command:
@@ -92,6 +91,7 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+      {{- end }}
     {{- end }}
       containers:
       - name: broker
