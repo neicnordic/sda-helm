@@ -10,11 +10,19 @@ metadata:
     heritage: {{ .Release.Service }}
     role: broker
 spec:
+{{- if .Values.ha.enabled }}
+  replicas: {{ default "3" .Values.ha.replicas }}
+{{- else }}
   replicas: 1
-  updateStrategy: 
+{{- end }}
+  updateStrategy:
     type: {{ .Values.updateStrategyType }}
   revisionHistoryLimit: {{ default "3" .Values.revisionHistory }}
+{{- if .Values.ha.enabled }}
+  serviceName: {{ template "sda.fullname" . }}-discovery
+{{- else }}
   serviceName: {{ template "sda.fullname" . }}
+{{- end }}
   selector:
     matchLabels:
       app: {{ template "sda.fullname" . }}
@@ -31,14 +39,46 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
+    {{- if .Values.ha.enabled }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: "app"
+                  operator: In
+                  values:
+                  - {{ template "sda.fullname" . }}
+            topologyKey: "kubernetes.io/hostname"
+    {{- end }}
     {{- if .Values.rbacEnabled}}
       serviceAccountName: {{ .Release.Name }}
     {{- end }}
       securityContext:
         runAsUser: 100
         fsGroup: 101
-    {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
+    {{- if or .Values.ha.enabled (and .Values.persistence.volumePermissions .Values.persistence.enabled) }}
       initContainers:
+      {{- if .Values.ha.enabled }}
+      - name: erlang
+        image: busybox
+        command:
+          - /bin/sh
+          - -cx
+          - |
+            echo "${RABBITMQ_ERLANG_COOKIE}" > /data/.erlang.cookie
+            chmod 600 /data/.erlang.cookie
+        env:
+        - name: RABBITMQ_ERLANG_COOKIE
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}
+              key: rabbitmq-erlang-cookie
+        volumeMounts:
+        - name: data
+          mountPath: /data
+       {{- end }}
+       {{- if and .Values.persistence.volumePermissions .Values.persistence.enabled }}
       - name: init-data-chmod
         image: busybox
         command:
@@ -51,6 +91,7 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+      {{- end }}
     {{- end }}
       containers:
       - name: broker
@@ -61,6 +102,26 @@ spec:
         resources:
 {{ toYaml .Values.resources | trim | indent 10 }}
         env:
+      {{- if .Values.ha.enabled }}
+        - name: RABBITMQ_ERLANG_COOKIE
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}
+              key: rabbitmq-erlang-cookie
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: RABBITMQ_USE_LONGNAME
+          value: "true"
+        - name: RABBITMQ_NODENAME
+          value: rabbit@$(MY_POD_NAME).{{ template "sda.fullname" . }}-discovery.{{ .Release.Namespace }}.svc.cluster.local
+        - name: K8S_HOSTNAME_SUFFIX
+          value: .{{ template "sda.fullname" . }}-discovery.{{ .Release.Namespace }}.svc.cluster.local
+        - name: K8S_SERVICE_NAME
+          value: {{ template "sda.fullname" . }}-discovery
+      {{- end }}
         - name: MQ_USER
           value: {{ required "The admin username is required" .Values.config.adminUser | quote }}
         - name: MQ_PASSWORD_HASH
@@ -93,6 +154,10 @@ spec:
           protocol: TCP
         - containerPort: 5671
           name: amqp
+      {{- if .Values.ha.enabled }}
+        - containerPort: 4369
+          name: peer-discovery
+      {{- end }}
         readinessProbe:
           tcpSocket:
             port: amqp
