@@ -129,11 +129,13 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}
               key: password_hash
+      {{- if and .Values.config.shovel.host (and .Values.config.shovel.user .Values.config.shovel.pass) }}
         - name: CEGA_CONNECTION
           valueFrom:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}
               key: shovel_connection
+      {{- end }}
       {{- if .Values.config.verifyPeer }}
         - name: MQ_CA
           value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/ca.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/ca.crt"{{ end }}
