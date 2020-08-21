@@ -114,6 +114,16 @@ spec:
           value: "{{ template "c4ghPath" . }}/passphrase"
         - name: OPENID_CONFIGURATION_URL
           value: "{{ .Values.global.elixir.oidcdHost }}/oidc/.well-known/openid-configuration"
+      {{- if .Values.doa.outbox.enabled }}
+        - name: OUTBOX_ENABLED
+          value: {{ .Values.doa.outbox.enabled }}
+        - name: OUTBOX_TYPE
+          value: {{ .Values.doa.outbox.type | quote}}
+        - name: OUTBOX_QUEUE
+          value: {{ .Values.doa.outbox.queue | quote }}
+        - name: OUTBOX_LOCATION
+          value: {{ .Values.doa.outbox.path | quote }}
+      {{- end }}   
       {{- if .Values.global.pkiService }}
         - name: PKI_PATH
           value: {{ include "secretsPath" . }}
