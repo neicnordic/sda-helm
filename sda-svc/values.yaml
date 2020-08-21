@@ -223,6 +223,15 @@ doa:
   debugPort: 1234
   logpath: "/tmp/logs"
   keystorePass: "changeit"
+  outbox:
+    enabled: false
+    # Outbox type can be either S3 or POSIX
+    type: ""
+    # MQ queue name for files/datasets export requests
+    queue: ""
+    # Outbox location with placeholder for the username
+    # 
+    path: ""
 # Extra annotations to attach to the service pods
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
