@@ -141,6 +141,21 @@ global:
   doa:
     servicePort: 8080
     ingressips: "0.0.0.0/0"
+    outbox:
+      enabled: false
+      # MQ queue name for files/datasets export requests
+      queue: ""
+      # Outbox type can be either S3 or POSIX
+      type: ""
+      # Outbox location with placeholder for the username
+      path: ""
+      s3Url: ""
+      s3Port: 443
+      s3Region: ""
+      s3Bucket: ""
+      s3CaFile: null
+      s3AccessKey: null
+      s3SecretKey: null
 
   elixir:
     pubKey: ""
@@ -235,15 +250,6 @@ doa:
   debugPort: 1234
   logpath: "/tmp/logs"
   keystorePass: "changeit"
-  outbox:
-    enabled: false
-    # Outbox type can be either S3 or POSIX
-    type: ""
-    # MQ queue name for files/datasets export requests
-    queue: ""
-    # Outbox location with placeholder for the username
-    # 
-    path: ""
 # Extra annotations to attach to the service pods
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods

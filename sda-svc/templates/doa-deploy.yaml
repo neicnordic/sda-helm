@@ -114,16 +114,43 @@ spec:
           value: "{{ template "c4ghPath" . }}/passphrase"
         - name: OPENID_CONFIGURATION_URL
           value: "{{ .Values.global.elixir.oidcdHost }}/oidc/.well-known/openid-configuration"
-      {{- if .Values.doa.outbox.enabled }}
+      {{- if .Values.global.doa.outbox.enabled }}
         - name: OUTBOX_ENABLED
           value: {{ .Values.doa.outbox.enabled }}
-        - name: OUTBOX_TYPE
-          value: {{ .Values.doa.outbox.type | quote}}
         - name: OUTBOX_QUEUE
-          value: {{ .Values.doa.outbox.queue | quote }}
+          value: {{ .Values.global.doa.outbox.queue | quote }}
+        - name: OUTBOX_TYPE
+          value: {{ .Values.global.doa.outbox.type | quote}}
+        {{- if eq "s3" .Values.global.doa.outbox.type }}
+        - name: S3_OUT_ENDPOINT
+          value: {{ .Values.global.doa.outbox.s3Url | quote}}
+        - name: S3_OUT_PORT
+          value: {{ .Values.global.doa.outbox.s3Port | quote}}
+        - name: S3_OUT_REGION
+          value: {{ .Values.global.doa.outbox.s3Region | quote}}
+        - name: S3_OUT_BUCKET
+          value: {{ .Values.global.doa.outbox.s3Bucket | quote}}
+        - name: S3_OUT_SECURE
+          value: "true"
+        {{- if .Values.global.doa.outbox.s3CaFile }}
+        - name: S3_OUT_ROOT_CERT_PATH
+          value: "/etc/ssl/certs/java/ca.crt"
+        {{- end }}
+        - name: S3_OUT_ACCESS_KEY
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-doa
+                key: s3OutboxAccessKey
+        - name: S3_OUT_SECRET_KEY
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-doa
+                key: s3OutboxAccessKey
+        {{- else }}
         - name: OUTBOX_LOCATION
-          value: {{ .Values.doa.outbox.path | quote }}
-      {{- end }}   
+          value: {{ .Values.global.doa.outbox.path | quote }}
+        {{- end }}
+      {{- end }}
       {{- if .Values.global.pkiService }}
         - name: PKI_PATH
           value: {{ include "secretsPath" . }}
