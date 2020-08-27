@@ -24,8 +24,8 @@ spec:
         role: finalize
         release: {{ .Release.Name }}
       annotations:
+        {{- if not .Values.global.secretsService }}
         checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
-        {{- if not .Values.global.confFile }}
         checksum/config: {{ include (print $.Template.BasePath "/finalize-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
@@ -39,15 +39,15 @@ spec:
       serviceAccountName: {{ .Release.Name }}
     {{- end }}
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
     {{- if .Values.global.pkiPermissions }}
       initContainers:
       - name: tls-init
         image: busybox
         command: ["/bin/sh", "-c"]
-        args: ["/bin/cp /tls-certs/* /tls/ && chown 1000:1000 /tls/* && chmod 0600 /tls/*"]
+        args: ["/bin/cp /tls-certs/* /tls/ && chown 65534:65534 /tls/* && chmod 0600 /tls/*"]
         securityContext:
           allowPrivilegeEscalation: false
         volumeMounts:
@@ -60,36 +60,87 @@ spec:
       - name: finalize
         image: "{{ .Values.finalize.repository }}:{{ .Values.finalize.imageTag }}"
         imagePullPolicy: {{ .Values.finalize.imagePullPolicy | quote }}
-        command: ["ega-finalize"]
-        args: ["--log", {{ .Values.global.log | quote }} {{- if .Values.global.confFile -}} , "--conf", "{{ template "confFile" . }}" {{- end -}}]
+        command: ["sda-finalize"]
         securityContext:
           allowPrivilegeEscalation: false
         env:
-        - name: BROKER_CACERTFILE
-          value: "{{ template "tlsPath" . }}/ca.crt"
-        - name: BROKER_CERTFILE
-          value: "{{ template "tlsPath" . }}/finalize.crt"
-        - name: BROKER_KEYFILE
-          value: "{{ template "tlsPath" . }}/finalize.key"
-        - name: BROKER_VERIFY_HOSTNAME
-          value: "false"
-        - name: BROKER_VERIFY_PEER
+        - name: BROKER_DURABLE
+          value: {{ .Values.global.broker.durable | quote }}
+        - name: BROKER_QUEUE
+          value: "stableIDs"
+        - name: BROKER_HOST
+          value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
+        - name: BROKER_PORT
+          value: {{ .Values.global.broker.port | quote }}
+        - name: BROKER_ROUTINGERROR
+          value: {{ .Values.global.broker.routingError }}
+        - name: BROKER_ROUTINGKEY
+          value: "files.completed"
+        - name: BROKER_VHOST
+          value: {{ .Values.global.broker.vhost | quote }}
+        - name: BROKER_SERVERNAME
+          value: {{ .Values.global.broker.host | quote }}
+        - name: BROKER_SSL
+          value: "true"
+        - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
-        {{- if not .Values.global.confFile }}
-        - name: BROKER_CONNECTION
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-finalize
-              key: mqConnection
-        - name: DB_CONNECTION
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-finalize
-              key: dbConnection
+      {{- if .Values.global.broker.ssl }}
+        - name: BROKER_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+        {{- if .Values.global.broker.verifyPeer }}
+        - name: BROKER_CLIENTCERT
+          value: {{ include "tlsPath" . }}/finalize.crt
+        - name: BROKER_CLIENTKEY
+          value: {{ include "tlsPath" . }}/finalize.key
         {{- end }}
+      {{- end }}
+      {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
+        - name: DB_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+      {{- end }}
+      {{- if eq "verify-full" .Values.global.db.sslMode }}
+        - name: DB_CLIENTCERT
+          value: {{ include "tlsPath" . }}/finalize.crt
+        - name: DB_CLIENTKEY
+          value: {{ include "tlsPath" . }}/finalize.key
+      {{- end }}
+        - name: DB_DATABASE
+          value: {{ default "lega" .Values.global.db.name | quote }}
+        - name: DB_HOST
+          value: {{ required "A valid DB host is required" .Values.global.db.host | quote }}
+        - name: DB_PORT
+          value: {{ .Values.global.db.port | quote }}
+        - name: DB_SSLMODE
+          value: {{ .Values.global.db.sslMode | quote }}
+      {{- if .Values.global.log }}
+        - name: LOG_LEVEL
+          value: {{ .Values.global.logLevel | quote }}
+      {{- end }}
+      {{- if not .Values.global.secretsService }}
+        - name: BROKER_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-finalize
+                key: mqPassword
+        - name: BROKER_USER
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-finalize
+                key: mqUser
+        - name: DB_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-finalize
+                key: dbPassword
+        - name: DB_USER
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-finalize
+                key: dbUser
+      {{- end }}
         resources:
 {{ toYaml .Values.finalize.resources | trim | indent 10 }}
-    {{- if not .Values.global.pkiService }}
+  {{- if not .Values.global.pkiService }}
         volumeMounts:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
