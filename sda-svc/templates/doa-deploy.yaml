@@ -50,6 +50,14 @@ spec:
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: no-oss,LocalEGA
+        - name: BROKER_HOST
+          value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
+        - name: BROKER_PORT
+          value: {{ .Values.global.broker.port | quote }}
+        - name: BROKER_VHOST
+          value: {{ .Values.global.broker.vhost | quote }}
+        - name: BROKER_VALIDATE
+          value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: DB_INSTANCE
           value: {{ required "A valid database host is required" .Values.global.db.host | quote}}
         - name: POSTGRES_DB
