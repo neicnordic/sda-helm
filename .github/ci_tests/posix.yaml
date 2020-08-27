@@ -5,13 +5,13 @@ global:
   podSecurityPolicy:
     create: false
   archive:
-    storageType: FileStorage
+    storageType: posix
     existingClaim: archive-volume
   broker:
     host: "broker-sda-mq"
     exchange: "lega"
     port: 5671
-    verifyHostname: false
+    verifyPeer: true
     password: "admin"
     username: "admin"
   cega:
@@ -22,8 +22,8 @@ global:
   elixir:
     pubKey: "token.pub"
   inbox:
-    storageType: FileStorage
-    path: "/ega/inbox"
+    storageType: posix
+    path: "/inbox"
     user: "lega"
     existingClaim: inbox-volume
   log: debug
