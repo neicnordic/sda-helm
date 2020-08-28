@@ -73,7 +73,7 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-doa
                 key: dbPassword
-      {{- if eq "S3Storage" .Values.global.archive.storageType }}
+      {{- if eq "s3" .Values.global.archive.storageType }}
         - name: S3_ENDPOINT
           value: {{ required "A valid archive S3 URL entry is required!" .Values.global.archive.s3Url | quote }}
         - name: S3_PORT
@@ -200,7 +200,7 @@ spec:
         - name: c4gh-key
           mountPath: {{ template "c4ghPath" . }}
       {{- end }}
-      {{- if eq "FileStorage" .Values.global.archive.storageType }}
+      {{- if eq "posix" .Values.global.archive.storageType }}
         - name: archive
           mountPath: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
@@ -232,7 +232,7 @@ spec:
             secretName: {{ template "sda.fullname" . }}-c4gh
             defaultMode: 0440
       {{- end }}
-      {{- if eq "FileStorage" .Values.global.archive.storageType }}
+      {{- if eq "posix" .Values.global.archive.storageType }}
         - name: archive
           {{- if .Values.global.archive.existingClaim }}
           persistentVolumeClaim:
