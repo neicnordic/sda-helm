@@ -1,5 +1,5 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
-{{- if eq "S3Storage" .Values.global.inbox.storageType }}
+{{- if eq "s3" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -105,11 +105,15 @@ spec:
           value: {{ include "tlsPath" . }}/ca.crt
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
-      {{- if .Values.global.broker.verifyPeer }}
+      {{- if .Values.global.broker.ssl }}
+        - name: BROKER_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+        {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
           value: {{ include "tlsPath" . }}/inbox.crt
         - name: BROKER_CLIENTKEY
           value: {{ include "tlsPath" . }}/inbox.key
+        {{- end }}
       {{- end }}
         - name: SERVER_CERT
           value: {{ include "tlsPath" . }}/inbox.crt

@@ -2,7 +2,7 @@
 
 ## Installing the Chart
 
-Edit the values.yaml file and specify the relevant parts of the `global` section.  
+Edit the values.yaml file and specify the relevant parts of the `global` section.
 If no shared credentials for the broker and database are used, the credentials for each service shuld be set in the `credentials` section.
 
 ### Configuration
@@ -34,7 +34,7 @@ Parameter | Description | Default
 `global.podAnnotations` | Annotations applied to pods of all services. |`{}`
 `global.pkiService` | If an external PKI infrastructure is used set this to true. |`false`
 `global.rbacEnabled` | Use role based access control. |`true`
-`global.archive.storageType` | Storage type for the data archive, available options are `S3Storage` and `FileStorage`. |`S3Storage`
+`global.archive.storageType` | Storage type for the data archive, available options are `s3` and `posix`. |`s3`
 `global.archive.s3Url` | URL to S3 archive instance. |`""`
 `global.archive.s3Bucket` | S3 archive bucket. |`""`
 `global.archive.s3Region` | S3 archive region. |`us-east-1`
@@ -43,8 +43,8 @@ Parameter | Description | Default
 `global.archive.s3SecretKey` | Secret key to S3 archive. |`""`
 `global.archive.s3CaFile` | CA certificate to use if the S3 archive is internal. |`""`
 `global.archive.s3Port` | Port that the S3 S3 archive is available on. |`443`
-`global.archive.volumePath` | Path to the mounted `FileStorage` volume. |`/ega/archive`
-`global.archive.volumeMode` | File mode on the `FileStorage` volume. |`2750`
+`global.archive.volumePath` | Path to the mounted `posix` volume. |`/ega/archive`
+`global.archive.volumeMode` | File mode on the `posix` volume. |`2750`
 `global.archive.nfsServer` | URL or IP addres to a NFS server. |`""`
 `global.archive.nfsPath` | Path on the NFS server for the archive. |`""`
 `global.auth.jwtAlg` | Key type to sign the JWT, available options are RS265 & ES256, Must match the key type |`"ES256"`
@@ -75,12 +75,12 @@ Parameter | Description | Default
 `global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org"`
 `global.inbox.brokerRoutingKey` | Routing key the inbox uses when publishing messages. | `files.inbox"`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
-`global.inbox.storageType` | Storage type for the inbox, available options are `S3Storage` and `FileStorage`. |`FileStorage`
-`global.inbox.path` | Path to the mounted `FileStorage` volume. |`/ega/inbox`
-`global.inbox.user` | Path to the mounted `FileStorage` volume. |`lega`
+`global.inbox.storageType` | Storage type for the inbox, available options are `s3` and `posix`. |`posix`
+`global.inbox.path` | Path to the mounted `posix` volume. |`/ega/inbox`
+`global.inbox.user` | Path to the mounted `posix` volume. |`lega`
 `global.inbox.nfsServer` | URL or IP addres to a NFS server. |`""`
 `global.inbox.nfsPath` | Path on the NFS server for the inbox. |`""`
-`global.inbox.existingClaim` | Existing volume to use for the `fileStorage` inbox. | `""`
+`global.inbox.existingClaim` | Existing volume to use for the `posix` inbox. | `""`
 `global.inbox.s3Url` | URL to S3 inbox instance. |`""`
 `global.inbox.s3Bucket` | S3 inbox bucket. |`""`
 `global.inbox.s3Region` | S3 inbox region. |`us-east-1`
@@ -128,11 +128,11 @@ Parameter | Description | Default
 `doa.imagePullPolicy` | dataedge container image pull policy | `Always`
 `doa.keystorePass` | keystore password | `changeit`
 `doa.annotations` | Specific annotation for the doa pod | `{}`
-`finalize.repository` | inbox container image repository | `neicnordic/sda-base`
+`finalize.repository` | inbox container image repository | `neicnordic/sda-pipeline`
 `finalize.imageTag` | inbox container image version | `latest`
 `finalize.imagePullPolicy` | inbox container image pull policy | `Always`
 `finalize.annotations` | Specific annotation for the finalize pod | `{}`
-`ingest.repository` | inbox container image repository | `neicnordic/sda-base`
+`ingest.repository` | inbox container image repository | `neicnordic/sda-pipeline`
 `ingest.imageTag` | inbox container image version | `latest`
 `ingest.imagePullPolicy` | inbox container image pull policy | `Always`
 `ingest.replicaCount` | desired number of ingest workers | `1`
@@ -149,7 +149,7 @@ Parameter | Description | Default
 `sftpInbox.keystorePass` | sftp inbox keystore password | `changeit`
 `sftpInbox.nodeHostname` | Node name if the sftp inbox  needs to be deployed on a specific node | `""`
 `sftpInbox.annotations` | Specific annotation for the sftp inbox pod | `{}`
-`verify.repository` | inbox container image repository | `neicnordic/sda-base`
+`verify.repository` | inbox container image repository | `neicnordic/sda-pipeline`
 `verify.imageTag` | inbox container image version | `latest`
 `verify.imagePullPolicy` | inbox container image pull policy | `Always`
 `verify.replicaCount`| desired number of verify containers | `1`
