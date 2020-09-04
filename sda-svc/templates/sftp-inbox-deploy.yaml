@@ -72,6 +72,8 @@ spec:
           value: {{ include "mqUserInbox" . | quote }}
         - name: BROKER_VHOST
           value: {{ .Values.global.broker.vhost | quote }}
+        - name: BROKER_EXCHANGE
+          value: {{ .Values.global.broker.exchange | quote }}
         - name: CEGA_ENDPOINT
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/%s?idType=username" | quote }}
         - name: CEGA_ENDPOINT_CREDS
