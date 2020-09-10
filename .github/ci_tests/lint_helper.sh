@@ -9,7 +9,7 @@ touch $1/files/server.crt
 fi
 
 if [ $1 = "sda-svc" ]; then
-for n in ca doa finalize inbox ingest verify
+for n in ca doa finalize inbox ingest interceptor verify
 do
 touch $1/files/$n.crt
 done

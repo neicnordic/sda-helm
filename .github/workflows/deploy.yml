@@ -129,10 +129,10 @@ jobs:
         cp LocalEGA-deploy-init/config/certs/*.p12 sda-svc/files/
         cp LocalEGA-deploy-init/config/certs/cacerts sda-svc/files/
         cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
-        for n in doa finalize ingest verify
+        for n in doa finalize ingest interceptor verify
           do cp LocalEGA-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
         done
-        for n in doa finalize ingest verify
+        for n in doa finalize ingest interceptor verify
           do cp LocalEGA-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
     - name: Deploy the SDA stack
@@ -333,10 +333,10 @@ jobs:
         cp LocalEGA-deploy-init/config/certs/doa.p12 sda-svc/files/
         cp LocalEGA-deploy-init/config/certs/cacerts sda-svc/files/
         cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
-        for n in doa finalize ingest verify inbox
+        for n in doa finalize ingest verify inbox interceptor
           do cp LocalEGA-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
         done
-        for n in doa finalize ingest verify inbox
+        for n in doa finalize ingest verify inbox interceptor
           do cp LocalEGA-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
         cp LocalEGA-deploy-init/config/certs/res.ca.crt sda-svc/files/auth.crt
