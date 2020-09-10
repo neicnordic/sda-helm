@@ -212,6 +212,10 @@ credentials:
     dbUser: ""
     dbPassword: ""
 
+  interceptor:
+    mqUser: ""
+    mqPassword: ""
+
   verify:
     mqUser: ""
     mqPassword: ""
@@ -290,6 +294,25 @@ ingest:
       cpu: "100m"
     limits:
       memory: "512Mi"
+      cpu: "2000m"
+# Extra annotations to attach to the service pods
+# This should be a multi-line string mapping directly to the a map of
+# the annotations to apply to the service pods
+  annotations: {}
+
+interceptor:
+  deploy: true
+  name: ingest
+  replicaCount: 1
+  repository: neicnordic/sda-pipeline
+  imageTag: latest
+  imagePullPolicy: Always
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
       cpu: "2000m"
 # Extra annotations to attach to the service pods
 # This should be a multi-line string mapping directly to the a map of

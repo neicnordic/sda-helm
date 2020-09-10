@@ -108,6 +108,8 @@ Parameter | Description | Default
 `credentials.ingest.dbPassword` | Database password for ingest | `""`
 `credentials.ingest.mqUser` | Broker user for ingest  | `""`
 `credentials.ingest.mqPassword` | Broker password for ingest | `""`
+`credentials.interceptor.mqUser` | Broker user for interceptor  | `""`
+`credentials.interceptor.mqPassword` | Broker password for interceptor | `""`
 `credentials.verify.dbUser` | Databse user for verify | `""`
 `credentials.verify.dbPassword` | Database password for verify | `""`
 `credentials.verify.mqUser` | Broker user for verify | `""`
@@ -137,6 +139,12 @@ Parameter | Description | Default
 `ingest.imagePullPolicy` | inbox container image pull policy | `Always`
 `ingest.replicaCount` | desired number of ingest workers | `1`
 `ingest.annotations` | Specific annotation for the ingest pod | `{}`
+`interceptor.repository` | interceptor container image repository | `neicnordic/sda-pipeline`
+`interceptor.imageTag` | interceptor container image version | `latest`
+`interceptor.imagePullPolicy` | interceptor container image pull policy | `Always`
+`interceptor.replicaCount` | desired number of interceptor workers | `1`
+`interceptor.annotations` | Specific annotation for the interceptor pod | `{}`
+`interceptor.deploy` | Set to false in a non federated deployment | `true`
 `s3Inbox.repository` | S3inbox container image repository | `neicnordic/sda-s3proxy`
 `s3Inbox.imageTag` | S3inbox container image version | `latest`
 `s3Inbox.imagePullPolicy` | S3inbox container image pull policy | `Always`
