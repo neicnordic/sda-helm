@@ -29,7 +29,6 @@ spec:
         {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
         {{- if not .Values.global.secretsService }}
-        checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
         checksum/config: {{ include (print $.Template.BasePath "/finalize-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
@@ -70,6 +69,8 @@ spec:
         env:
         - name: BROKER_DURABLE
           value: {{ .Values.global.broker.durable | quote }}
+        - name: BROKER_EXCHANGE
+          value: {{ default "lega" .Values.global.broker.exchange }}
         - name: BROKER_QUEUE
           value: "stableIDs"
         - name: BROKER_HOST

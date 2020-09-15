@@ -100,6 +100,8 @@ spec:
       {{- end }}
         - name: BROKER_DURABLE
           value: {{ .Values.global.broker.durable | quote }}
+        - name: BROKER_EXCHANGE
+          value: {{ default "lega" .Values.global.broker.exchange }}
         - name: BROKER_QUEUE
           value: "files"
         - name: BROKER_HOST
