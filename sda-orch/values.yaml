@@ -33,6 +33,11 @@ tlsPath: "/tls/certs"
 # If an external secrets management service is used set this to true
 secretsService: false
 
+# used by both Message Broker and Database
+sslmode:
+  ssl: true
+  verifyPeer: true
+
 db:
   host: ""
   name: "lega"
@@ -48,9 +53,7 @@ broker:
   host: ""
   password: ""
   port: 5671
-  ssl: true
   username: ""
-  verifyPeer: true
   vhost: "/"
   queue:
     inbox: ""

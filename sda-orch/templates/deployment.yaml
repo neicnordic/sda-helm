@@ -110,14 +110,14 @@ spec:
           value: {{ .Values.broker.queue.complete | quote }}
         - name: INBOX_QUEUE
           value: {{ .Values.broker.queue.inbox | quote }}
-        {{- if .Values.broker.ssl }}
-        - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/root.ca.crt
-        {{- if .Values.broker.verifyPeer }}
-        - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/cert.ca.crt
-        - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/cert.ca.key
+        {{- if .Values.sslmode.ssl }}
+        - name: SSL_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+        {{- if .Values.sslmode.verifyPeer }}
+        - name: SSL_CLIENTCERT
+          value: {{ include "tlsPath" . }}/orch.crt
+        - name: SSL_CLIENTKEY
+          value: {{ include "tlsPath" . }}/orch.key
         {{- end }}
       {{- end }}
         resources:
