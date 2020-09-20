@@ -1,0 +1,67 @@
+
+image:
+  repository: neicnordic/sda-orch
+  tag: latest
+  pullPolicy: Always
+
+# Annotations applied to pods of all services.
+# This should be a multi-line string mapping directly to the a map of
+# the annotations to apply to the service pods
+podAnnotations: {}
+
+# If an external PKI infrastructure is used set this to true
+pkiService: false
+# if permissions needs to be set on the injected certificates set this to true
+pkiPermissions: true
+
+# Assume RBAC is enabled in the cluster
+rbacEnabled: true
+
+podSecurityPolicy:
+  create: true
+
+networkPolicy:
+  create: false
+
+tlsPath: "/tls/certs"
+
+## RevisionHistory
+##  If defined, set the revisionHistoryLimit of the deployment, defaults to 3
+##  RevisionHistoryLimit is number of old ReplicaSets to retain to allow rollback.
+  # revisionHistory: 3
+
+# If an external secrets management service is used set this to true
+secretsService: false
+
+db:
+  host: ""
+  name: "lega"
+  userIngest: ""
+  userOutgest: ""
+  passIngest: ""
+  passOutgest: ""
+  port: 5432
+  sslMode: "verify-full"
+
+broker:
+  exchange: ""
+  host: ""
+  password: ""
+  port: 5671
+  ssl: true
+  username: ""
+  verifyPeer: true
+  vhost: "/"
+  queue:
+    inbox: ""
+    completed: ""
+    verify: ""
+
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "250m"
