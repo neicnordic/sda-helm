@@ -3,6 +3,7 @@ image:
   repository: neicnordic/sda-orch
   tag: latest
   pullPolicy: Always
+logLevel: "info"
 
 # Annotations applied to pods of all services.
 # This should be a multi-line string mapping directly to the a map of
