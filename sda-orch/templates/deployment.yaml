@@ -58,7 +58,7 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
         env:
-        - name: DEFAULT_LOG
+        - name: LOG_LEVEL
           value: {{ .Values.LogLevel | quote }}
         - name: BROKER_PASSWORD
           valueFrom:
