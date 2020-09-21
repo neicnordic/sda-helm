@@ -104,7 +104,7 @@ spec:
           value: {{ .Values.broker.port | quote }}
         - name: BROKER_VHOST
           value: {{ .Values.broker.vhost | quote }}
-        - name: BRO KER_EXCHANGE
+        - name: BROKER_EXCHANGE
           value: {{ .Values.broker.exchange | quote }}
         - name: VERIFIED_QUEUE
           value: {{ .Values.broker.queue.verify | quote }}
