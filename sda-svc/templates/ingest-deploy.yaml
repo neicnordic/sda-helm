@@ -154,7 +154,7 @@ spec:
         - name: INBOX_LOCATION
           value: "{{ .Values.global.inbox.path }}/%s"
       {{- end }}
-      {{- if .Values.global.log }}
+      {{- if .Values.global.logLevel }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
@@ -212,6 +212,10 @@ spec:
         resources:
 {{ toYaml .Values.ingest.resources | trim | indent 10 }}
         volumeMounts:
+      {{- if not .Values.global.secretsService }}
+        - name: c4gh
+          mountPath: {{ template "c4ghPath" . }}
+      {{- end }}
       {{- if not .Values.global.pkiService }}
         - name: tls
           mountPath: "{{ template "tlsPath" . }}"
@@ -225,6 +229,15 @@ spec:
           mountPath: {{ .Values.global.inbox.path | quote }}
       {{- end }}
       volumes:
+    {{- if not .Values.global.secretsService }}
+        - name: c4gh
+          secret:
+            defaultMode: 0440
+            secretName: {{ template "sda.fullname" . }}-c4gh
+            items:
+            - key: {{ .Values.global.c4gh.file }}
+              path: {{ .Values.global.c4gh.file }}
+      {{- end }}
     {{- if not .Values.global.pkiService }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:

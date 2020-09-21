@@ -50,7 +50,7 @@ spec:
           allowPrivilegeEscalation: false
         env:
         - name: LOG_LEVEL
-          value: {{ upper .Values.global.log }}
+          value: {{ upper .Values.global.logLevel }}
       {{- if not .Values.global.confFile }}
         - name: ELIXIR_ID
           valueFrom:
