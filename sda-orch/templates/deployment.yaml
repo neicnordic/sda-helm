@@ -58,6 +58,8 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
         env:
+        - name: DEFAULT_LOG
+          value: {{ .Values.LogLevel | quote }}
         - name: BROKER_PASSWORD
           valueFrom:
               secretKeyRef:
