@@ -49,7 +49,6 @@ spec:
       - name: s3inbox
         image: "{{ .Values.s3Inbox.repository }}:{{ .Values.s3Inbox.imageTag }}"
         imagePullPolicy: {{ .Values.s3Inbox.imagePullPolicy | quote }}
-        args: ["--log", {{ .Values.global.log | quote }}]
         securityContext:
           allowPrivilegeEscalation: false
         env:
@@ -128,7 +127,7 @@ spec:
           value: "{{ .Values.global.elixir.oidcdHost }}{{ .Values.global.elixir.jwkPath }}"
         {{- end }}
         - name: SERVER_LOG_LEVEL
-          value: {{ .Values.global.log }}
+          value: {{ .Values.global.logLevel }}
         ports:
         - name: inbox
           containerPort: 8000

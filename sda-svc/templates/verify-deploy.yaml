@@ -142,9 +142,9 @@ spec:
           value: {{ .Values.global.db.port | quote }}
         - name: DB_SSLMODE
           value: {{ .Values.global.db.sslMode | quote }}
-      {{- if .Values.global.log }}
+      {{- if .Values.global.logLevel }}
         - name: LOG_LEVEL
-          value: {{ .Values.global.log | quote }}
+          value: {{ .Values.global.logLevel | quote }}
       {{- end }}
       {{- if not .Values.global.secretsService }}
         {{- if eq "s3" .Values.global.archive.storageType }}
