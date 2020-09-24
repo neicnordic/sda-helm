@@ -86,7 +86,7 @@ spec:
           - -cx
           - |
             find /data -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 100:101
-            chmod 700 /data/.erlang.cookie
+            chmod 700 /data/.erlang.cookie || true
         securityContext:
           allowPrivilegeEscalation: false
         volumeMounts:
