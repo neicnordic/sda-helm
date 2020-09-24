@@ -1,5 +1,5 @@
-{{- if and .Values.rbacEnabled .Values.securityPolicy.create }}
-apiVersion: policy/v1beta1
+{{- if and .Values.global.rbacEnabled .Values.global.podSecurityPolicy.create }}
+apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: {{ .Release.Name }}-psp
@@ -12,6 +12,7 @@ spec:
   privileged: false
   allowPrivilegeEscalation: false
   defaultAllowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
   hostNetwork: false
   hostPID: false
   hostIPC: false
@@ -31,10 +32,10 @@ spec:
       max: 65535
   volumes:
   - secret
-  - persistentVolumeClaim
   - configMap
   - emptyDir
   - projected
+  - downwardAPI
   - nfs
 ---
 apiVersion: rbac.authorization.k8s.io/v1
