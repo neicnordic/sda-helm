@@ -54,6 +54,9 @@ spec:
         command: ["java", "-jar", "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts", "-Djavax.net.ssl.trustStorePassword={{ .Values.sftpInbox.keystorePass }}" ,"inbox-0.0.3-SNAPSHOT.jar"]
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
         resources:
 {{ toYaml .Values.sftpInbox.resources | trim | indent 10 }}
         env:

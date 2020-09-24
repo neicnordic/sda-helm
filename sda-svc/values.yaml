@@ -82,6 +82,11 @@ global:
   podSecurityPolicy:
     create: true
 
+# Extra security context to apply to all pods
+# This should be a multi-line string mapping directly to the a map of
+# the securityContext to apply to the service pods
+  extraSecurityContext: {}
+
 # If an external secrets management service is used set this to true
   secretsService: false
 
