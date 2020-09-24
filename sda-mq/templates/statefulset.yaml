@@ -59,6 +59,9 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.extraSecurityContext }}
+{{- toYaml .Values.extraSecurityContext | nindent 10 -}}
+{{- end }}
         resources:
 {{ toYaml .Values.resources | trim | indent 10 }}
         env:
