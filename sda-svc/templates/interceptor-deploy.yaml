@@ -49,6 +49,9 @@ spec:
         command: ["sda-interceptor"]
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
         env:
       {{- if not .Values.global.secretsService }}
         - name: BROKER_PASSWORD

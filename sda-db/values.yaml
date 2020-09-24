@@ -10,6 +10,11 @@ externalPkiService:
 # tlsPath is the path where the external service mounts the certificates
   tlsPath: null
 
+# Extra security context to apply to all pods
+# This should be a multi-line string mapping directly to the a map of
+# the securityContext to apply to the service pods
+extraSecurityContext: {}
+
 image:
   repository: neicnordic/sda-db
   tag: latest

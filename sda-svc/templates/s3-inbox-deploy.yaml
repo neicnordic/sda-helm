@@ -49,6 +49,9 @@ spec:
         imagePullPolicy: {{ .Values.s3Inbox.imagePullPolicy | quote }}
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
         env:
       {{- if not .Values.global.confFile }}
         - name: AWS_ACCESSKEY

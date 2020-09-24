@@ -1,4 +1,4 @@
-{{- if and .Values.rbacEnabled .Values.securityPolicy.create }}
+{{- if and .Values.global.rbacEnabled .Values.global.podSecurityPolicy.create }}
 apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -32,10 +32,10 @@ spec:
       max: 65535
   volumes:
   - secret
-  - persistentVolumeClaim
   - configMap
   - emptyDir
   - projected
+  - downwardAPI
   - nfs
 ---
 apiVersion: rbac.authorization.k8s.io/v1
