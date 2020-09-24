@@ -156,6 +156,8 @@ global:
     nfsServer: ""
     nfsPath: ""
     existingClaim: ""
+    broker:
+      exchange: "cega"
   # These lines below are only used with S3Storage
     s3Url: ""
     s3Bucket: "inbox"
