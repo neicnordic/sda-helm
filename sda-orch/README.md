@@ -1,0 +1,45 @@
+# SDA Orchestrator Service
+
+## Installing the Chart
+
+Edit the values.yaml file and specify the relevant parts of the `config` section.  
+
+Parameter | Description | Default
+--------- | ----------- | -------
+`global.tlsPath` | Default TLS path for certs and key in the pod. | `/tls/certs`
+`revisionHistory` | Number of revisions to keep for the option to rollback a deployment | `3`
+`podAnnotations` | Annotations applied to pods of all services. |`{}`
+`pkiService` | If an external PKI infrastructure is used set this to true. |`false`
+`rbacEnabled` | Use role based access control. |`true`
+`networkPolicy.create` | Use network isolation. | `false`
+`podSecurityPolicy.create` | Use pod security policy. | `false`
+`secretsService.create` | Use If secrets are managed externally. | `false`
+`sslmode.ssl` | Enable SSL for DB and MQ | `true`
+`sslmode.verifyPeer` | Use Client/Server verification (used by BD and MQ connection). | `true`
+`broker.host` | Domain name or IP address to the message broker. |`""`
+`broker.exchange` | Exchange to publish messages to. |`""`
+`broker.port` | Port for the message broker. |`5671`
+`broker.verifyPeer` |  | `true`
+`broker.vhost` | Virtual host to connect to. | `/`
+`broker.password` | Shared password to the message broker. | `""`
+`broker.username` | Shared user to the message broker. | `""`
+`broker.queue.inbox` | Inbox queue for MQ connection. | `""`
+`broker.queue.completed` | Completed queue for MQ connection. | `""`
+`broker.queue.verify` | Verify queue for MQ connection. | `""`
+`db.host` | Hostname for the database. |`""`
+`db.name` | Database to connect to. |`lega`
+`db.userIngest` | User `data in` services. |`""`
+`db.userOutgest` | User for `data out` services. |`""`
+`db.passIngest` | Password used for `data in` services. |`""`
+`db.passOutgest` | Password used for `data out` services. |`""`
+`db.port` | Port that the database is listening on. |`5432`
+`db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. | `verify-full`
+
+
+### TLS
+
+Certificates should be placed in the `files` folder and named accordingly.
+
+- root.ca.crt, root ca certificate.
+- cert.ca.crt, serer certificate.
+- cert.ca.key, server key.
