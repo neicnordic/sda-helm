@@ -81,7 +81,7 @@ spec:
         - name: ARCHIVE_REGION
           value: {{ default "us-east-1" .Values.global.archive.s3Region }}
         - name: ARCHIVE_CHUNKSIZE
-          value: {{ .Values.global.archive.s3ChunkSize | mul 1048576 | quote }}
+          value: {{ .Values.global.archive.s3ChunkSize | quote }}
       {{- if .Values.global.archive.s3CaFile }}
         - name: ARCHIVE_CACERT
           value: {{ template "tlsPath" . }}/{{ .Values.global.archive.s3CaFile }}
