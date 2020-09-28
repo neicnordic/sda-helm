@@ -78,15 +78,9 @@ spec:
                 name: {{ template "sda.fullname" . }}-orchestrate
                 key: dbOutPass
         - name: DB_IN_USER
-          valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-orchestrate
-                key: dbInUser
+          value: {{ default "lega_in" .Values.db.userIngest }}
         - name: DB_OUT_USER
-          valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-orchestrate
-                key: dbOutUser
+          value: {{ default "lega_out" .Values.db.userOutgest }}
         - name: DB_HOST
           value: {{ required "A valid DB host is required" .Values.db.host | quote }}
         - name: DB_DATABASE
