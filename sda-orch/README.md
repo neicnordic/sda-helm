@@ -6,10 +6,15 @@ Edit the values.yaml file and specify the relevant parts of the `config` section
 
 Parameter | Description | Default
 --------- | ----------- | -------
+`image.repository` | sda-orch container image repository | `neicnordic/sda-orch`
+`image.tag` | sda-orch  container image version | `"latest"`
+`image.pullPolicy` | sda-orch container image pull policy | `Always`
+`logLevel` | sda-orch logging level | `info`
 `global.tlsPath` | Default TLS path for certs and key in the pod. | `/tls/certs`
 `revisionHistory` | Number of revisions to keep for the option to rollback a deployment | `3`
 `podAnnotations` | Annotations applied to pods of all services. |`{}`
 `pkiService` | If an external PKI infrastructure is used set this to true. |`false`
+`pkiPermissions` | if permissions needs to be set on the injected certificates set this to true | `true`
 `rbacEnabled` | Use role based access control. |`true`
 `networkPolicy.create` | Use network isolation. | `false`
 `podSecurityPolicy.create` | Use pod security policy. | `false`
@@ -36,6 +41,7 @@ Parameter | Description | Default
 `db.passOutgest` | Password used for `data out` services. |`""`
 `db.port` | Port that the database is listening on. |`5432`
 `db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. | `verify-full`
+
 
 
 ### TLS
