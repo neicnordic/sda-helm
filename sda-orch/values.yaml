@@ -26,8 +26,14 @@ rbacEnabled: true
 podSecurityPolicy:
   create: true
 
+# utilize network isolation
+# Make sure you’ve configured a network provider with network policy support.
+# There are a number of network providers that support NetworkPolicy, including:
+# Calico, Cilium, Kube-router, Romana and Weave Net
 networkPolicy:
   create: false
+  brokerNamespace: ""
+  databaseNamespace: ""
 
 tlsPath: "/tls/certs"
 
