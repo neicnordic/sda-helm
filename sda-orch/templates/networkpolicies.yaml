@@ -38,13 +38,30 @@ spec:
     matchLabels:
       app: {{ template "sda.fullname" . }}
   policyTypes:
-  - Ingress
-  ingress:
-    - ports:
-      - port: postgres
-    - from:
-      - podSelector:
-          matchLabels:
-{{ .Values.networkPolicy.matchLabels | trim | indent 12 }}
+  - Egress
+  egress:
+  - to:
+    {{- if .Values.networkPolicy.brokerNamespace }}
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Values.networkPolicy.brokerNamespace }}
+    {{- end }}
+    - podSelector:
+        matchLabels:
+          role: broker
+    ports:
+    - protocol: TCP
+      port: 5432
+    {{- if .Values.networkPolicy.databaseNamespace }}
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Values.networkPolicy.databaseNamespace }}
+    {{- end }}
+    - podSelector:
+        matchLabels:
+          role: database
+    ports:
+    - protocol: TCP
+      port: 5432
 ---
 {{- end }}
