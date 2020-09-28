@@ -26,6 +26,8 @@ Parameter | Description | Default
 `broker.queue.inbox` | Inbox queue for MQ connection. | `""`
 `broker.queue.completed` | Completed queue for MQ connection. | `""`
 `broker.queue.verify` | Verify queue for MQ connection. | `""`
+`broker.queue.stableid` | Accession IDs queue for MQ connection. | `""`
+`broker.queue.files` | Files queue for MQ connection, general file operations. | `""`
 `db.host` | Hostname for the database. |`""`
 `db.name` | Database to connect to. |`lega`
 `db.userIngest` | User `data in` services. |`""`

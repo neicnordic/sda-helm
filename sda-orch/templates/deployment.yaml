@@ -112,6 +112,10 @@ spec:
           value: {{ .Values.broker.queue.complete | quote }}
         - name: INBOX_QUEUE
           value: {{ .Values.broker.queue.inbox | quote }}
+        - name: FILES_QUEUE
+          value: {{ .Values.broker.queue.files | quote }}
+        - name: STABLEIDS_QUEUE
+          value: {{ .Values.broker.queue.stableid | quote }}
         {{- if .Values.sslmode.ssl }}
         - name: SSL_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
