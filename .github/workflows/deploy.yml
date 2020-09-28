@@ -448,7 +448,8 @@ jobs:
         helm install broker sda-mq \
         --set securityPolicy.create=false,\
         config.adminUser=admin,\
-        config.adminPasswordHash="DI0kJIvQHptGSBH2coZ25dsjjN9Z4uxp8hAyqtd9H7rb/SBO"
+        config.adminPasswordHash="DI0kJIvQHptGSBH2coZ25dsjjN9Z4uxp8hAyqtd9H7rb/SBO",\
+        config.vhost=lega
     - name: Wait for broker to become ready
       run: |
         RETRY_TIMES=0
@@ -473,9 +474,10 @@ jobs:
       run: |
         DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        helm install posix sda-orch \
-        --set broker.password="admin",\
-        broker.username="admin",\
+        helm install orch sda-orch \
+        --set podSecurityPolicy.create=false,\
+        broker.password="admin",\
+        broker.username=admin,\
         broker.host="broker-sda-mq",\
         broker.exchange="lega",\
         broker.vhost="lega",\
@@ -490,10 +492,10 @@ jobs:
     - name: Wait for SDA Orch to become ready
       run: |
         RETRY_TIMES=0
-        until kubectl get pods -lrole=orchestrator -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True"
-        do echo "waiting for orchestrator to become ready"
+        until kubectl get pods -lrole=orchestrator -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True";
+        do echo "waiting for orchestrator to become ready";
         RETRY_TIMES=$((RETRY_TIMES+1));
-        if [ $RETRY_TIMES -eq 30 ]; then exit 1; fi
+        if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
         sleep 10;
         done
     - name: debug sda orch
