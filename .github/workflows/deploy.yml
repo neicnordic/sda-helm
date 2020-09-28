@@ -382,3 +382,125 @@ jobs:
         for s in auth doa finalize ingest verify inbox
         do kubectl logs $(kubectl get pods | grep $s | awk '{print $1}')
         done 
+
+  sda-orch:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install k3s
+      run: curl -sfL https://get.k3s.io | sh -
+    - name: Fix permissions & copy config file
+      run: |
+        sudo chmod 666 /etc/rancher/k3s/* 
+        mkdir -p ~/.kube/ && cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+    - name: Install helm3
+      run: |
+        wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz -O - | tar -xz
+        sudo cp linux-amd64/helm /usr/local/bin/helm
+    - name: Wait for k3s to become ready
+      run: until kubectl -n kube-system get pods -lk8s-app=metrics-server -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True"; do echo "waiting for k3s to become ready"; sleep 10; done
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Clone and install deploy-init
+      run: |
+        git clone https://github.com/neicnordic/LocalEGA-deploy-init
+        pip3 install LocalEGA-deploy-init/
+        legainit --cega --config-path LocalEGA-deploy-init/config \
+                 --svc-config .github/ci_tests/svc.conf
+    - name: Copy DB certs
+      run: |
+        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
+        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
+        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
+    - name: Deploy SDA database
+      run: |
+        DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        helm install postgres sda-db \
+        --set securityPolicy.create=false,\
+        global.pg_in_password="$DB_IN_PASS",\
+        global.pg_out_password="$DB_OUT_PASS",\
+        global.verifyPeer=false
+    - name: Wait for database to become ready
+      run: |
+        RETRY_TIMES=0
+        until kubectl get pods -lrole=database -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True";
+        do echo "waiting for database to become ready";
+        RETRY_TIMES=$((RETRY_TIMES+1));
+        if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
+        sleep 3;
+        done
+    - name: debug DB
+      if: failure()
+      run: kubectl describe pod -l role=database
+    - name: log DB
+      if: failure()
+      run: kubectl logs postgres-sda-db-0
+    - name: Copy MQ certs
+      run: |
+        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
+        cp LocalEGA-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
+        cp LocalEGA-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
+    - name: Deploy SDA message broker
+      run: |
+        helm install broker sda-mq \
+        --set securityPolicy.create=false,\
+        config.adminUser=admin,\
+        config.adminPasswordHash="DI0kJIvQHptGSBH2coZ25dsjjN9Z4uxp8hAyqtd9H7rb/SBO"
+    - name: Wait for broker to become ready
+      run: |
+        RETRY_TIMES=0
+        until kubectl get pods -lrole=broker -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True";
+        do echo "waiting for broker to become ready";
+        RETRY_TIMES=$((RETRY_TIMES+1));
+        if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
+        sleep 10;
+        done
+    - name: debug MQ
+      if: failure()
+      run: kubectl describe pod -l role=broker
+    - name: log MQ
+      if: failure()
+      run: kubectl logs broker-sda-mq-0
+    - name: Prepare for deployment
+      run: |
+        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-orch/files/ca.crt
+        cp LocalEGA-deploy-init/config/certs/orchestrator.ca.crt sda-orch/files/orch.crt
+        cp LocalEGA-deploy-init/config/certs/orchestrator.ca.key sda-orch/files/orch.key
+    - name: Deploy the SDA orch
+      run: |
+        DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        helm install posix sda-orch \
+        --set broker.password="admin",\
+        broker.username="admin",\
+        broker.host="broker-sda-mq",\
+        broker.exchange="lega",\
+        broker.vhost="lega",\
+        broker.queue.inbox="files.inbox",\
+        broker.queue.completed="files.completed",\
+        broker.queue.verify="lega",\
+        broker.queue.files="files",\
+        broker.queue.stabledid="stableIDs",\
+        db.host="postgres-sda-db",\
+        db.passIngest="$DB_IN_PASS",\
+        db.passOutgest="$DB_OUT_PASS"
+    - name: Wait for SDA Orch to become ready
+      run: |
+        RETRY_TIMES=0
+        until kubectl get pods -lrole=orchestrator -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True"
+        do echo "waiting for orchestrator to become ready"
+        RETRY_TIMES=$((RETRY_TIMES+1));
+        if [ $RETRY_TIMES -eq 30 ]; then exit 1; fi
+        sleep 10;
+        done
+    - name: debug sda orch
+      if: failure()
+      run: |
+        kubectl describe pod -l role=orchestrator
+    - name: log sda orch
+      if: failure()
+      run: |
+        kubectl logs $(kubectl get pods | grep orchestrator | awk '{print $1}')
