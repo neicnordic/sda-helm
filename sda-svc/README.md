@@ -45,7 +45,7 @@ Parameter | Description | Default
 `global.archive.s3Port` | Port that the S3 S3 archive is available on. |`443`
 `global.archive.volumePath` | Path to the mounted `posix` volume. |`/ega/archive`
 `global.archive.volumeMode` | File mode on the `posix` volume. |`2750`
-`global.archive.nfsServer` | URL or IP addres to a NFS server. |`""`
+`global.archive.nfsServer` | URL or IP address to a NFS server. |`""`
 `global.archive.nfsPath` | Path on the NFS server for the archive. |`""`
 `global.auth.jwtAlg` | Key type to sign the JWT, available options are RS265 & ES256, Must match the key type |`"ES256"`
 `global.auth.jwtKey` | Private key used to sign the JWT. |`""`
@@ -78,7 +78,7 @@ Parameter | Description | Default
 `global.inbox.storageType` | Storage type for the inbox, available options are `s3` and `posix`. |`posix`
 `global.inbox.path` | Path to the mounted `posix` volume. |`/ega/inbox`
 `global.inbox.user` | Path to the mounted `posix` volume. |`lega`
-`global.inbox.nfsServer` | URL or IP addres to a NFS server. |`""`
+`global.inbox.nfsServer` | URL or IP address to a NFS server. |`""`
 `global.inbox.nfsPath` | Path on the NFS server for the inbox. |`""`
 `global.inbox.existingClaim` | Existing volume to use for the `posix` inbox. | `""`
 `global.inbox.s3Url` | URL to S3 inbox instance. |`""`
@@ -122,7 +122,7 @@ Parameter | Description | Default
 `auth.replicaCount` | desired number of replicas | `1`
 `auth.repository` | dataedge container image repository | `neicnordic/sda-auth`
 `auth.imageTag` | dataedge container image version | `"latest"`
-`autha.imagePullPolicy` | dataedge container image pull policy | `Always`
+`auth.imagePullPolicy` | dataedge container image pull policy | `Always`
 `auth.annotations` | Specific annotation for the auth pod | `{}`
 `doa.replicaCount` | desired number of replicas | `1`
 `doa.repository` | dataedge container image repository | `neicnordic/sda-doa`
