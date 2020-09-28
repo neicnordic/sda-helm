@@ -52,7 +52,7 @@ spec:
           mountPath: /tls
     {{- end }}
       containers:
-      - name: sda-orchestrate
+      - name: orchestrator
         image: "{{ .Values.image.repository }}:{{ .Values.image.imageTag }}"
         imagePullPolicy: {{ .Values.image.imagePullPolicy | quote }}
         securityContext:
