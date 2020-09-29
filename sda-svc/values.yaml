@@ -180,7 +180,7 @@ global:
     s3SecretKey: null
     s3CaFile: null
     s3ReadyPath: ""
-    s3region: ""
+    s3Region: ""
 
 ##################################
 # service specific credentials
@@ -216,7 +216,7 @@ credentials:
     dbPassword: ""
 
 ##################################
-# Service specifica settings
+# Service specific settings
 
 auth:
   name: auth
