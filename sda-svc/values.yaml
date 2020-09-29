@@ -148,6 +148,8 @@ global:
     name: "lega"
     passIngest: ""
     passOutgest: ""
+    port: 5432
+    # to be used with networkpolicies
     servicePort: 5432
     sslMode: "verify-full"
 
