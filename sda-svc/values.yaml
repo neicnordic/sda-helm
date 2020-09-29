@@ -377,6 +377,11 @@ sftpInbox:
 # the annotations to apply to the service pods
   annotations: {}
 
+test:
+  repository: neicnordic/sda-helm-tests-support
+  imageTag: latest
+  imagePullPolicy: Always
+  
 verify:
   replicaCount: 1
   repository: neicnordic/sda-pipeline
