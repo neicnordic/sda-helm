@@ -43,3 +43,10 @@ Certificates should be placed in the `files` folder and named accordingly.
 - CA.crt, root ca certificate.
 - pg.crt, serer certificate.
 - pg.key, server key.
+
+If you want `helm test` to work, you should also put
+
+- tester.ca.key, private key used for tests
+- tester.ca.crt, certificate for key, used for tests
+
+in the same `files` folder.

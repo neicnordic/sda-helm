@@ -47,3 +47,13 @@ Certificates should be placed in the `files` folder and named accordingly.
 - ca.crt, root ca certificate.
 - server.crt, serer certificate.
 - server.key, server key.
+
+If you want `helm test` to work, you should also put
+
+- tester.ca.key, private key used for tests
+- tester.ca.crt, certificate for key, used for tests
+
+in the same `files` folder. Note that `helm test` for the `sda-mq`
+chart will currently only verify service availability and TLS setup,
+not accounts or other aspects (they will be verified by the `sda-svc`
+chart tests instead).
