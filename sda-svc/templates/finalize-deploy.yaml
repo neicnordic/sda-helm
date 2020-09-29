@@ -150,18 +150,9 @@ spec:
 {{ toYaml .Values.finalize.resources | trim | indent 10 }}
   {{- if not .Values.global.pkiService }}
         volumeMounts:
-        {{- if (.Values.global.log | lower) eq "debug" }}
-        - name: tmp
-          mountPath: /tmp
-        {{- end }}
         - name: tls
           mountPath: {{ template "tlsPath" . }}
       volumes:
-      {{- if (.Values.global.log | lower) eq "debug" }}
-        - name: tmp
-          emptyDir:
-            medium: Memory
-      {{- end }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440
