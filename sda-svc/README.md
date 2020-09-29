@@ -1,5 +1,9 @@
 # SDA services
 
+Source repositories:
+    - https://github.com/neicnordic/sda-pipeline
+    - https://github.com/neicnordic/LocalEGA-DOA
+
 ## Installing the Chart
 
 Edit the values.yaml file and specify the relevant parts of the `global` section.
