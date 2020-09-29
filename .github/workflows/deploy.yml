@@ -51,7 +51,7 @@ jobs:
         do echo "waiting for database to become ready";
         RETRY_TIMES=$((RETRY_TIMES+1));
         if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
-        sleep 3;
+        sleep 10;
         done
     - name: debug DB
       if: failure()
@@ -223,7 +223,7 @@ jobs:
         do echo "waiting for database to become ready";
         RETRY_TIMES=$((RETRY_TIMES+1));
         if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
-        sleep 3;
+        sleep 10;
         done
     - name: debug DB
       if: failure()
@@ -430,7 +430,7 @@ jobs:
         do echo "waiting for database to become ready";
         RETRY_TIMES=$((RETRY_TIMES+1));
         if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
-        sleep 3;
+        sleep 10;
         done
     - name: debug DB
       if: failure()
