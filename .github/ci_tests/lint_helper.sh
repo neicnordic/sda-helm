@@ -8,6 +8,12 @@ touch $1/files/ca.crt
 touch $1/files/server.crt
 fi
 
+if [ $1 = "sda-orch" ]; then
+touch $1/files/ca.crt
+touch $1/files/orch.crt
+touch $1/files/orch.key
+fi
+
 if [ $1 = "sda-svc" ]; then
 for n in ca doa finalize inbox ingest interceptor verify
 do
