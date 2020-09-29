@@ -76,7 +76,7 @@ Parameter | Description | Default
 `global.doa.outbox.enabled` | Enable Outbox functionality of Data Out API | `false`
 `global.doa.outbox.queue` | MQ queue name for files/datasets export requests | `""`
 `global.doa.outbox.type` | Outbox type can be either S3 or POSIX | `""`
-`global.doa.outbox.path` | Outbox location with placeholder for the username | `""`
+`global.doa.outbox.path` | Posix outbox location with placeholder for the username | `""`
 `global.doa.outbox.s3Url` | Outbox S3 URL | `""`
 `global.doa.outbox.s3Port` | Outbox S3 port | `443`
 `global.doa.outbox.s3Region` | Outbox S3 region | `""`

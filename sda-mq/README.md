@@ -38,7 +38,7 @@ Parameter | Description | Default
 `resources.requests.cpu` | CPU request for container. |`100m`
 `resources.limits.memory` | Memory limit for container. |`256Mi`
 `resources.limits.cpu` | CPU limit for container. |`200m`
-`podAnnotations` | Annotations applied to pods of all services. |`{}`
+`podAnnotations` | Annotations applied to the pod. |`{}`
 
 ### TLS
 

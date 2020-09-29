@@ -22,7 +22,7 @@ Parameter | Description | Default
 `global.verifyPeer` | Require client certificates. |`true`
 `externalPkiService.tlsPath` | If an external PKI service is used, this is the path where the certifiates are placed | `""`
 `persistence.enabled` | Enable persistence. | `true`
-`persistence.mountPath` | Enable persistence. | `/var/lib/postgresql`
+`persistence.mountPath` | Mountpoint for persistent volume. | `/var/lib/postgresql`
 `persistence.storageSize` | Volume size. | `8Gi`
 `persistence.storageClass` | Use specific storage class, by default dynamic provisioning enabled. | `null`
 `persistence.existingClaim` | Use existing claim. | `null`
@@ -33,7 +33,7 @@ Parameter | Description | Default
 `resources.requests.cpu` | CPU request for container. |`100m`
 `resources.limits.memory` | Memory limit for container. |`256Mi`
 `resources.limits.cpu` | CPU limit for container. |`200m`
-`podAnnotations` | Annotations applied to pods of all services. |`{}`
+`podAnnotations` | Annotations applied to the pod |`{}`
 
 
 ### TLS
