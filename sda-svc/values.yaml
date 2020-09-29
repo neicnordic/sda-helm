@@ -215,6 +215,10 @@ credentials:
     dbUser: ""
     dbPassword: ""
 
+  releasetest:
+    mqUser: ""
+    mqPassword: ""
+
   verify:
     mqUser: ""
     mqPassword: ""
