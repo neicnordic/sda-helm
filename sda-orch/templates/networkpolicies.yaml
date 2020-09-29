@@ -48,8 +48,7 @@ spec:
     {{- end }}
     - podSelector:
         matchLabels:
-          role: database
-  {{- end }}
+          role: broker
     ports:
     - protocol: TCP
       port: 5432
@@ -60,27 +59,9 @@ spec:
     {{- end }}
     - podSelector:
         matchLabels:
-          role: broker
-  {{- end }}
+          role: database
     ports:
     - protocol: TCP
-      port: 5672
-{{- if .Values.global.inbox.ingressips }}
----
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: inbox-ingress-policy
-  namespace: {{ .Release.Namespace }}
-spec:
-    matchLabels:
-      role: inbox
-  policyTypes:
-  - Ingress
-  egress:
-  - to:
-    - ipBlock:
-        cidr: {{ .Values.global.inbox.ingressips }}
-{{- end }}
+      port: 5432
 ---
 {{- end }}
