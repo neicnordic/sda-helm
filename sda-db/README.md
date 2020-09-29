@@ -1,5 +1,7 @@
 # SDA Database
 
+Source repository: https://github.com/neicnordic/LocalEGA-db 
+
 ## Installing the Chart
 
 Edit the values.yaml file and specify the relevant parts of the `default` section.  
