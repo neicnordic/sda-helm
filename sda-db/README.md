@@ -5,7 +5,6 @@ Source repository: https://github.com/neicnordic/LocalEGA-db
 ## Installing the Chart
 
 Edit the values.yaml file and specify the relevant parts of the `default` section.  
-If no shared credentials for the broker and database are used, the credentials for each service shuld be set in the `credentials` section.
 
 Parameter | Description | Default
 --------- | ----------- | -------
