@@ -6,7 +6,7 @@
 
 ## Info
 
-This repositroy contains helmcharts for deploying a Sensitive Data Archive solution that is compatible with the European Genome Archives federated archiving model
+This repositroy contains helmcharts for deploying a Sensitive Data Archive solution that is compatible with the European Genome Archives federated archiving model.
 
 ## sda-db
 
@@ -14,7 +14,7 @@ This chart deploys a pre-configured database instance for Sensitive Data Archive
 
 ## sda-mq
 
-This chart deploys a pre-configured message broker designed to work European Genome Archives federated archive setup
+This chart deploys a pre-configured message broker designed to work European Genome Archives federated archive setup.
 
 ## sda-svc
 
