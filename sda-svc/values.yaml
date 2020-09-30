@@ -233,7 +233,7 @@ credentials:
     dbPassword: ""
 
 ##################################
-# Service specifica settings
+# Service specific settings
 
 auth:
   name: auth

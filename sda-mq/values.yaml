@@ -26,9 +26,6 @@ ha:
 # This should be a multi-line string mapping directly to the a map of
 # the securityContext to apply to the service pods
 extraSecurityContext: {}
-ha:
-  enabled: true
-  replicas: 3
 
 image:
   repository: neicnordic/sda-mq
