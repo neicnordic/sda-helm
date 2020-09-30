@@ -1,0 +1,167 @@
+---
+
+{{- define "svcfullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- /* if .Values.global.c4gh.publicFile  */ -}}
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "{{ .Release.Name }}-test-certs"
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+type: Opaque
+data:
+  {{- (.Files.Glob "files/{tester,CA,ca}*").AsSecrets | nindent 2 }}
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "{{ .Release.Name }}-relasetest-passwords"
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+type: Opaque
+data:
+  mqPassword: {{ include "mqPassReleaseTest" . | b64enc }}
+  mqUser: {{ include "mqUserReleaseTest" . | b64enc }}
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-test-app"
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  {{- (.Files.Glob (printf "files/{release-test.py,%s}" .Values.global.c4gh.publicFile)).AsConfig | nindent 2 }}
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-test"
+  resourceVersion: {{ template "svcfullname" . }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "10"
+spec:
+  containers:
+    - name: "{{ .Release.Name }}-test"
+      image:  "{{ .Values.test.repository }}:{{ .Values.test.imageTag }}"
+      imagePullPolicy: {{ .Values.test.imagePullPolicy | quote }}
+      volumeMounts:
+      {{- if not .Values.global.pkiService }}
+        - name: certs
+          mountPath: "/certs"
+      {{- end }}
+        - name: testapp
+          mountPath: "/testapp"
+    {{- if eq .Values.global.inbox.storageType "posix" }}
+        - name: "inboxtest"
+          mountPath: "/posix"
+    {{- end }}
+      env:
+        {{- if .Values.global.pkiService}}
+        - name: PKI_PATH
+          value: {{include "secretsPath" }}
+        {{- end}}
+        - name: STORAGE_TYPE
+          value: {{ required "Missing storage type for inbox" .Values.global.inbox.storageType | quote }}
+        - name: MQ_HOST
+          value: {{ required "Broker host must be set" .Values.global.broker.host | quote }}
+      {{- if not .Values.global.secretsService }}
+        - name: MQ_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-relasetest-passwords"
+                key: mqPassword
+        - name: MQ_USER
+          valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-relasetest-passwords"
+                key: mqUser
+      {{- end }}
+      {{- if .Values.global.broker.vhost }}
+        - name: MQ_VHOST
+          value: {{ .Values.global.broker.vhost | quote }}
+      {{- end }}
+      command: [ "/bin/sh" ]
+      args:
+        - "-c"
+        - 's=${PKI_PATH:-/certs};
+           mkdir -p /tmp/c4gh;
+
+           dd if=/dev/urandom of=/tmp/testfile bs=1k count=16;
+
+           crypt4gh-keygen --sk /tmp/c4gh/key --pk /tmp/c4gh/key.pub --nocrypt -f;
+
+           crypt4gh encrypt --recipient_pk /testapp/c4gh.pub --sk /tmp/c4gh/key 
+                 < /tmp/testfile 
+                 > /tmp/testfile.encrypted;
+           
+           if [ "$STORAGE_TYPE" = posix ]; then
+              cp /tmp/testfile.encrypted /posix/;
+           else
+              echo s3cmd ;
+           fi;
+
+           sleep 400;
+           python3 /testapp/release-test.py'
+  volumes:
+    {{- if not .Values.global.pkiService }}
+      - name: certs
+        projected:
+          sources:
+          - secret:
+              name: "{{ .Release.Name }}-test-certs"
+              items:
+              - key: tester.ca.key
+                path: tester.ca.key
+              - key: tester.ca.crt
+                path: tester.ca.crt
+              - key: ca.crt
+                path: ca.crt
+    {{- end }}
+    {{- if eq .Values.global.inbox.storageType "posix" }}
+      - name: "inboxtest"
+    {{- if .Values.global.inbox.existingClaim }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.global.inbox.existingClaim }}
+    {{- else }}
+        nfs:
+          server: {{ required "An inbox NFS server is required" .Values.global.inbox.nfsServer | quote }}
+          path: {{ if .Values.global.inbox.nfsPath }}{{ .Values.global.inbox.nfsPath | quote}}{{ else }}{{ "/" }}{{ end }}
+    {{- end }}
+    {{- end }}
+      - name: testapp
+        projected:
+          sources:
+            - configMap:
+                name: "{{ .Release.Name }}-test-app"
+                items:
+                  - key: release-test.py
+                    path: release-test.py
+                  - key: {{ .Values.global.c4gh.publicFile | quote }}
+                    path: c4gh.pub
+  restartPolicy: Never
+{{- /* end for only run if given publicFile */ -}}
+{{- /* end  */ -}}
