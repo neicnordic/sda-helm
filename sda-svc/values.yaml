@@ -132,6 +132,8 @@ global:
 # name of the c4gh key file.
     file: c4gh.key
     passphrase: ""
+# name of the public file, required for testing
+    publicFile: ""
 
   db:
     host: ""
