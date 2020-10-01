@@ -175,10 +175,10 @@ Create chart name and version as used by the chart label.
 
 {{/**/}}
 {{- define "mqUserInterceptor" -}}
-{{- ternary .Values.global.broker.username .Values.credentials.interceptor.mqUser (empty .Values.credentials.interceptor.mqUser) -}}
+{{- ternary .Values.global.broker.username .Values.credentials.intercept.mqUser (empty .Values.credentials.intercept.mqUser) -}}
 {{- end -}}
 {{- define "mqPassInterceptor" -}}
-{{- ternary .Values.global.broker.password .Values.credentials.interceptor.mqPassword (empty .Values.credentials.interceptor.mqPassword) -}}
+{{- ternary .Values.global.broker.password .Values.credentials.intercept.mqPassword (empty .Values.credentials.intercept.mqPassword) -}}
 {{- end -}}
 
 {{/**/}}
