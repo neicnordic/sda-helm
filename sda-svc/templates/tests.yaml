@@ -1,19 +1,5 @@
 ---
-
-{{- define "svcfullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{- /* if .Values.global.c4gh.publicFile  */ -}}
+{{- if .Values.global.c4gh.publicFile  -}}
 
 apiVersion: v1
 kind: Secret
@@ -50,7 +36,7 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 data:
-  {{- (.Files.Glob (printf "files/{release-test.py,%s}" .Values.global.c4gh.publicFile)).AsConfig | nindent 2 }}
+  {{- (.Files.Glob (printf "files/{release-test.py,release-test.sh,%s}" .Values.global.c4gh.publicFile)).AsConfig | nindent 2 }}
 
 ---
 
@@ -58,7 +44,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: "{{ .Release.Name }}-test"
-  resourceVersion: {{ template "svcfullname" . }}
+  resourceVersion: "{{ .Release.Name }}-{{ .Release.Revision }}"
   annotations:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -75,19 +61,45 @@ spec:
       {{- end }}
         - name: testapp
           mountPath: "/testapp"
-    {{- if eq .Values.global.inbox.storageType "posix" }}
+    {{- if eq "posix" .Values.global.inbox.storageType }}
         - name: "inboxtest"
           mountPath: "/posix"
     {{- end }}
       env:
-        {{- if .Values.global.pkiService}}
+        {{- if .Values.global.pkiService }}
         - name: PKI_PATH
           value: {{include "secretsPath" }}
-        {{- end}}
+        {{- end }}
         - name: STORAGE_TYPE
           value: {{ required "Missing storage type for inbox" .Values.global.inbox.storageType | quote }}
+      {{- if eq "s3" .Values.global.inbox.storageType }}
+        - name: INBOX_BUCKET
+          value: {{ required "S3 inbox bucket missing" .Values.global.inbox.s3Bucket }}
+      {{- if .Values.global.inbox.s3CaFile }}
+        - name: INBOX_CACERT
+          value: {{ template "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}
+      {{- end }}
+        - name: INBOX_REGION
+          value: {{ default "us-east-1" .Values.global.inbox.s3Region }}
+        - name: INBOX_URL
+          value: {{ required "S3 inbox URL missing" .Values.global.inbox.s3Url }}
+        - name: INBOX_ACCESSKEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-s3inbox-keys
+              key: s3InboxAccessKey
+        - name: INBOX_SECRETKEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-s3inbox-keys
+              key: s3InboxSecretKey
+      {{- end }}
+        {{- if eq "s3" .Values.global.inbox.storageType }}
+        {{- end }}
         - name: MQ_HOST
           value: {{ required "Broker host must be set" .Values.global.broker.host | quote }}
+        - name: MQ_EXCHANGE
+          value: {{ default "lega" .Values.global.broker.exchange | quote }}
       {{- if not .Values.global.secretsService }}
         - name: MQ_PASSWORD
           valueFrom:
@@ -106,27 +118,8 @@ spec:
       {{- end }}
       command: [ "/bin/sh" ]
       args:
-        - "-c"
-        - 's=${PKI_PATH:-/certs};
-           mkdir -p /tmp/c4gh;
-
-           dd if=/dev/urandom of=/tmp/testfile bs=1k count=16;
-
-           crypt4gh-keygen --sk /tmp/c4gh/key --pk /tmp/c4gh/key.pub --nocrypt -f;
-
-           crypt4gh encrypt --recipient_pk /testapp/c4gh.pub --sk /tmp/c4gh/key 
-                 < /tmp/testfile 
-                 > /tmp/testfile.encrypted;
-           
-           if [ "$STORAGE_TYPE" = posix ]; then
-              cp /tmp/testfile.encrypted /posix/;
-           else
-              echo s3cmd ;
-           fi;
-
-           sleep 400;
-           python3 /testapp/release-test.py'
-  volumes:
+        - "/testapp/release-test.sh"
+  volumes:  
     {{- if not .Values.global.pkiService }}
       - name: certs
         projected:
@@ -160,8 +153,11 @@ spec:
                 items:
                   - key: release-test.py
                     path: release-test.py
+                  - key: release-test.sh
+                    path: release-test.sh
                   - key: {{ .Values.global.c4gh.publicFile | quote }}
                     path: c4gh.pub
   restartPolicy: Never
+
 {{- /* end for only run if given publicFile */ -}}
-{{- /* end  */ -}}
+{{- end -}}
