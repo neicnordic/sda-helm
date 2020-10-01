@@ -37,12 +37,16 @@ EOF
   s3cmd  --region="${INBOX_REGION}" -c /tmp/s3cmd.cfg put /tmp/testfile.encrypted "s3://${INBOX_BUCKET}"
 fi
 
+
+sleep 60
 count=0
 
-until python3 /testapp/release-test.py; do
+until python3 /testapp/release-test.py testuser /testfile.encrypted; do
     sleep 10
     count=$((count+1))
     if [ "$count" -gt 10 ]; then
 	break
     fi
 done
+sleep 100
+exit 1

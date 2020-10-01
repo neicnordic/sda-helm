@@ -77,4 +77,4 @@ channel.basic_publish(exchange=exchange,
                                                       content_type='application/json',
                                                       delivery_mode=2))
 
-
+connection.close()
