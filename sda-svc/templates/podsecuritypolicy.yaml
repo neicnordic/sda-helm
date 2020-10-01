@@ -1,5 +1,5 @@
 {{- if and .Values.global.rbacEnabled .Values.global.podSecurityPolicy.create }}
-apiVersion: extensions/v1beta1
+apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: {{ .Release.Name }}-psp
