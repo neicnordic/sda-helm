@@ -36,7 +36,7 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 data:
-  {{- (.Files.Glob (printf "files/{release-test.py,release-test.sh,%s}" .Values.global.c4gh.publicFile)).AsConfig | nindent 2 }}
+  {{- (.Files.Glob (printf "files/{trigger-ingest.py,release-test.sh,%s}" .Values.global.c4gh.publicFile)).AsConfig | nindent 2 }}
 
 ---
 
@@ -151,8 +151,8 @@ spec:
             - configMap:
                 name: "{{ .Release.Name }}-test-app"
                 items:
-                  - key: release-test.py
-                    path: release-test.py
+                  - key: trigger-ingest.py
+                    path: trigger-ingest.py
                   - key: release-test.sh
                     path: release-test.sh
                   - key: {{ .Values.global.c4gh.publicFile | quote }}
