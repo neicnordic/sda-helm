@@ -15,7 +15,7 @@ touch $1/files/orch.key
 fi
 
 if [ $1 = "sda-svc" ]; then
-for n in ca doa finalize inbox ingest interceptor verify
+for n in ca doa finalize inbox ingest intercept verify
 do
 touch $1/files/$n.crt
 done
