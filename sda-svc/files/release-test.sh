@@ -41,7 +41,10 @@ fi
 sleep 60
 count=0
 
-until python3 /testapp/release-test.py testuser /testfile.encrypted; do
+
+MQ_EXCHANGE=''
+
+until python3 /testapp/trigger-ingest.py testuser /testfile.encrypted; do
     sleep 10
     count=$((count+1))
     if [ "$count" -gt 10 ]; then
