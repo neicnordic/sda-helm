@@ -24,6 +24,7 @@ encoding = UTF-8
 encrypt = True
 guess_mime_type = True
 host_base = ${INBOX_URL}
+host_bucket = ${INBOX_URL}
 human_readable_sizes = True
 multipart_chunk_size_mb = 5
 use_https = True
@@ -33,7 +34,7 @@ EOF
   if [ -n "${INBOX_CACERT}" ]; then
      echo "ca_certs_file = ${INBOX_CACERT}" >> /tmp/s3cmd.cfg
   fi
-  echo s3cmd 
+  s3cmd  --region="${INBOX_REGION}" -c /tmp/s3cmd.cfg put /tmp/testfile.encrypted "s3://${INBOX_BUCKET}"
 fi
 
 count=0
