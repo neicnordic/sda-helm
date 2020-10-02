@@ -1,14 +1,14 @@
-{{- if .Values.interceptor.deploy}}
+{{- if .Values.intercept.deploy}}
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "sda.fullname" . }}-interceptor
+  name: {{ template "sda.fullname" . }}-intercept
   labels:
-    role: interceptor
+    role: intercept
     app: {{ template "sda.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: {{ .Release.Name }}-interceptor
+    component: {{ .Release.Name }}-intercept
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -16,23 +16,23 @@ spec:
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
   selector:
     matchLabels:
-      app: {{ template "sda.name" . }}-interceptor
+      app: {{ template "sda.name" . }}-intercept
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "sda.name" . }}-interceptor
-        role: interceptor
+        app: {{ template "sda.name" . }}-intercept
+        role: intercept
         release: {{ .Release.Name }}
       annotations:
         {{- if not .Values.global.secretsService }}
-        checksum/config: {{ include (print $.Template.BasePath "/interceptor-secrets.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/intercept-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
 {{- toYaml .Values.global.podAnnotations | nindent 8 -}}
 {{- end }}
-{{- if .Values.interceptor.annotations }}
-{{- toYaml .Values.interceptor.annotations | nindent 8 -}}
+{{- if .Values.intercept.annotations }}
+{{- toYaml .Values.intercept.annotations | nindent 8 -}}
 {{- end }}
     spec:
     {{- if .Values.global.rbacEnabled}}
@@ -43,10 +43,10 @@ spec:
         runAsGroup: 65534
         fsGroup: 65534
       containers:
-      - name: interceptor
-        image: "{{ .Values.interceptor.repository }}:{{ .Values.interceptor.imageTag }}"
-        imagePullPolicy: {{ .Values.interceptor.imagePullPolicy | quote }}
-        command: ["sda-interceptor"]
+      - name: intercept
+        image: "{{ .Values.intercept.repository }}:{{ .Values.intercept.imageTag }}"
+        imagePullPolicy: {{ .Values.intercept.imagePullPolicy | quote }}
+        command: ["sda-intercept"]
         securityContext:
           allowPrivilegeEscalation: false
 {{- if .Values.global.extraSecurityContext }}
@@ -57,12 +57,12 @@ spec:
         - name: BROKER_PASSWORD
           valueFrom:
               secretKeyRef:
-                name: {{ template "sda.fullname" . }}-interceptor
+                name: {{ template "sda.fullname" . }}-intercept
                 key: mqPassword
         - name: BROKER_USER
           valueFrom:
               secretKeyRef:
-                name: {{ template "sda.fullname" . }}-interceptor
+                name: {{ template "sda.fullname" . }}-intercept
                 key: mqUser
       {{- end }}
         {{- if .Values.global.broker.ssl }}
@@ -70,9 +70,9 @@ spec:
           value: {{ include "tlsPath" . }}/ca.crt
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/interceptor.crt
+          value: {{ include "tlsPath" . }}/intercept.crt
         - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/interceptor.key
+          value: {{ include "tlsPath" . }}/intercept.key
         {{- end }}
         {{- end }}
         - name: BROKER_DURABLE
@@ -98,7 +98,7 @@ spec:
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
         resources:
-{{ toYaml .Values.interceptor.resources | trim | indent 10 }}
+{{ toYaml .Values.intercept.resources | trim | indent 10 }}
   {{- if not .Values.global.pkiService }}
         volumeMounts:
         - name: tls
@@ -107,7 +107,7 @@ spec:
         - name: {{ "tls"  }}
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-interceptor-certs
+            secretName: {{ template "sda.fullname" . }}-intercept-certs
     {{- end }}
       restartPolicy: Always
 {{- end }}

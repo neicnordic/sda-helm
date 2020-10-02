@@ -222,7 +222,7 @@ credentials:
     dbUser: ""
     dbPassword: ""
 
-  interceptor:
+  intercept:
     mqUser: ""
     mqPassword: ""
 
@@ -310,7 +310,7 @@ ingest:
 # the annotations to apply to the service pods
   annotations: {}
 
-interceptor:
+intercept:
   deploy: true
   name: ingest
   replicaCount: 1

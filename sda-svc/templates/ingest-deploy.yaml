@@ -89,7 +89,7 @@ spec:
       {{- else }}
           value: "posix"
         - name: ARCHIVE_LOCATION
-          value: "{{ .Values.global.archive.volumePath }}/%s"
+          value: "{{ .Values.global.archive.volumePath }}/"
       {{- end }}
       {{- if .Values.global.broker.ssl }}
         - name: BROKER_CACERT
@@ -159,7 +159,7 @@ spec:
       {{- else }}
           value: "posix"
         - name: INBOX_LOCATION
-          value: "{{ .Values.global.inbox.path }}/%s"
+          value: "{{ .Values.global.inbox.path }}/"
       {{- end }}
       {{- if .Values.global.logLevel }}
         - name: LOG_LEVEL
