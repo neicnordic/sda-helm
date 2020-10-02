@@ -122,8 +122,8 @@ Parameter | Description | Default
 `credentials.ingest.dbPassword` | Database password for ingest | `""`
 `credentials.ingest.mqUser` | Broker user for ingest  | `""`
 `credentials.ingest.mqPassword` | Broker password for ingest | `""`
-`credentials.interceptor.mqUser` | Broker user for interceptor  | `""`
-`credentials.interceptor.mqPassword` | Broker password for interceptor | `""`
+`credentials.intercept.mqUser` | Broker user for intercept  | `""`
+`credentials.intercept.mqPassword` | Broker password for intercept | `""`
 `credentials.verify.dbUser` | Databse user for verify | `""`
 `credentials.verify.dbPassword` | Database password for verify | `""`
 `credentials.verify.mqUser` | Broker user for verify | `""`
@@ -169,16 +169,16 @@ Parameter | Description | Default
 `ingest.resources.requests.cpu` | CPU request for ingest container. |`100m`
 `ingest.resources.limits.memory` | Memory limit for ingest container. |`512Mi`
 `ingest.resources.limits.cpu` | CPU limit for ingest container. |`2000m`
-`interceptor.repository` | interceptor container image repository | `neicnordic/sda-pipeline`
-`interceptor.imageTag` | interceptor container image version | `latest`
-`interceptor.imagePullPolicy` | interceptor container image pull policy | `Always`
-`interceptor.replicaCount` | desired number of interceptor workers | `1`
-`interceptor.annotations` | Specific annotation for the interceptor pod | `{}`
-`interceptor.deploy` | Set to false in a non federated deployment | `true`
-`interceptor.resources.requests.memory` | Memory request for interceptor container. |`32Mi`
-`interceptor.resources.requests.cpu` | CPU request for interceptor container. |`100m`
-`interceptor.resources.limits.memory` | Memory limit for interceptor container. |`128Mi`
-`interceptor.resources.limits.cpu` | CPU limit for interceptor container. |`2000m`
+`intercept.repository` | intercept container image repository | `neicnordic/sda-pipeline`
+`intercept.imageTag` | intercept container image version | `latest`
+`intercept.imagePullPolicy` | intercept container image pull policy | `Always`
+`intercept.replicaCount` | desired number of intercept workers | `1`
+`intercept.annotations` | Specific annotation for the intercept pod | `{}`
+`intercept.deploy` | Set to false in a non federated deployment | `true`
+`intercept.resources.requests.memory` | Memory request for intercept container. |`32Mi`
+`intercept.resources.requests.cpu` | CPU request for intercept container. |`100m`
+`intercept.resources.limits.memory` | Memory limit for intercept container. |`128Mi`
+`intercept.resources.limits.cpu` | CPU limit for intercept container. |`2000m`
 `s3Inbox.repository` | S3inbox container image repository | `neicnordic/sda-s3proxy`
 `s3Inbox.imageTag` | S3inbox container image version | `latest`
 `s3Inbox.imagePullPolicy` | S3inbox container image pull policy | `Always`
