@@ -1,4 +1,4 @@
-# SDA Orchestrator Service
+# SDA Orchestrate Service
 
 ## Installing the Chart
 
