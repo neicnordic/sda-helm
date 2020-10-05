@@ -22,4 +22,4 @@ This chart deploys the service components needed for the Sensitive Data Archive 
 
 ## sda-orch
 
-This chart deploys the orchestrator service needed for the Sensitive Data Archive standalone solution (No European Genome Archive connection).
+This chart deploys the orchestrate service needed for the Sensitive Data Archive standalone solution (No European Genome Archive connection).
