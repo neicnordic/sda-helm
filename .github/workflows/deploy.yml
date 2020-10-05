@@ -468,8 +468,8 @@ jobs:
     - name: Prepare for deployment
       run: |
         cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-orch/files/ca.crt
-        cp LocalEGA-deploy-init/config/certs/orchestrator.ca.crt sda-orch/files/orch.crt
-        cp LocalEGA-deploy-init/config/certs/orchestrator.ca.key sda-orch/files/orch.key
+        cp LocalEGA-deploy-init/config/certs/orchestrate.ca.crt sda-orch/files/orch.crt
+        cp LocalEGA-deploy-init/config/certs/orchestrate.ca.key sda-orch/files/orch.key
     - name: Deploy the SDA orch
       run: |
         DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
@@ -492,8 +492,8 @@ jobs:
     - name: Wait for SDA Orch to become ready
       run: |
         RETRY_TIMES=0
-        until kubectl get pods -lrole=orchestrator -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True";
-        do echo "waiting for orchestrator to become ready";
+        until kubectl get pods -lrole=orchestrate -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True";
+        do echo "waiting for orchestrate to become ready";
         RETRY_TIMES=$((RETRY_TIMES+1));
         if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
         sleep 10;
@@ -501,8 +501,8 @@ jobs:
     - name: debug sda orch
       if: failure()
       run: |
-        kubectl describe pod -l role=orchestrator
+        kubectl describe pod -l role=orchestrate
     - name: log sda orch
       if: failure()
       run: |
-        kubectl logs $(kubectl get pods | grep orchestrator | awk '{print $1}')
+        kubectl logs $(kubectl get pods | grep orchestrate | awk '{print $1}')

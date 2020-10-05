@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "sda.fullname" . }}-orchestrator
+  name: {{ template "sda.fullname" . }}-orchestrate
   labels:
-    role: orchestrator
+    role: orchestrate
     app: {{ template "sda.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: {{ .Release.Name }}-orchestrator
+    component: {{ .Release.Name }}-orchestrate
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -14,13 +14,13 @@ spec:
   revisionHistoryLimit: {{ default "3" .Values.revisionHistory }}
   selector:
     matchLabels:
-      app: {{ template "sda.name" . }}-orchestrator
+      app: {{ template "sda.name" . }}-orchestrate
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "sda.name" . }}-orchestrator
-        role: orchestrator
+        app: {{ template "sda.name" . }}-orchestrate
+        role: orchestrate
         release: {{ .Release.Name }}
       annotations:
         {{- if not .Values.secretsService }}
@@ -52,7 +52,7 @@ spec:
           mountPath: /tls
     {{- end }}
       containers:
-      - name: orchestrator
+      - name: orchestrate
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.imagePullPolicy | quote }}
         securityContext:
