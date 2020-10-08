@@ -177,6 +177,11 @@ global:
     jwkPath: "/oidc/jwk"
     oidcdHost: "https://login.elixir-czech.org"
 
+  # enable custom OIDC endpoint
+  oidc:
+    enable: false
+    host: ""
+
   inbox:
     servicePort: 2222
     storageType: "posix"
