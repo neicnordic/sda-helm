@@ -197,6 +197,12 @@ Create chart name and version as used by the chart label.
 {{/**/}}
 
 {{/**/}}
+{{- define "dbUserTest" -}}
+{{- ternary "lega_in" .Values.credentials.releasetest.dbUser (empty .Values.credentials.releasetest.dbUser) -}}
+{{- end -}}
+{{- define "dbPassIngest" -}}
+{{- ternary .Values.global.db.passIngest .Values.credentials.releasetest.dbPassword (empty .Values.credentials.releasetest.dbPassword) -}}
+{{- end -}}
 {{- define "mqUserReleaseTest" -}}
 {{- ternary .Values.global.broker.username .Values.credentials.releasetest.mqUser (empty .Values.credentials.releasetest.mqUser) -}}
 {{- end -}}
