@@ -65,7 +65,7 @@ spec:
       volumeMounts:
       {{- if not .Values.global.pkiService }}
         - name: certs
-          mountPath: "/certs"
+          mountPath: {{ template "tlsPath" .  }}
       {{- end }}
         - name: release-test-app
           mountPath: "/release-test-app"
@@ -78,10 +78,13 @@ spec:
           mountPath: "/posix_archive"
       {{- end }}
       env:
-        {{- if .Values.global.pkiService }}
+      {{- if .Values.global.pkiService }}
         - name: PKI_PATH
           value: {{include "secretsPath" }}
-        {{- end }}
+      {{- else }}
+        - name: PKI_PATH
+          value: {{ template "tlsPath" . }}
+      {{- end }}
         - name: INBOX_STORAGE_TYPE
           value: {{ required "Missing storage type for inbox" .Values.global.inbox.storageType | quote }}
       {{- if eq "s3" .Values.global.inbox.storageType }}
@@ -136,9 +139,9 @@ spec:
       {{- end }}
       {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/ingest.crt
+          value: {{ include "tlsPath" . }}/tester.ca.crt
         - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/ingest.key
+          value: {{ include "tlsPath" . }}/tester.ca.key
       {{- end }}
         - name: DB_DATABASE
           value: {{ default "lega" .Values.global.db.name | quote }}

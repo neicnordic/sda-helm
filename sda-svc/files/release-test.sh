@@ -1,6 +1,5 @@
 #!/bin/bash
 
-s=${PKI_PATH:-/certs}
 mkdir -p /tmp/c4gh
 
 
@@ -44,7 +43,6 @@ access_key=${INBOX_ACCESSKEY}
 secret_key=${INBOX_SECRETKEY}
 check_ssl_certificate = True
 encoding = UTF-8
-encrypt = True
 guess_mime_type = True
 host_base = ${INBOX_URL}
 host_bucket = ${INBOX_URL}
@@ -87,13 +85,20 @@ done
 PGSSL=/tmp/pgcerts
 mkdir -p "$PGSSL"
 
+if [ -n "${DB_SSLMODE}" ]; then
+    PGSSLMODE=${DB_SSLMODE}
+    export PGSSLMODE
+fi
+
 PGSSLKEY=$PGSSL/postgresql.key
 PGSSLCERT=$PGSSL/postgresql.crt
-export PGSSL PGSSLKEY PGSSLCERT
+PGSSLROOTCERT=$PGSSL/root.crt
+export PGSSLKEY PGSSLCERT PGSSLROOTCERT
 
-s=${PKI_VOLUME_PATH:-/certs}
-cp "$s/tester.ca.key" $PGSSL/postgresql.key
-cp "$s/tester.ca.crt" $PGSSL/postgresql.crt
+s=${PKI_PATH:-/certs}
+
+cp "$s/tester.ca.key" "$PGSSL/postgresql.key"
+cp "$s/tester.ca.crt" "$PGSSL/postgresql.crt"
 cp "$s/ca.crt" $PGSSL/root.crt
 
 chmod -R og-rw $PGSSL
@@ -210,7 +215,6 @@ access_key=${ARCHIVE_ACCESSKEY}
 secret_key=${ARCHIVE_SECRETKEY}
 check_ssl_certificate = True
 encoding = UTF-8
-encrypt = True
 guess_mime_type = True
 host_base = ${ARCHIVE_URL}
 host_bucket = ${ARCHIVE_URL}
@@ -227,6 +231,6 @@ EOF
   s3cmd  --region="${ARCHIVE_REGION}" -c /tmp/s3cmd.cfg del "s3://${ARCHIVE_BUCKET}/$archivepath"
 fi
 
-sleep 3000
+
 exit 0
 
