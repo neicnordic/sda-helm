@@ -218,6 +218,8 @@ credentials:
     dbPassword: ""
 
   releasetest:
+    dbUser: ""
+    dbPassword: ""
     mqUser: ""
     mqPassword: ""
 
@@ -379,7 +381,7 @@ sftpInbox:
 # the annotations to apply to the service pods
   annotations: {}
 
-test:
+releasetest:
   repository: neicnordic/sda-helm-tests-support
   imageTag: latest
   imagePullPolicy: Always
