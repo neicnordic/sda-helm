@@ -25,6 +25,8 @@ type: Opaque
 data:
   mqPassword: {{ include "mqPassReleaseTest" . | b64enc }}
   mqUser: {{ include "mqUserReleaseTest" . | b64enc }}
+  dbPassword: {{ include "dbPassReleaseTest" . | b64enc }}
+  dbUser: {{ include "dbUserReleaseTest" . | b64enc }}
 
 ---
 
@@ -60,8 +62,8 @@ metadata:
 spec:
   containers:
     - name: "{{ .Release.Name }}-test"
-      image:  "{{ .Values.test.repository }}:{{ .Values.test.imageTag }}"
-      imagePullPolicy: {{ .Values.test.imagePullPolicy | quote }}
+      image:  "{{ .Values.releasetest.repository }}:{{ .Values.releasetest.imageTag }}"
+      imagePullPolicy: {{ .Values.releasetest.imagePullPolicy | quote }}
       volumeMounts:
       {{- if not .Values.global.pkiService }}
         - name: certs
@@ -171,12 +173,12 @@ spec:
         - name: DB_PASSWORD
           valueFrom:
               secretKeyRef:
-                name: {{ template "sda.fullname" . }}-ingest
+                name: {{ template "sda.fullname" . }}-release-test
                 key: dbPassword
         - name: DB_USER
           valueFrom:
               secretKeyRef:
-                name: {{ template "sda.fullname" . }}-ingest
+                name: {{ template "sda.fullname" . }}-release-test
                 key: dbUser
       {{- end }}
       {{- if .Values.global.broker.vhost }}
