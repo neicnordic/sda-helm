@@ -66,6 +66,7 @@ Parameter | Description | Default
 `global.cega.password` | Password for the EGA user authentication service. |`""`
 `global.c4gh.file` | Private C4GH key. |`c4gh.key`
 `global.c4gh.passphrase` | Passphrase for the private C4GH key. |`""`
+`global.c4gh.publicFile` | Public key corresponding to the private key, neeeded for tests. |`""`
 `global.db.host` | Hostname for the database. |`""`
 `global.db.name` | Database to connect to. |`lega`
 `global.db.passIngest` | Password used for `data in` services. |`""`
@@ -123,6 +124,10 @@ Parameter | Description | Default
 `credentials.ingest.mqPassword` | Broker password for ingest | `""`
 `credentials.intercept.mqUser` | Broker user for intercept  | `""`
 `credentials.intercept.mqPassword` | Broker password for intercept | `""`
+`credentials.test.dbUser` | Databse user for test | `""`
+`credentials.test.dbPassword` | Database password for test | `""`
+`credentials.test.mqUser` | Broker user for test | `""`
+`credentials.test.mqPassword` | Broker password for test | `""`
 `credentials.verify.dbUser` | Databse user for verify | `""`
 `credentials.verify.dbPassword` | Database password for verify | `""`
 `credentials.verify.mqUser` | Broker user for verify | `""`
@@ -207,3 +212,6 @@ Parameter | Description | Default
 `verify.resources.requests.cpu` | CPU request for verify container. |`100m`
 `verify.resources.limits.memory` | Memory limit for verify container. |`512Mi`
 `verify.resources.limits.cpu` | CPU limit for verify container. |`2000m`
+`releasetest.repository` | inbox container image repository | `neicnordic/sda-helm-test-support`
+`releasetest.imageTag` | inbox container image version | `latest`
+`releasetest.imagePullPolicy` | inbox container image pull policy | `Always`
