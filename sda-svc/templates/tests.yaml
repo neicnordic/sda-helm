@@ -17,7 +17,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: "{{ .Release.Name }}-relase-test-passwords"
+  name: "{{ .Release.Name }}-release-test-passwords"
   annotations:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
@@ -163,22 +163,22 @@ spec:
         - name: MQ_PASSWORD
           valueFrom:
               secretKeyRef:
-                name: "{{ .Release.Name }}-relase-test-passwords"
+                name: "{{ .Release.Name }}-release-test-passwords"
                 key: mqPassword
         - name: MQ_USER
           valueFrom:
               secretKeyRef:
-                name: "{{ .Release.Name }}-relase-test-passwords"
+                name: "{{ .Release.Name }}-release-test-passwords"
                 key: mqUser
         - name: DB_PASSWORD
           valueFrom:
               secretKeyRef:
-                name: {{ template "sda.fullname" . }}-release-test
+                name: "{{ .Release.Name }}-release-test-passwords"
                 key: dbPassword
         - name: DB_USER
           valueFrom:
               secretKeyRef:
-                name: {{ template "sda.fullname" . }}-release-test
+                name: "{{ .Release.Name }}-release-test-passwords"
                 key: dbUser
       {{- end }}
       {{- if .Values.global.broker.vhost }}
