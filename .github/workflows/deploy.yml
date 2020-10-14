@@ -1,6 +1,6 @@
 name: k3s deployment
 
-on: [push,pull_request]
+on: [pull_request]
 
 jobs:
 
@@ -160,7 +160,7 @@ jobs:
         do echo "waiting for $p to become ready"
         RETRY_TIMES=$((RETRY_TIMES+1));
         if [ $RETRY_TIMES -eq 30 ]; then exit 1; fi
-        sleep 10;
+        sleep 15;
         done
         done
     - name: debug sda
@@ -367,7 +367,7 @@ jobs:
         do echo "waiting for $p to become ready"
         RETRY_TIMES=$((RETRY_TIMES+1));
         if [ $RETRY_TIMES -eq 30 ]; then exit 1; fi
-        sleep 10;
+        sleep 15;
         done
         done
     - name: debug sda
@@ -496,7 +496,7 @@ jobs:
         do echo "waiting for orchestrate to become ready";
         RETRY_TIMES=$((RETRY_TIMES+1));
         if [ $RETRY_TIMES -eq 10 ]; then exit 1; fi
-        sleep 10;
+        sleep 12;
         done
     - name: debug sda orch
       if: failure()
