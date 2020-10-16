@@ -113,6 +113,22 @@ Create chart name and version as used by the chart label.
 {{- ternary .Values.global.secretsPath (printf "%s/%s" .Values.global.secretsPath .Values.global.jwtPath) (empty .Values.global.jwtPath) -}}
 {{- end -}}
 
+{{- define "openid.endpoint" -}}
+  {{- if .Values.global.oidc.enable -}}
+    {{- printf "%s/.well-known/openid-configuration" (required "An oidc host is required" .Values.global.oidc.host) }}
+  {{- else }}
+    {{- printf "%s/oidc/.well-known/openid-configuration" .Values.global.elixir.oidcdHost -}}
+  {{ end }}
+{{- end -}}
+
+{{- define "openid.userinfo" -}}
+  {{- if .Values.global.confFilePath -}}
+    {{- printf "%s/idp/profile/oidc/userinfo" (required "An oidc host is required" .Values.global.oidc.host) }}
+  {{- else }}
+    {{- printf "%s/oidc/userinfo" .Values.global.elixir.oidcdHost -}}
+  {{ end }}
+{{- end -}}
+
 {{- define "confFile" -}}
   {{- if .Values.global.confFilePath -}}
     {{- printf "%s%s/%s" .Values.global.secretsPath .Values.global.confFilePath .Values.global.confFile }}
