@@ -180,24 +180,24 @@ spec:
       {{- end }}
         - name: BROKER_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-ingest
-                key: mqPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-ingest
+              key: mqPassword
         - name: BROKER_USER
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-ingest
-                key: mqUser
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-ingest
+              key: mqUser
         - name: DB_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-ingest
-                key: dbPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-ingest
+              key: dbPassword
         - name: DB_USER
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-ingest
-                key: dbUser
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-ingest
+              key: dbUser
         - name: C4GH_PASSPHRASE
           valueFrom:
             secretKeyRef:
@@ -244,7 +244,7 @@ spec:
             items:
             - key: {{ .Values.global.c4gh.file }}
               path: {{ .Values.global.c4gh.file }}
-      {{- end }}
+    {{- end }}
     {{- if not .Values.global.pkiService }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:

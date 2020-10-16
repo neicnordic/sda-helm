@@ -164,14 +164,14 @@ spec:
         {{- end }}
         - name: BROKER_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-verify
-                key: mqPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: mqPassword
         - name: BROKER_USER
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-verify
-                key: mqUser
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: mqUser
         - name: C4GH_PASSPHRASE
           valueFrom:
             secretKeyRef:
@@ -179,14 +179,14 @@ spec:
               key: c4ghPassphrase
         - name: DB_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-verify
-                key: dbPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: dbPassword
         - name: DB_USER
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-verify
-                key: dbUser
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: dbUser
       {{- end }}
         resources:
 {{ toYaml .Values.verify.resources | trim | indent 10 }}

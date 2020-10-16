@@ -127,24 +127,24 @@ spec:
       {{- if not .Values.global.secretsService }}
         - name: BROKER_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-finalize
-                key: mqPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-finalize
+              key: mqPassword
         - name: BROKER_USER
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-finalize
-                key: mqUser
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-finalize
+              key: mqUser
         - name: DB_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-finalize
-                key: dbPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-finalize
+              key: dbPassword
         - name: DB_USER
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-finalize
-                key: dbUser
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-finalize
+              key: dbUser
       {{- end }}
         resources:
 {{ toYaml .Values.finalize.resources | trim | indent 10 }}

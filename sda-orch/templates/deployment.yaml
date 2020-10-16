@@ -62,21 +62,21 @@ spec:
           value: {{ .Values.logLevel | quote }}
         - name: BROKER_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-orchestrate
-                key: mqPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-orchestrate
+              key: mqPassword
         - name: BROKER_USER
           value: {{ .Values.broker.username | quote }}
         - name: DB_IN_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-orchestrate
-                key: dbInPass
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-orchestrate
+              key: dbInPass
         - name: DB_OUT_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-orchestrate
-                key: dbOutPass
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-orchestrate
+              key: dbOutPass
         - name: DB_IN_USER
           value: {{ default "lega_in" .Values.db.userIngest }}
         - name: DB_OUT_USER

@@ -73,9 +73,9 @@ spec:
           value: {{ .Values.global.db.sslMode | quote }}
         - name: POSTGRES_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-doa
-                key: dbPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-doa
+              key: dbPassword
       {{- if eq "s3" .Values.global.archive.storageType }}
         - name: S3_ENDPOINT
           value: {{ required "A valid archive S3 URL entry is required!" .Values.global.archive.s3Url | quote }}
@@ -83,14 +83,14 @@ spec:
           value: {{ .Values.global.archive.s3Port | quote }}
         - name: S3_ACCESS_KEY
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-s3archive-keys
-                key: s3ArchiveAccessKey
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-s3archive-keys
+              key: s3ArchiveAccessKey
         - name: S3_SECRET_KEY
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-s3archive-keys
-                key: s3ArchiveSecretKey
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-s3archive-keys
+              key: s3ArchiveSecretKey
         - name: S3_REGION
           value: {{ .Values.global.archive.s3Region }}
         - name: S3_SECURE
@@ -149,14 +149,14 @@ spec:
         {{- end }}
         - name: S3_OUT_ACCESS_KEY
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-doa
-                key: s3OutboxAccessKey
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-doa
+              key: s3OutboxAccessKey
         - name: S3_OUT_SECRET_KEY
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-doa
-                key: s3OutboxAccessKey
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-doa
+              key: s3OutboxAccessKey
         {{- else }}
         - name: OUTBOX_LOCATION
           value: {{ .Values.global.doa.outbox.path | quote }}

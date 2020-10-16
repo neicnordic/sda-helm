@@ -108,7 +108,7 @@ spec:
           secret:
             defaultMode: 0440
             secretName: {{ template "sda.fullname" . }}-intercept-certs
-    {{- end }}
+  {{- end }}
       restartPolicy: Always
 {{- end }}
 {{- end }}
