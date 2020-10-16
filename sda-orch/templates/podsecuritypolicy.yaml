@@ -34,7 +34,5 @@ spec:
   hostPID: false
   volumes:
   - secret
-  - configMap
   - emptyDir
-  - projected
 {{- end }}
