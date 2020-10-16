@@ -1,4 +1,4 @@
-{{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "internal" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,10 +28,10 @@ spec:
         {{ .Values.global.networkPolicy.databaseNamespace }}: allowtraffic
         {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
-        {{- if not .Values.global.confFile }}
+      {{- if not .Values.global.secretsService }}
         checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
         checksum/config: {{ include (print $.Template.BasePath "/verify-secrets.yaml") . | sha256sum }}
-        {{- end }}
+      {{- end }}
 {{- if .Values.global.podAnnotations }}
 {{- toYaml .Values.global.podAnnotations | nindent 8 -}}
 {{- end }}
@@ -43,17 +43,20 @@ spec:
       serviceAccountName: {{ .Release.Name }}
     {{- end }}
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
     {{- if .Values.global.pkiPermissions }}
       initContainers:
       - name: tls-init
         image: busybox
         command: ["/bin/sh", "-c"]
-        args: ["/bin/cp /tls-certs/* /tls/ && chown 1000:1000 /tls/* && chmod 0600 /tls/*"]
+        args: ["/bin/cp /tls-certs/* /tls/ && chown 65534:65534 /tls/* && chmod 0600 /tls/*"]
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
         volumeMounts:
         - name: tls-certs
           mountPath: /tls-certs
@@ -64,76 +67,131 @@ spec:
       - name: verify
         image: "{{ .Values.verify.repository }}:{{ .Values.verify.imageTag }}"
         imagePullPolicy: {{ .Values.verify.imagePullPolicy | quote }}
-        command: ["ega-verify"]
-        args: ["--log", {{ .Values.global.log | quote }} {{- if .Values.global.confFile -}} , "--conf", "{{ template "confFile" . }}" {{- end -}}]
+        command: ["sda-verify"]
         securityContext:
           allowPrivilegeEscalation: false
         env:
-        - name: ARCHIVE_STORAGE_DRIVER
-        {{- if eq "FileStorage" .Values.global.archive.storageType }}
-          value: "FileStorage"
-        - name: ARCHIVE_LOCATION
-          value: "{{ .Values.global.archive.volumePath }}/%s"
-        {{ else }}
-          value: S3Storage
-        - name: ARCHIVE_S3_URL
+        - name: ARCHIVE_TYPE
+      {{- if eq "s3" .Values.global.archive.storageType }}
+          value: "s3"
+        - name: ARCHIVE_URL
           value: {{ required "S3 archive URL missing" .Values.global.archive.s3Url }}
-        - name: ARCHIVE_S3_BUCKET
+        - name: ARCHIVE_BUCKET
           value: {{ required "S3 archive bucket missing" .Values.global.archive.s3Bucket }}
-        - name: ARCHIVE_S3_REGION
+        - name: ARCHIVE_REGION
           value: {{ default "us-east-1" .Values.global.archive.s3Region }}
-        - name: ARCHIVE_S3_CHUNK_SIZE
-          value: {{  .Values.global.archive.s3ChunkSize | mul 1048576 | quote }}
+        - name: ARCHIVE_CHUNKSIZE
+          value: {{ .Values.global.archive.s3ChunkSize | quote }}
+        {{- if .Values.global.archive.s3CaFile }}
+        - name: ARCHIVE_CACERT
+          value: {{ template "tlsPath" . }}/{{ .Values.global.archive.s3CaFile }}
         {{- end }}
-        - name: BROKER_CACERTFILE
-          value:  "{{ template "tlsPath" . }}/ca.crt"
-        - name: BROKER_CERTFILE
-          value:  "{{ template "tlsPath" . }}/verify.crt"
-        - name: BROKER_KEYFILE
-          value:  "{{ template "tlsPath" . }}/verify.key"
-        - name: BROKER_VERIFY_HOSTNAME
-          value: "false"
-        - name: BROKER_VERIFY_PEER
+      {{- else }}
+          value: "posix"
+        - name: ARCHIVE_LOCATION
+          value: "{{ .Values.global.archive.volumePath }}/"
+      {{- end }}
+      {{- if .Values.global.broker.ssl }}
+        - name: BROKER_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+        {{- if .Values.global.broker.verifyPeer }}
+        - name: BROKER_CLIENTCERT
+          value: {{ include "tlsPath" . }}/verify.crt
+        - name: BROKER_CLIENTKEY
+          value: {{ include "tlsPath" . }}/verify.key
+        {{- end }}
+      {{- end }}
+        - name: BROKER_DURABLE
+          value: {{ .Values.global.broker.durable | quote }}
+        - name: BROKER_EXCHANGE
+          value: {{ default "lega" .Values.global.broker.exchange }}
+        - name: BROKER_HOST
+          value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
+        - name: BROKER_PORT
+          value: {{ .Values.global.broker.port | quote }}
+        - name: BROKER_QUEUE
+          value: "archived"
+        - name: BROKER_ROUTINGERROR
+          value: {{ .Values.global.broker.routingError }}
+        - name: BROKER_ROUTINGKEY
+          value: "files.verified"
+      {{- if .Values.global.broker.serverName }}
+        - name: BROKER_SERVERNAME
+          value: {{ .Values.global.broker.serverName | quote }}
+      {{- end }}
+        - name: BROKER_SSL
+          value: "true"
+        - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
-        {{- if not .Values.global.confFile }}
-        - name: C4GH_FILE_FILEPATH
-          value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.file }}"
-        - name: C4GH_FILE_PASSPHRASE
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-c4gh
-              key: passphrase
-        - name: BROKER_CONNECTION
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-verify
-              key: mqConnection
-        - name: DB_CONNECTION
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-verify
-              key: dbConnection
-        {{- if eq "S3Storage" .Values.global.archive.storageType }}
-        - name: ARCHIVE_S3_ACCESS_KEY
+        - name: BROKER_VHOST
+          value: {{ .Values.global.broker.vhost | quote }}
+        - name: C4GH_FILEPATH
+          value: {{ template "c4ghPath" . }}/{{ default "c4gh.sec.pem" .Values.global.c4gh.file }}
+      {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
+        - name: DB_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+      {{- end }}
+      {{- if eq "verify-full" .Values.global.db.sslMode }}
+        - name: DB_CLIENTCERT
+          value: {{ include "tlsPath" . }}/verify.crt
+        - name: DB_CLIENTKEY
+          value: {{ include "tlsPath" . }}/verify.key
+      {{- end }}
+        - name: DB_DATABASE
+          value: {{ default "lega" .Values.global.db.name | quote }}
+        - name: DB_HOST
+          value: {{ required "A valid DB host is required" .Values.global.db.host | quote }}
+        - name: DB_PORT
+          value: {{ .Values.global.db.port | quote }}
+        - name: DB_SSLMODE
+          value: {{ .Values.global.db.sslMode | quote }}
+      {{- if .Values.global.logLevel }}
+        - name: LOG_LEVEL
+          value: {{ .Values.global.logLevel | quote }}
+      {{- end }}
+      {{- if not .Values.global.secretsService }}
+        {{- if eq "s3" .Values.global.archive.storageType }}
+        - name: ARCHIVE_ACCESSKEY
           valueFrom:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-s3archive-keys
               key: s3ArchiveAccessKey
-        - name: ARCHIVE_S3_SECRET_KEY
+        - name: ARCHIVE_SECRETKEY
           valueFrom:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-s3archive-keys
               key: s3ArchiveSecretKey
         {{- end }}
-        {{- end }}
+        - name: BROKER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: mqPassword
+        - name: BROKER_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: mqUser
+        - name: C4GH_PASSPHRASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: c4ghPassphrase
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: dbPassword
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-verify
+              key: dbUser
+      {{- end }}
         resources:
 {{ toYaml .Values.verify.resources | trim | indent 10 }}
         volumeMounts:
-        {{- if (.Values.global.log | lower) eq "debug" }}
-        - name: tmp
-          mountPath: /tmp
-        {{- end }}
-        {{- if not .Values.global.confFile }}
+        {{- if not .Values.global.secretsService }}
         - name: c4gh
           mountPath: {{ template "c4ghPath" . }}
         {{- end }}
@@ -141,29 +199,24 @@ spec:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
         {{- end }}
-        {{- if eq "FileStorage" .Values.global.archive.storageType }}
+        {{- if eq "posix" .Values.global.archive.storageType }}
         - name: archive
           mountPath: {{ .Values.global.archive.volumePath | quote }}
         {{- end }}
       volumes:
-    {{- if (.Values.global.log | lower) eq "debug" }}
-        - name: tmp
-          emptyDir:
-            medium: Memory
-    {{- end }}
-    {{- if not .Values.global.pkiService }}
+      {{- if not .Values.global.pkiService }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440
             secretName: {{ template "sda.fullname" . }}-verify-certs
-      {{- if .Values.global.pkiPermissions }}
+        {{- if .Values.global.pkiPermissions }}
         - name: tls
           emptyDir:
             medium: Memory
             sizeLimit: 10Mi
+        {{- end }}
       {{- end }}
-    {{- end }}
-      {{- if not .Values.global.confFile }}
+      {{- if not .Values.global.secretsService }}
         - name: c4gh
           secret:
             defaultMode: 0440
@@ -172,7 +225,7 @@ spec:
             - key: {{ .Values.global.c4gh.file }}
               path: {{ .Values.global.c4gh.file }}
       {{- end }}
-      {{- if eq "FileStorage" .Values.global.archive.storageType }}
+      {{- if eq "posix" .Values.global.archive.storageType }}
         - name: archive
         {{- if .Values.global.archive.existingClaim }}
           persistentVolumeClaim:

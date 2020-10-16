@@ -22,6 +22,10 @@ externalPkiService:
 ha:
   enabled: true
   replicas: 3
+# Extra security context to apply to all pods
+# This should be a multi-line string mapping directly to the a map of
+# the securityContext to apply to the service pods
+extraSecurityContext: {}
 
 image:
   repository: neicnordic/sda-mq

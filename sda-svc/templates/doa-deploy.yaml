@@ -40,18 +40,29 @@ spec:
       serviceAccountName: {{ .Release.Name }}
     {{- end }}
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       containers:
       - name: doa
         image: "{{ .Values.doa.repository }}:{{ .Values.doa.imageTag }}"
         imagePullPolicy: {{ .Values.doa.imagePullPolicy | quote }}
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: no-oss,LocalEGA
+        - name: BROKER_HOST
+          value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
+        - name: BROKER_PORT
+          value: {{ .Values.global.broker.port | quote }}
+        - name: BROKER_VHOST
+          value: {{ .Values.global.broker.vhost | quote }}
+        - name: BROKER_VALIDATE
+          value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: DB_INSTANCE
           value: {{ required "A valid database host is required" .Values.global.db.host | quote}}
         - name: POSTGRES_DB
@@ -62,24 +73,24 @@ spec:
           value: {{ .Values.global.db.sslMode | quote }}
         - name: POSTGRES_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-doa
-                key: dbPassword
-      {{- if eq "S3Storage" .Values.global.archive.storageType }}
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-doa
+              key: dbPassword
+      {{- if eq "s3" .Values.global.archive.storageType }}
         - name: S3_ENDPOINT
           value: {{ required "A valid archive S3 URL entry is required!" .Values.global.archive.s3Url | quote }}
         - name: S3_PORT
           value: {{ .Values.global.archive.s3Port | quote }}
         - name: S3_ACCESS_KEY
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-s3archive-keys
-                key: s3ArchiveAccessKey
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-s3archive-keys
+              key: s3ArchiveAccessKey
         - name: S3_SECRET_KEY
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-s3archive-keys
-                key: s3ArchiveSecretKey
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-s3archive-keys
+              key: s3ArchiveSecretKey
         - name: S3_REGION
           value: {{ .Values.global.archive.s3Region }}
         - name: S3_SECURE
@@ -114,6 +125,43 @@ spec:
           value: "{{ template "c4ghPath" . }}/passphrase"
         - name: OPENID_CONFIGURATION_URL
           value: "{{ .Values.global.elixir.oidcdHost }}/oidc/.well-known/openid-configuration"
+      {{- if .Values.global.doa.outbox.enabled }}
+        - name: OUTBOX_ENABLED
+          value: {{ .Values.doa.outbox.enabled }}
+        - name: OUTBOX_QUEUE
+          value: {{ .Values.global.doa.outbox.queue | quote }}
+        - name: OUTBOX_TYPE
+          value: {{ .Values.global.doa.outbox.type | quote}}
+        {{- if eq "s3" .Values.global.doa.outbox.type }}
+        - name: S3_OUT_ENDPOINT
+          value: {{ .Values.global.doa.outbox.s3Url | quote}}
+        - name: S3_OUT_PORT
+          value: {{ .Values.global.doa.outbox.s3Port | quote}}
+        - name: S3_OUT_REGION
+          value: {{ .Values.global.doa.outbox.s3Region | quote}}
+        - name: S3_OUT_BUCKET
+          value: {{ .Values.global.doa.outbox.s3Bucket | quote}}
+        - name: S3_OUT_SECURE
+          value: "true"
+        {{- if .Values.global.doa.outbox.s3CaFile }}
+        - name: S3_OUT_ROOT_CERT_PATH
+          value: "/etc/ssl/certs/java/ca.crt"
+        {{- end }}
+        - name: S3_OUT_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-doa
+              key: s3OutboxAccessKey
+        - name: S3_OUT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-doa
+              key: s3OutboxAccessKey
+        {{- else }}
+        - name: OUTBOX_LOCATION
+          value: {{ .Values.global.doa.outbox.path | quote }}
+        {{- end }}
+      {{- end }}
       {{- if .Values.global.pkiService }}
         - name: PKI_PATH
           value: {{ include "secretsPath" . }}
@@ -155,7 +203,7 @@ spec:
         - name: c4gh-key
           mountPath: {{ template "c4ghPath" . }}
       {{- end }}
-      {{- if eq "FileStorage" .Values.global.archive.storageType }}
+      {{- if eq "posix" .Values.global.archive.storageType }}
         - name: archive
           mountPath: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
@@ -187,7 +235,7 @@ spec:
             secretName: {{ template "sda.fullname" . }}-c4gh
             defaultMode: 0440
       {{- end }}
-      {{- if eq "FileStorage" .Values.global.archive.storageType }}
+      {{- if eq "posix" .Values.global.archive.storageType }}
         - name: archive
           {{- if .Values.global.archive.existingClaim }}
           persistentVolumeClaim:

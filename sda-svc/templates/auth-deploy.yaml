@@ -1,5 +1,5 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
-{{- if eq "S3Storage" .Values.global.inbox.storageType }}
+{{- if eq "s3" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -48,9 +48,12 @@ spec:
         imagePullPolicy: {{ .Values.auth.imagePullPolicy | quote }}
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
         env:
         - name: LOG_LEVEL
-          value: {{ upper .Values.global.log }}
+          value: {{ upper .Values.global.logLevel }}
       {{- if not .Values.global.confFile }}
         - name: ELIXIR_ID
           valueFrom:

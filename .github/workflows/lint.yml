@@ -44,3 +44,17 @@ jobs:
       run: |
         bash .github/ci_tests/lint_helper.sh sda-svc
         helm lint sda-svc
+
+  lint_sda-orch:
+    name: Lint sda-orch
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install helm3
+      run: |
+        wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz -O - | tar -xz
+        sudo cp linux-amd64/helm /usr/local/bin/helm
+    - name: Lint sda-orch
+      run: |
+        bash .github/ci_tests/lint_helper.sh sda-orch
+        helm lint sda-orch

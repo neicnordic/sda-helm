@@ -1,8 +1,12 @@
 # SDA services
 
+Source repositories:
+    - https://github.com/neicnordic/sda-pipeline
+    - https://github.com/neicnordic/LocalEGA-DOA
+
 ## Installing the Chart
 
-Edit the values.yaml file and specify the relevant parts of the `global` section.  
+Edit the values.yaml file and specify the relevant parts of the `global` section.
 If no shared credentials for the broker and database are used, the credentials for each service shuld be set in the `credentials` section.
 
 ### Configuration
@@ -11,7 +15,7 @@ The following table lists the configurable parameters of the `sda-svc` chart and
 
 Parameter | Description | Default
 --------- | ----------- | -------
-`global.secretsPath` |  | `/etc/ega`
+`global.secretsPath` |  | `/.secrets`
 `global.c4ghPath` |  | `""`
 `global.tlsPath` |  | `""`
 `global.deploymentType` | Deployment can be split into `external` and `internal` components, available options are `all`, `external` and `internal`. | `all`
@@ -34,18 +38,17 @@ Parameter | Description | Default
 `global.podAnnotations` | Annotations applied to pods of all services. |`{}`
 `global.pkiService` | If an external PKI infrastructure is used set this to true. |`false`
 `global.rbacEnabled` | Use role based access control. |`true`
-`global.archive.storageType` | Storage type for the data archive, available options are `S3Storage` and `FileStorage`. |`S3Storage`
+`global.archive.storageType` | Storage type for the data archive, available options are `s3` and `posix`. |`s3`
 `global.archive.s3Url` | URL to S3 archive instance. |`""`
 `global.archive.s3Bucket` | S3 archive bucket. |`""`
 `global.archive.s3Region` | S3 archive region. |`us-east-1`
 `global.archive.s3ChunkSize` | S3 chunk size in MB. |`15`
-`global.archive.s3AccessKey` | Access key to S3 archive . |`""`
-`global.archive.s3SecretKey` | Secret key to S3 archive. |`""`
-`global.archive.s3CaFile` | CA certificate to use if the S3 archive is internal. |`""`
+`global.archive.s3AccessKey` | Access key to S3 archive . |`null`
+`global.archive.s3SecretKey` | Secret key to S3 archive. |`null`
+`global.archive.s3CaFile` | CA certificate to use if the S3 archive is internal. |`null`
 `global.archive.s3Port` | Port that the S3 S3 archive is available on. |`443`
-`global.archive.volumePath` | Path to the mounted `FileStorage` volume. |`/ega/archive`
-`global.archive.volumeMode` | File mode on the `FileStorage` volume. |`2750`
-`global.archive.nfsServer` | URL or IP addres to a NFS server. |`""`
+`global.archive.volumePath` | Path to the mounted `posix` volume. |`/archive`
+`global.archive.nfsServer` | URL or IP address to a NFS server. |`""`
 `global.archive.nfsPath` | Path on the NFS server for the archive. |`""`
 `global.auth.jwtAlg` | Key type to sign the JWT, available options are RS265 & ES256, Must match the key type |`"ES256"`
 `global.auth.jwtKey` | Private key used to sign the JWT. |`""`
@@ -70,24 +73,35 @@ Parameter | Description | Default
 `global.db.port` | Port that the database is listening on. |`5432`
 `global.db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. |`verify-full`
 `global.doa.serviceport` | Port that the DOA service is accessible on | `443`
+`global.doa.outbox.enabled` | Enable Outbox functionality of Data Out API | `false`
+`global.doa.outbox.queue` | MQ queue name for files/datasets export requests | `""`
+`global.doa.outbox.type` | Outbox type can be either S3 or POSIX | `""`
+`global.doa.outbox.path` | Posix outbox location with placeholder for the username | `""`
+`global.doa.outbox.s3Url` | Outbox S3 URL | `""`
+`global.doa.outbox.s3Port` | Outbox S3 port | `443`
+`global.doa.outbox.s3Region` | Outbox S3 region | `""`
+`global.doa.outbox.s3Bucket` | Outbox S3 bucket | `""`
+`global.doa.outbox.s3CaFile` | Outbox S3 CA certificate to use | `null`
+`global.doa.outbox.s3AccessKey` | Outbox S3 Access Key | `null`
+`global.doa.outbox.s3SecretKey` | Outbox S3 Secret key | `null`
 `global.elixir.pubKey` | Public key used to verify Elixir JWT. | `""`
 `global.elixir.jwkPath` | Path on the oicd Host where the JWK definitions can be found. | `/oidc/jwk`
 `global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org"`
 `global.inbox.brokerRoutingKey` | Routing key the inbox uses when publishing messages. | `files.inbox"`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
-`global.inbox.storageType` | Storage type for the inbox, available options are `S3Storage` and `FileStorage`. |`FileStorage`
-`global.inbox.path` | Path to the mounted `FileStorage` volume. |`/ega/inbox`
-`global.inbox.user` | Path to the mounted `FileStorage` volume. |`lega`
-`global.inbox.nfsServer` | URL or IP addres to a NFS server. |`""`
+`global.inbox.storageType` | Storage type for the inbox, available options are `s3` and `posix`. |`posix`
+`global.inbox.path` | Path to the mounted `posix` volume. |`/inbox`
+`global.inbox.user` | Path to the mounted `posix` volume. |`lega`
+`global.inbox.nfsServer` | URL or IP address to a NFS server. |`""`
 `global.inbox.nfsPath` | Path on the NFS server for the inbox. |`""`
-`global.inbox.existingClaim` | Existing volume to use for the `fileStorage` inbox. | `""`
+`global.inbox.existingClaim` | Existing volume to use for the `posix` inbox. | `""`
 `global.inbox.s3Url` | URL to S3 inbox instance. |`""`
 `global.inbox.s3Bucket` | S3 inbox bucket. |`""`
-`global.inbox.s3Region` | S3 inbox region. |`us-east-1`
+`global.inbox.s3Region` | S3 inbox region. |`""`
 `global.inbox.s3ChunkSize` | S3 chunk size in MB. |`15`
-`global.inbox.s3AccessKey` | Access key to S3 inbox . |`""`
-`global.inbox.s3SecretKey` | Secret key to S3 inbox. |`""`
-`global.inbox.s3CaFile` | CA certificate to use if the S3 inbox is internal. |`""`
+`global.inbox.s3AccessKey` | Access key to S3 inbox . |`null`
+`global.inbox.s3SecretKey` | Secret key to S3 inbox. |`null`
+`global.inbox.s3CaFile` | CA certificate to use if the S3 inbox is internal. |`null`
 `global.inbox.s3ReadyPath` | Endpoint to verify that the inbox is respondig. |`""`
 
 ### Credentials
@@ -108,6 +122,8 @@ Parameter | Description | Default
 `credentials.ingest.dbPassword` | Database password for ingest | `""`
 `credentials.ingest.mqUser` | Broker user for ingest  | `""`
 `credentials.ingest.mqPassword` | Broker password for ingest | `""`
+`credentials.intercept.mqUser` | Broker user for intercept  | `""`
+`credentials.intercept.mqPassword` | Broker password for intercept | `""`
 `credentials.verify.dbUser` | Databse user for verify | `""`
 `credentials.verify.dbPassword` | Database password for verify | `""`
 `credentials.verify.mqUser` | Broker user for verify | `""`
@@ -118,30 +134,60 @@ Parameter | Description | Default
 Parameter | Description | Default
 --------- | ----------- | -------
 `auth.replicaCount` | desired number of replicas | `1`
-`auth.repository` | dataedge container image repository | `neicnordic/sda-auth`
-`auth.imageTag` | dataedge container image version | `"latest"`
-`autha.imagePullPolicy` | dataedge container image pull policy | `Always`
+`auth.repository` | auth container image repository | `neicnordic/sda-auth`
+`auth.imageTag` | auth container image version | `"latest"`
+`auth.imagePullPolicy` | auth container image pull policy | `Always`
 `auth.annotations` | Specific annotation for the auth pod | `{}`
+`auth.resources.requests.memory` | Memory request for container. |`128Mi`
+`auth.resources.requests.cpu` | CPU request for container. |`100m`
+`auth.resources.limits.memory` | Memory limit for container. |`256Mi`
+`auth.resources.limits.cpu` | CPU limit for container. |`250m`
 `doa.replicaCount` | desired number of replicas | `1`
 `doa.repository` | dataedge container image repository | `neicnordic/sda-doa`
 `doa.imageTag` | dataedge container image version | `"latest"`
 `doa.imagePullPolicy` | dataedge container image pull policy | `Always`
 `doa.keystorePass` | keystore password | `changeit`
 `doa.annotations` | Specific annotation for the doa pod | `{}`
-`finalize.repository` | inbox container image repository | `neicnordic/sda-base`
+`doa.resources.requests.memory` | Memory request for dataedge container. |`128Mi`
+`doa.resources.requests.cpu` | CPU request for dataedge container. |`100m`
+`doa.resources.limits.memory` | Memory limit for dataedge container. |`1024Mi`
+`doa.resources.limits.cpu` | CPU limit for dataedge container. |`2000m`
+`finalize.repository` | inbox container image repository | `neicnordic/sda-pipeline`
 `finalize.imageTag` | inbox container image version | `latest`
 `finalize.imagePullPolicy` | inbox container image pull policy | `Always`
 `finalize.annotations` | Specific annotation for the finalize pod | `{}`
-`ingest.repository` | inbox container image repository | `neicnordic/sda-base`
+`finalize.resources.requests.memory` | Memory request for finalize container. |`128Mi`
+`finalize.resources.requests.cpu` | CPU request for finalize container. |`100m`
+`finalize.resources.limits.memory` | Memory limit for finalize container. |`256Mi`
+`finalize.resources.limits.cpu` | CPU limit for finalize container. |`250m`
+`ingest.repository` | inbox container image repository | `neicnordic/sda-pipeline`
 `ingest.imageTag` | inbox container image version | `latest`
 `ingest.imagePullPolicy` | inbox container image pull policy | `Always`
 `ingest.replicaCount` | desired number of ingest workers | `1`
 `ingest.annotations` | Specific annotation for the ingest pod | `{}`
+`ingest.resources.requests.memory` | Memory request for ingest container. |`128Mi`
+`ingest.resources.requests.cpu` | CPU request for ingest container. |`100m`
+`ingest.resources.limits.memory` | Memory limit for ingest container. |`512Mi`
+`ingest.resources.limits.cpu` | CPU limit for ingest container. |`2000m`
+`intercept.repository` | intercept container image repository | `neicnordic/sda-pipeline`
+`intercept.imageTag` | intercept container image version | `latest`
+`intercept.imagePullPolicy` | intercept container image pull policy | `Always`
+`intercept.replicaCount` | desired number of intercept workers | `1`
+`intercept.annotations` | Specific annotation for the intercept pod | `{}`
+`intercept.deploy` | Set to false in a non federated deployment | `true`
+`intercept.resources.requests.memory` | Memory request for intercept container. |`32Mi`
+`intercept.resources.requests.cpu` | CPU request for intercept container. |`100m`
+`intercept.resources.limits.memory` | Memory limit for intercept container. |`128Mi`
+`intercept.resources.limits.cpu` | CPU limit for intercept container. |`2000m`
 `s3Inbox.repository` | S3inbox container image repository | `neicnordic/sda-s3proxy`
 `s3Inbox.imageTag` | S3inbox container image version | `latest`
 `s3Inbox.imagePullPolicy` | S3inbox container image pull policy | `Always`
 `s3Inbox.replicaCount`| desired number of S3inbox containers | `1`
 `s3Inbox.annotations` | Specific annotation for the S3inbox pod | `{}`
+`s3Inbox.resources.requests.memory` | Memory request for s3Inbox container. |`128Mi`
+`s3Inbox.resources.requests.cpu` | CPU request for s3Inbox container. |`100m`
+`s3Inbox.resources.limits.memory` | Memory limit for s3Inbox container. |`1024Mi`
+`s3Inbox.resources.limits.cpu` | CPU limit for s3Inbox container. |`1000m`
 `sftpInbox.repository` | sftp inbox container image repository | `neicnordic/sda-inbox-sftp`
 `sftpInbox.imageTag` | sftp inbox container image version | `latest`
 `sftpInbox.imagePullPolicy` | sftp inbox container image pull policy | `Always`
@@ -149,8 +195,16 @@ Parameter | Description | Default
 `sftpInbox.keystorePass` | sftp inbox keystore password | `changeit`
 `sftpInbox.nodeHostname` | Node name if the sftp inbox  needs to be deployed on a specific node | `""`
 `sftpInbox.annotations` | Specific annotation for the sftp inbox pod | `{}`
-`verify.repository` | inbox container image repository | `neicnordic/sda-base`
+`sftpInbox.resources.requests.memory` | Memory request for sftpInbox container. |`128Mi`
+`sftpInbox.resources.requests.cpu` | CPU request for sftpInbox container. |`100m`
+`sftpInbox.resources.limits.memory` | Memory limit for sftpInbox container. |`256Mi`
+`sftpInbox.resources.limits.cpu` | CPU limit for sftpInbox container. |`250m`
+`verify.repository` | inbox container image repository | `neicnordic/sda-pipeline`
 `verify.imageTag` | inbox container image version | `latest`
 `verify.imagePullPolicy` | inbox container image pull policy | `Always`
 `verify.replicaCount`| desired number of verify containers | `1`
 `verify.annotations` | Specific annotation for the verify pod | `{}`
+`verify.resources.requests.memory` | Memory request for verify container. |`128Mi`
+`verify.resources.requests.cpu` | CPU request for verify container. |`100m`
+`verify.resources.limits.memory` | Memory limit for verify container. |`512Mi`
+`verify.resources.limits.cpu` | CPU limit for verify container. |`2000m`

@@ -1,7 +1,7 @@
 apiVersion: v2
-name: sda-svc
-version: "0.4"
-description: Components for Sensitive Data Archive (SDA) installation
+name: sda-orch
+version: "0.3"
+description: Orchestrate component for Sensitive Data Archive (SDA) standalone installation
 home: https://neic-sda.readthedocs.io
 icon: https://neic.no/assets/images/logo.png
 sources:

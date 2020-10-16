@@ -1,5 +1,5 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
-{{- if eq "FileStorage" .Values.global.inbox.storageType }}
+{{- if eq "posix" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,9 +44,9 @@ spec:
       serviceAccountName: {{ .Release.Name }}
     {{- end }}
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       containers:
       - name: inbox
         image: "{{ .Values.sftpInbox.repository }}:{{ .Values.sftpInbox.imageTag }}"
@@ -54,6 +54,9 @@ spec:
         command: ["java", "-jar", "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts", "-Djavax.net.ssl.trustStorePassword={{ .Values.sftpInbox.keystorePass }}" ,"inbox-0.0.3-SNAPSHOT.jar"]
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
         resources:
 {{ toYaml .Values.sftpInbox.resources | trim | indent 10 }}
         env:

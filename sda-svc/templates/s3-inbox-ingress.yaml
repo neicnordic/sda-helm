@@ -1,5 +1,5 @@
 {{- if and (not .Values.global.confFile) (or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType)) (not .Values.global.deploymentType)) }}
-{{- if and (eq "S3Storage" .Values.global.inbox.storageType) .Values.global.ingress.deploy }}
+{{- if and (eq "s3" .Values.global.inbox.storageType) .Values.global.ingress.deploy }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:

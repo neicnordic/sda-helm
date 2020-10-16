@@ -3,18 +3,18 @@
 # Declare variables to be passed into your templates.
 global:
 
-# Path where the sensitive files can be found, default is "/etc/ega".
+# Path where the sensitive files can be found, default is "/.secrets".
 # TLS certificates or C4GH key locations can be set using global.tlsPath or global.c4ghPath respectively,
 # this path will be a subpath to the secretsPath.
-  secretsPath: /etc/ega
+  secretsPath: /.secrets
   c4ghPath: ""
   tlsPath: ""
   jwtPath: ""
-  
+
 # Name of an injected config file, located in the secretsPath
 # If the file is located in a subpath it can be set using the confFilePath
 # If no conf file is specified DB and MQ connections will be configured via ENVs
-  # confFile: conf.ini
+  # confFile: config.yaml
   # confFilePath: ""
 
 # Deployment can be split into `external` and `internal` components
@@ -39,7 +39,7 @@ global:
 # issuer requires a configured cert-manager
     issuer: ""
 
-  log: "info"
+  logLevel: "info"
 
 # utilize network isolation
 # Make sure you’ve configured a network provider with network policy support.
@@ -73,6 +73,7 @@ global:
 
 # If an external PKI infrastructure is used set this to true
   pkiService: false
+# if permissions needs to be set on the injected certificates set this to true
   pkiPermissions: true
 
 # Assume RBAC is enabled in the cluster
@@ -81,9 +82,17 @@ global:
   podSecurityPolicy:
     create: true
 
+# Extra security context to apply to all pods
+# This should be a multi-line string mapping directly to the a map of
+# the securityContext to apply to the service pods
+  extraSecurityContext: {}
+
+# If an external secrets management service is used set this to true
+  secretsService: false
+
 # global configurations
   archive:
-    storageType: "S3Storage" # S3Storage or FileStorage
+    storageType: "s3" # s3 or posix
   # The six lines below is only used with S3 backend
     s3Url: ""
     s3Bucket: ""
@@ -93,10 +102,8 @@ global:
     s3SecretKey: null
     s3CaFile: null
     s3Port: 443
-  # The two lines below is only used with FileStorage
-    volumePath: "/ega/archive"
-    volumeUser: lega
-    volumeMode: 2750
+  # The lines below is only used with POSIX backend
+    volumePath: "/archive"
     nfsServer: ""
     nfsPath: ""
 
@@ -110,13 +117,19 @@ global:
     external: false
     host: ""
     ip: ""
+    durable: true
+    external: false
+    host: ""
+    ip: ""
     exchange: ""
+    host: ""
+    password: ""
     port: 5671
+    routingError: ""
+    ssl: true
+    username: ""
     verifyPeer: true
     vhost: "/"
-# This 
-    password: ""
-    username: ""
 
   cega:
     host: ""
@@ -135,12 +148,29 @@ global:
     name: "lega"
     passIngest: ""
     passOutgest: ""
+    port: 5432
+    # to be used with networkpolicies
     servicePort: 5432
     sslMode: "verify-full"
 
   doa:
     servicePort: 8080
     ingressips: "0.0.0.0/0"
+    outbox:
+      enabled: false
+      # MQ queue name for files/datasets export requests
+      queue: ""
+      # Outbox type can be either S3 or POSIX
+      type: ""
+      # Outbox location with placeholder for the username
+      path: ""
+      s3Url: ""
+      s3Port: 443
+      s3Region: ""
+      s3Bucket: ""
+      s3CaFile: null
+      s3AccessKey: null
+      s3SecretKey: null
 
   elixir:
     pubKey: ""
@@ -149,9 +179,9 @@ global:
 
   inbox:
     servicePort: 2222
-    storageType: "FileStorage"
-  # These lines below are only used with FileStorage
-    path: "/ega/inbox"
+    storageType: "posix"
+  # These lines below are only used with posix
+    path: "/inbox"
     user: "lega"
     nfsServer: ""
     nfsPath: ""
@@ -192,6 +222,10 @@ credentials:
     dbUser: ""
     dbPassword: ""
 
+  intercept:
+    mqUser: ""
+    mqPassword: ""
+
   verify:
     mqUser: ""
     mqPassword: ""
@@ -199,7 +233,7 @@ credentials:
     dbPassword: ""
 
 ##################################
-# Service specifica settings
+# Service specific settings
 
 auth:
   name: auth
@@ -243,7 +277,7 @@ doa:
 finalize:
   name: finalize
   replicaCount: 1
-  repository: neicnordic/sda-base
+  repository: neicnordic/sda-pipeline
   imageTag: latest
   imagePullPolicy: IfNotPresent
   resources:
@@ -261,7 +295,7 @@ finalize:
 ingest:
   name: ingest
   replicaCount: 1
-  repository: neicnordic/sda-base
+  repository: neicnordic/sda-pipeline
   imageTag: latest
   imagePullPolicy: Always
   resources:
@@ -270,6 +304,25 @@ ingest:
       cpu: "100m"
     limits:
       memory: "512Mi"
+      cpu: "2000m"
+# Extra annotations to attach to the service pods
+# This should be a multi-line string mapping directly to the a map of
+# the annotations to apply to the service pods
+  annotations: {}
+
+intercept:
+  deploy: true
+  name: ingest
+  replicaCount: 1
+  repository: neicnordic/sda-pipeline
+  imageTag: latest
+  imagePullPolicy: Always
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
       cpu: "2000m"
 # Extra annotations to attach to the service pods
 # This should be a multi-line string mapping directly to the a map of
@@ -316,7 +369,7 @@ sftpInbox:
 
 verify:
   replicaCount: 1
-  repository: neicnordic/sda-base
+  repository: neicnordic/sda-pipeline
   imageTag: latest
   imagePullPolicy: Always
   resources:

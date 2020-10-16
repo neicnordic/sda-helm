@@ -1,5 +1,5 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
-{{- if eq "S3Storage" .Values.global.inbox.storageType }}
+{{- if eq "s3" .Values.global.inbox.storageType }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -49,26 +49,28 @@ spec:
       - name: s3inbox
         image: "{{ .Values.s3Inbox.repository }}:{{ .Values.s3Inbox.imageTag }}"
         imagePullPolicy: {{ .Values.s3Inbox.imagePullPolicy | quote }}
-        args: ["--log", {{ .Values.global.log | quote }}]
         securityContext:
           allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
         env:
       {{- if not .Values.global.confFile }}
         - name: AWS_ACCESSKEY
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-inbox
-                key: s3InboxAccessKey
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-inbox
+              key: s3InboxAccessKey
         - name: AWS_SECRETKEY
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-inbox
-                key: s3InboxSecretKey
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-inbox
+              key: s3InboxSecretKey
         - name: BROKER_PASSWORD
           valueFrom:
-              secretKeyRef:
-                name: {{ template "sda.fullname" . }}-inbox
-                key: mqPassword
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-inbox
+              key: mqPassword
         - name: BROKER_USER
           value: {{ include "mqUserInbox" . | quote }}
       {{- else }}
@@ -107,11 +109,15 @@ spec:
           value: {{ include "tlsPath" . }}/ca.crt
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
-      {{- if .Values.global.broker.verifyPeer }}
+      {{- if .Values.global.broker.ssl }}
+        - name: BROKER_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+        {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
           value: {{ include "tlsPath" . }}/inbox.crt
         - name: BROKER_CLIENTKEY
           value: {{ include "tlsPath" . }}/inbox.key
+        {{- end }}
       {{- end }}
         - name: SERVER_CERT
           value: {{ include "tlsPath" . }}/inbox.crt
@@ -124,7 +130,7 @@ spec:
           value: "{{ .Values.global.elixir.oidcdHost }}{{ .Values.global.elixir.jwkPath }}"
         {{- end }}
         - name: SERVER_LOG_LEVEL
-          value: {{ .Values.global.log }}
+          value: {{ .Values.global.logLevel }}
         ports:
         - name: inbox
           containerPort: 8000
