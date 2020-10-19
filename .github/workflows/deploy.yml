@@ -485,7 +485,7 @@ jobs:
         broker.queue.completed="files.completed",\
         broker.queue.verify="lega",\
         broker.queue.files="files",\
-        broker.queue.stabledid="stableIDs",\
+        broker.queue.stabledid="accessionIDs",\
         db.host="postgres-sda-db",\
         db.passIngest="$DB_IN_PASS",\
         db.passOutgest="$DB_OUT_PASS"
