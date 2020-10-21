@@ -100,7 +100,7 @@ spec:
         - name: BROKER_DURABLE
           value: {{ .Values.global.broker.durable | quote }}
         - name: BROKER_EXCHANGE
-          value: {{ default "lega" .Values.global.broker.exchange }}
+          value: {{ default "sda" .Values.global.broker.exchange }}
         - name: BROKER_HOST
           value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
         - name: BROKER_PORT
@@ -110,7 +110,7 @@ spec:
         - name: BROKER_ROUTINGERROR
           value: {{ .Values.global.broker.routingError }}
         - name: BROKER_ROUTINGKEY
-          value: "files.verified"
+          value: "verified"
       {{- if .Values.global.broker.serverName }}
         - name: BROKER_SERVERNAME
           value: {{ .Values.global.broker.serverName | quote }}
