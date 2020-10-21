@@ -71,6 +71,10 @@ spec:
               key: mqPassword
         - name: BROKER_PORT
           value: {{ .Values.global.broker.port | quote }}
+        - name: BROKER_EXCHANGE
+          value: {{ .Values.global.broker.exchange | quote }}
+        - name: BROKER_ROUTINGKEY
+          value: "inbox"
         - name: BROKER_USERNAME
           value: {{ include "mqUserInbox" . | quote }}
         - name: BROKER_VHOST

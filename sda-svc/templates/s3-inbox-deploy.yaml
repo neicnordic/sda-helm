@@ -100,7 +100,7 @@ spec:
         - name: BROKER_EXCHANGE
           value: {{ .Values.global.broker.exchange | quote }}
         - name: BROKER_ROUTINGKEY
-          value: "files.inbox"
+          value: "inbox"
         - name: BROKER_SSL
           value: "true"
         - name: BROKER_CACERT

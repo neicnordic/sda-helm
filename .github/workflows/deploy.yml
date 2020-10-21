@@ -129,10 +129,10 @@ jobs:
         cp LocalEGA-deploy-init/config/certs/*.p12 sda-svc/files/
         cp LocalEGA-deploy-init/config/certs/cacerts sda-svc/files/
         cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
-        for n in doa finalize ingest intercept verify
+        for n in doa finalize ingest intercept verify mapper
           do cp LocalEGA-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
         done
-        for n in doa finalize ingest intercept verify
+        for n in doa finalize ingest intercept verify mapper
           do cp LocalEGA-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
     - name: Deploy the SDA stack
@@ -333,10 +333,10 @@ jobs:
         cp LocalEGA-deploy-init/config/certs/doa.p12 sda-svc/files/
         cp LocalEGA-deploy-init/config/certs/cacerts sda-svc/files/
         cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
-        for n in doa finalize ingest verify inbox intercept
+        for n in doa finalize ingest verify inbox intercept mapper
           do cp LocalEGA-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
         done
-        for n in doa finalize ingest verify inbox intercept
+        for n in doa finalize ingest verify inbox intercept mapper
           do cp LocalEGA-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
         cp LocalEGA-deploy-init/config/certs/res.ca.crt sda-svc/files/auth.crt
@@ -479,13 +479,13 @@ jobs:
         broker.password="admin",\
         broker.username=admin,\
         broker.host="broker-sda-mq",\
-        broker.exchange="lega",\
-        broker.vhost="lega",\
-        broker.queue.inbox="files.inbox",\
-        broker.queue.completed="files.completed",\
-        broker.queue.verify="lega",\
+        broker.exchange="sda",\
+        broker.vhost="sda",\
+        broker.queue.inbox="inbox",\
+        broker.queue.completed="completed",\
+        broker.queue.verify="archived",\
         broker.queue.files="files",\
-        broker.queue.stabledid="stableIDs",\
+        broker.queue.stabledid="accessionIDs",\
         db.host="postgres-sda-db",\
         db.passIngest="$DB_IN_PASS",\
         db.passOutgest="$DB_OUT_PASS"
