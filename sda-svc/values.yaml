@@ -209,6 +209,12 @@ credentials:
     mqUser: ""
     mqPassword: ""
 
+  mapper:
+    mqUser: ""
+    mqPassword: ""
+    dbUser: ""
+    dbPassword: ""
+
   verify:
     mqUser: ""
     mqPassword: ""
@@ -302,10 +308,27 @@ intercept:
   imagePullPolicy: Always
   resources:
     requests:
-      memory: "32Mi"
+      memory: "128Mi"
       cpu: "100m"
     limits:
+      memory: "256Mi"
+      cpu: "250m"
+# Extra annotations to attach to the service pods
+# This should be a multi-line string mapping directly to the a map of
+# the annotations to apply to the service pods
+  annotations: {}
+
+mapper:
+  replicaCount: 1
+  repository: neicnordic/sda-pipeline
+  imageTag: latest
+  imagePullPolicy: Always
+  resources:
+    requests:
       memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
       cpu: "2000m"
 # Extra annotations to attach to the service pods
 # This should be a multi-line string mapping directly to the a map of
