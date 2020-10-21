@@ -1,7 +1,33 @@
 #!/bin/bash
 
-mkdir -p /tmp/c4gh
+if [ "${DEPLOYMENT_TYPE}" = all -o "${DEPLOYMENT_TYPE}" = external ]; then
 
+    python3 /release-test-app/verify-inboxes.py
+
+    if [ "$?" -ne 0 ]; then
+	echo "Failed inbox verification, bailing out"
+	exit 1
+    fi
+
+    echo "Inbox seems okay"
+
+    python3 /release-test-app/verify-doa.py
+
+    if [ "$?" -ne 0 ]; then
+	echo "Failed doa verification, bailing out"
+	exit 1
+    fi
+
+    echo "DOA seems okay"
+
+fi
+
+if [ "${DEPLOYMENT_TYPE}" = external ] ; then
+   echo "External-only deployment, nothing more to check."
+   exit 0
+fi
+
+mkdir -p /tmp/c4gh
 
 user=release-test-${RANDOM}
 
@@ -230,7 +256,6 @@ EOF
   echo "Removing s3://${ARCHIVE_BUCKET}/$archivepath"
   s3cmd  --region="${ARCHIVE_REGION}" -c /tmp/s3cmd.cfg del "s3://${ARCHIVE_BUCKET}/$archivepath"
 fi
-
 
 exit 0
 
