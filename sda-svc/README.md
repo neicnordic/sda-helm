@@ -87,7 +87,7 @@ Parameter | Description | Default
 `global.elixir.pubKey` | Public key used to verify Elixir JWT. | `""`
 `global.elixir.jwkPath` | Path on the oicd Host where the JWK definitions can be found. | `/oidc/jwk`
 `global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org"`
-`global.inbox.brokerRoutingKey` | Routing key the inbox uses when publishing messages. | `files.inbox"`
+`global.inbox.brokerRoutingKey` | Routing key the inbox uses when publishing messages. | `inbox"`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
 `global.inbox.storageType` | Storage type for the inbox, available options are `s3` and `posix`. |`posix`
 `global.inbox.path` | Path to the mounted `posix` volume. |`/inbox`
