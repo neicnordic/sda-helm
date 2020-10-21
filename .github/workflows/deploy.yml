@@ -483,7 +483,7 @@ jobs:
         broker.vhost="sda",\
         broker.queue.inbox="inbox",\
         broker.queue.completed="completed",\
-        broker.queue.verify="archive",\
+        broker.queue.verify="archived",\
         broker.queue.files="files",\
         broker.queue.stabledid="accessionIDs",\
         db.host="postgres-sda-db",\
