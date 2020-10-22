@@ -99,13 +99,19 @@ spec:
           containerPort: 2222
           protocol: TCP
         livenessProbe:
-          tcpSocket:
-            port: 2222
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - netstat -an | grep -q ':2222 '
           initialDelaySeconds: 120
           periodSeconds: 5
         readinessProbe:
-          tcpSocket:
-            port: 2222
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - netstat -an | grep -q ':2222 '
           initialDelaySeconds: 30
           periodSeconds: 5
         volumeMounts:
