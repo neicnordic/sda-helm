@@ -78,13 +78,13 @@ spec:
         - name: BROKER_DURABLE
           value: "true"
         - name: BROKER_EXCHANGE
-          value: {{ default "lega" .Values.global.broker.exchange | quote}}
+          value: {{ default "sda" .Values.global.broker.exchange | quote}}
         - name: BROKER_HOST
           value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
         - name: BROKER_PORT
           value: {{ .Values.global.broker.port | quote }}
         - name: BROKER_QUEUE
-          value: "cega_files"
+          value: "files"
         - name: BROKER_ROUTINGERROR
           value: {{ .Values.global.broker.routingError | quote }}
         - name: BROKER_SSL

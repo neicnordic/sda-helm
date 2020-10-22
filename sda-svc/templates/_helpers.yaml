@@ -198,6 +198,37 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/**/}}
+{{- define "dbUserMapper" -}}
+{{- ternary "lega_out" .Values.credentials.mapper.dbUser (empty .Values.credentials.mapper.dbUser) -}}
+{{- end -}}
+{{- define "dbPassMapper" -}}
+{{- ternary .Values.global.db.passpassOutgest .Values.credentials.mapper.dbPassword (empty .Values.credentials.mapper.dbPassword) -}}
+{{- end -}}
+{{- define "mqUserMapper" -}}
+{{- ternary .Values.global.broker.username .Values.credentials.mapper.mqUser (empty .Values.credentials.mapper.mqUser) -}}
+{{- end -}}
+{{- define "mqPassMapper" -}}
+{{- ternary .Values.global.broker.password .Values.credentials.mapper.mqPassword (empty .Values.credentials.mapper.mqPassword) -}}
+{{- end -}}
+{{/**/}}
+
+{{/**/}}
+{{- define "dbUserReleaseTest" -}}
+{{- ternary "lega_in" .Values.credentials.releasetest.dbUser (empty .Values.credentials.releasetest.dbUser) -}}
+{{- end -}}
+{{- define "dbPassReleaseTest" -}}
+{{- ternary .Values.global.db.passIngest .Values.credentials.releasetest.dbPassword (empty .Values.credentials.releasetest.dbPassword) -}}
+{{- end -}}
+{{- define "mqUserReleaseTest" -}}
+{{- ternary .Values.global.broker.username .Values.credentials.releasetest.mqUser (empty .Values.credentials.releasetest.mqUser) -}}
+{{- end -}}
+{{- define "mqPassReleaseTest" -}}
+{{- ternary .Values.global.broker.password .Values.credentials.releasetest.mqPassword (empty .Values.credentials.releasetest.mqPassword) -}}
+{{- end -}}
+{{/**/}}
+
+
+{{/**/}}
 {{- define "dbUserVerify" -}}
 {{- ternary "lega_in" .Values.credentials.verify.dbUser (empty .Values.credentials.verify.dbUser) -}}
 {{- end -}}
