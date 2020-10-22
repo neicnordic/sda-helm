@@ -29,6 +29,11 @@ image:
   tag: latest
   pullPolicy: Always
 
+testimage:
+  repository: neicnordic/sda-helm-tests-support
+  tag: latest
+  pullPollicy: Always
+
 # utilize network isolation
 # Make sure you’ve configured a network provider with network policy support.
 # There are a number of network providers that support NetworkPolicy, including:

@@ -132,6 +132,8 @@ global:
 # name of the c4gh key file.
     file: c4gh.key
     passphrase: ""
+# name of the public file, required for testing
+    publicFile: ""
 
   db:
     host: ""
@@ -214,6 +216,12 @@ credentials:
     mqPassword: ""
     dbUser: ""
     dbPassword: ""
+
+  releasetest:
+    dbUser: ""
+    dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   verify:
     mqUser: ""
@@ -373,6 +381,11 @@ sftpInbox:
 # the annotations to apply to the service pods
   annotations: {}
 
+releasetest:
+  repository: neicnordic/sda-helm-tests-support
+  imageTag: latest
+  imagePullPolicy: Always
+  
 verify:
   replicaCount: 1
   repository: neicnordic/sda-pipeline
