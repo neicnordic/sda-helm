@@ -1,0 +1,81 @@
+---
+{{- define "dbfullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-test"
+  resourceVersion: {{ template "dbfullname" . }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  securityContext:
+    runAsUser: 70
+    fsGroup: 70
+  containers:
+    - name: {{ .Release.Name }}-test
+      image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
+      imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+      volumeMounts:
+      {{- if not .Values.externalPkiService.tlsPath }}
+        - name: certs
+          mountPath: /certs
+      {{- end }}
+      env:
+        {{- if .Values.externalPkiService.tlsPath }}
+        - name: PKI_VOLUME_PATH
+          value: {{.Values.externalPkiService.tlsPath }}
+        {{- end }}
+        - name: DB_HOST
+          value: "{{ template "dbfullname" . }}"
+        - name: PGPASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "dbfullname" . }}
+                key: pgInPasswd             
+      command: [ "/bin/bash" ]
+      args:
+        - "-c"
+        - 'cd $HOME;
+           mkdir -p $PGSSL;
+           s=${PKI_VOLUME_PATH:-/certs};
+           cp "$s/tester.ca.key" $PGSSL/postgresql.key;
+           cp "$s/tester.ca.crt" $PGSSL/postgresql.crt;
+           cp "$s/CA.crt" $PGSSL/root.crt;
+           chmod -R og-rw $PGSSL;
+           count=1;
+           until (psql -h ${DB_HOST} -U lega_in lega -c "select * from local_ega.dbschema_version" || [ "$count" -ge 10 ]); do 
+             sleep 10;
+             count=$((count+1));
+           done |
+           grep -F "Created with version"'
+  volumes:
+    {{- if not .Values.externalPkiService.tlsPath }}
+      - name: certs
+        projected:
+          sources:
+          - secret:
+              name: "{{ .Release.Name }}-test-certs"
+              items:
+              - key: tester.ca.key
+                path: tester.ca.key
+              - key: tester.ca.crt
+                path: tester.ca.crt
+              - key: CA.crt
+                path: CA.crt
+    {{- end }}
+  restartPolicy: Never
+

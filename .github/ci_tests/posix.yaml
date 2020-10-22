@@ -9,7 +9,7 @@ global:
     existingClaim: archive-volume
   broker:
     host: "broker-sda-mq"
-    exchange: "lega"
+    exchange: "sda"
     port: 5671
     verifyPeer: true
     password: "admin"

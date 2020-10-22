@@ -140,6 +140,8 @@ global:
 # name of the c4gh key file.
     file: c4gh.key
     passphrase: ""
+# name of the public file, required for testing
+    publicFile: ""
 
   db:
     external: false
@@ -228,6 +230,18 @@ credentials:
     dbPassword: ""
 
   intercept:
+    mqUser: ""
+    mqPassword: ""
+
+  mapper:
+    mqUser: ""
+    mqPassword: ""
+    dbUser: ""
+    dbPassword: ""
+
+  releasetest:
+    dbUser: ""
+    dbPassword: ""
     mqUser: ""
     mqPassword: ""
 
@@ -324,10 +338,27 @@ intercept:
   imagePullPolicy: Always
   resources:
     requests:
-      memory: "32Mi"
+      memory: "128Mi"
       cpu: "100m"
     limits:
+      memory: "256Mi"
+      cpu: "250m"
+# Extra annotations to attach to the service pods
+# This should be a multi-line string mapping directly to the a map of
+# the annotations to apply to the service pods
+  annotations: {}
+
+mapper:
+  replicaCount: 1
+  repository: neicnordic/sda-pipeline
+  imageTag: latest
+  imagePullPolicy: Always
+  resources:
+    requests:
       memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
       cpu: "2000m"
 # Extra annotations to attach to the service pods
 # This should be a multi-line string mapping directly to the a map of
@@ -372,6 +403,11 @@ sftpInbox:
 # the annotations to apply to the service pods
   annotations: {}
 
+releasetest:
+  repository: neicnordic/sda-helm-tests-support
+  imageTag: latest
+  imagePullPolicy: Always
+  
 verify:
   replicaCount: 1
   repository: neicnordic/sda-pipeline
