@@ -2,7 +2,7 @@
 
 Source repositories:
     - https://github.com/neicnordic/sda-pipeline
-    - https://github.com/neicnordic/LocalEGA-DOA
+    - https://github.com/neicnordic/sda-doa
 
 ## Installing the Chart
 
