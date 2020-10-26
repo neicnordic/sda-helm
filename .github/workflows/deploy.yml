@@ -26,19 +26,19 @@ jobs:
         python-version: 3.7
     - name: Clone and install deploy-init
       run: |
-        git clone https://github.com/neicnordic/LocalEGA-deploy-init
-        pip3 install LocalEGA-deploy-init/
-        legainit --cega --config-path LocalEGA-deploy-init/config \
+        git clone https://github.com/neicnordic/sda-deploy-init
+        pip3 install sda-deploy-init/
+        legainit --cega --config-path sda-deploy-init/config \
                  --svc-config .github/ci_tests/svc.conf
     - name: Copy DB certs
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
+        cp sda-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
+        cp sda-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
+        cp sda-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
     - name: Deploy SDA database
       run: |
-        DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_IN_PASS=$(grep pg_in_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_OUT_PASS=$(grep pg_out_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install postgres sda-db \
         --set securityPolicy.create=false,\
         global.pg_in_password="$DB_IN_PASS",\
@@ -63,7 +63,7 @@ jobs:
       run: git clone https://github.com/nbisweden/LocalEGA-helm
     - name: Start CEGA services
       run: |
-        cp -r LocalEGA-deploy-init/config LocalEGA-helm/ega-charts/cega/config
+        cp -r sda-deploy-init/config LocalEGA-helm/ega-charts/cega/config
         ls -la LocalEGA-helm/ega-charts/cega/config
         cat LocalEGA-helm/ega-charts/cega/config/trace.yml
         helm install cega LocalEGA-helm/ega-charts/cega -f LocalEGA-helm/ega-charts/cega/config/trace.yml \
@@ -92,12 +92,12 @@ jobs:
         done 
     - name: Copy MQ certs
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
-        cp LocalEGA-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
-        cp LocalEGA-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
+        cp sda-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
+        cp sda-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
+        cp sda-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
     - name: Deploy SDA message broker
       run: |
-        CEGA_MQ_PASS=$(grep cega_mq_pass LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        CEGA_MQ_PASS=$(grep cega_mq_pass sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install broker sda-mq \
         --set securityPolicy.create=false,\
         config.adminUser=admin,\
@@ -124,26 +124,26 @@ jobs:
       run: kubectl logs broker-sda-mq-0
     - name: Prepare for deployment
       run: |
-        cp LocalEGA-deploy-init/config/token.pub sda-svc/files/
-        cp LocalEGA-deploy-init/config/ega_key.c4gh.sec sda-svc/files/c4gh.key
-        cp LocalEGA-deploy-init/config/certs/*.p12 sda-svc/files/
-        cp LocalEGA-deploy-init/config/certs/cacerts sda-svc/files/
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
+        cp sda-deploy-init/config/token.pub sda-svc/files/
+        cp sda-deploy-init/config/ega_key.c4gh.sec sda-svc/files/c4gh.key
+        cp sda-deploy-init/config/certs/*.p12 sda-svc/files/
+        cp sda-deploy-init/config/certs/cacerts sda-svc/files/
+        cp sda-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
         for n in doa finalize ingest intercept verify mapper
-          do cp LocalEGA-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
+          do cp sda-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
         done
         for n in doa finalize ingest intercept verify mapper
-          do cp LocalEGA-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
+          do cp sda-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
     - name: Deploy the SDA stack
       run: |
         kubectl apply -f .github/ci_tests/posix-volumes.yaml
-        CEGA_USERS_PASS=$(grep cega_users_pass LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        ARCHIVE_ACCESS_KEY=$(grep s3_archive_access_key LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        ARCHIVE_SECRET_KEY=$(grep s3_archive_secret_key LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        C4GH_PASSPHRASE=$(grep ega_c4gh_passphrase LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        CEGA_USERS_PASS=$(grep cega_users_pass sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_IN_PASS=$(grep pg_in_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_OUT_PASS=$(grep pg_out_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        ARCHIVE_ACCESS_KEY=$(grep s3_archive_access_key sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        ARCHIVE_SECRET_KEY=$(grep s3_archive_secret_key sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        C4GH_PASSPHRASE=$(grep ega_c4gh_passphrase sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install posix sda-svc -f .github/ci_tests/posix.yaml \
         --set global.cega.password="$CEGA_USERS_PASS",\
         global.archive.s3AccessKey="$ARCHIVE_ACCESS_KEY",\
@@ -198,19 +198,19 @@ jobs:
         python-version: 3.7
     - name: Clone and install deploy-init
       run: |
-        git clone https://github.com/neicnordic/LocalEGA-deploy-init
-        pip3 install LocalEGA-deploy-init/
-        legainit --cega --config-path LocalEGA-deploy-init/config \
+        git clone https://github.com/neicnordic/sda-deploy-init
+        pip3 install sda-deploy-init/
+        legainit --cega --config-path sda-deploy-init/config \
                  --svc-config .github/ci_tests/svc.conf
     - name: Copy DB certs
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
+        cp sda-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
+        cp sda-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
+        cp sda-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
     - name: Deploy SDA database
       run: |
-        DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_IN_PASS=$(grep pg_in_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_OUT_PASS=$(grep pg_out_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install postgres sda-db \
         --set securityPolicy.create=false,\
         global.pg_in_password="$DB_IN_PASS",\
@@ -235,7 +235,7 @@ jobs:
       run: git clone https://github.com/nbisweden/LocalEGA-helm
     - name: Start CEGA services
       run: |
-        cp -r LocalEGA-deploy-init/config LocalEGA-helm/ega-charts/cega/config
+        cp -r sda-deploy-init/config LocalEGA-helm/ega-charts/cega/config
         ls -la LocalEGA-helm/ega-charts/cega/config
         cat LocalEGA-helm/ega-charts/cega/config/trace.yml
         helm install cega LocalEGA-helm/ega-charts/cega -f LocalEGA-helm/ega-charts/cega/config/trace.yml \
@@ -266,12 +266,12 @@ jobs:
       run: kubectl apply -f .github/ci_tests/oidc.yaml
     - name: Copy MQ certs
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
-        cp LocalEGA-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
-        cp LocalEGA-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
+        cp sda-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
+        cp sda-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
+        cp sda-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
     - name: Deploy SDA message broker
       run: |
-        CEGA_MQ_PASS=$(grep cega_mq_pass LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        CEGA_MQ_PASS=$(grep cega_mq_pass sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install broker sda-mq \
         --set securityPolicy.create=false,\
         config.adminUser=admin,\
@@ -302,11 +302,11 @@ jobs:
         helm repo update
     - name: Install minio
       run: |
-        cp LocalEGA-deploy-init/config/certs/s3.ca.crt public.crt
-        cp LocalEGA-deploy-init/config/certs/s3.ca.key private.key
+        cp sda-deploy-init/config/certs/s3.ca.crt public.crt
+        cp sda-deploy-init/config/certs/s3.ca.key private.key
         kubectl create secret generic minio-certs --from-file=public.crt --from-file=private.key
-        MINIO_ACCESS=$(grep s3_archive_access_key LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        MINIO_SECRET=$(grep s3_archive_secret_key LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        MINIO_ACCESS=$(grep s3_archive_access_key sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        MINIO_SECRET=$(grep s3_archive_secret_key sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install minio \
         --set accessKey=$MINIO_ACCESS,secretKey=$MINIO_SECRET,\
         tls.enabled=true,tls.certSecret=minio-certs,\
@@ -328,27 +328,27 @@ jobs:
       run: kubectl logs $(kubectl get pods | grep minio | awk '{print $1}')
     - name: Prepare for deployment
       run: |
-        cp LocalEGA-deploy-init/config/token.pub sda-svc/files/
-        cp LocalEGA-deploy-init/config/ega_key.c4gh.sec sda-svc/files/c4gh.key
-        cp LocalEGA-deploy-init/config/certs/doa.p12 sda-svc/files/
-        cp LocalEGA-deploy-init/config/certs/cacerts sda-svc/files/
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
+        cp sda-deploy-init/config/token.pub sda-svc/files/
+        cp sda-deploy-init/config/ega_key.c4gh.sec sda-svc/files/c4gh.key
+        cp sda-deploy-init/config/certs/doa.p12 sda-svc/files/
+        cp sda-deploy-init/config/certs/cacerts sda-svc/files/
+        cp sda-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
         for n in doa finalize ingest verify inbox intercept mapper
-          do cp LocalEGA-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
+          do cp sda-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
         done
         for n in doa finalize ingest verify inbox intercept mapper
-          do cp LocalEGA-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
+          do cp sda-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
-        cp LocalEGA-deploy-init/config/certs/res.ca.crt sda-svc/files/auth.crt
-        cp LocalEGA-deploy-init/config/certs/res.ca.key sda-svc/files/auth.key
+        cp sda-deploy-init/config/certs/res.ca.crt sda-svc/files/auth.crt
+        cp sda-deploy-init/config/certs/res.ca.key sda-svc/files/auth.key
     - name: Deploy the SDA stack
       run: |
-        CEGA_USERS_PASS=$(grep cega_users_pass LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        S3_ACCESS_KEY=$(grep s3_archive_access_key LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        S3_SECRET_KEY=$(grep s3_archive_secret_key LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        C4GH_PASSPHRASE=$(grep ega_c4gh_passphrase LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        CEGA_USERS_PASS=$(grep cega_users_pass sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_IN_PASS=$(grep pg_in_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_OUT_PASS=$(grep pg_out_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        S3_ACCESS_KEY=$(grep s3_archive_access_key sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        S3_SECRET_KEY=$(grep s3_archive_secret_key sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        C4GH_PASSPHRASE=$(grep ega_c4gh_passphrase sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install sda sda-svc -f .github/ci_tests/s3.yaml \
         --set global.archive.s3AccessKey="$S3_ACCESS_KEY",\
         global.archive.s3SecretKey="$S3_SECRET_KEY",\
@@ -405,19 +405,19 @@ jobs:
         python-version: 3.7
     - name: Clone and install deploy-init
       run: |
-        git clone https://github.com/neicnordic/LocalEGA-deploy-init
-        pip3 install LocalEGA-deploy-init/
-        legainit --cega --config-path LocalEGA-deploy-init/config \
+        git clone https://github.com/neicnordic/sda-deploy-init
+        pip3 install sda-deploy-init/
+        legainit --cega --config-path sda-deploy-init/config \
                  --svc-config .github/ci_tests/svc.conf
     - name: Copy DB certs
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
-        cp LocalEGA-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
+        cp sda-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
+        cp sda-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
+        cp sda-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
     - name: Deploy SDA database
       run: |
-        DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_IN_PASS=$(grep pg_in_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_OUT_PASS=$(grep pg_out_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install postgres sda-db \
         --set securityPolicy.create=false,\
         global.pg_in_password="$DB_IN_PASS",\
@@ -440,9 +440,9 @@ jobs:
       run: kubectl logs postgres-sda-db-0
     - name: Copy MQ certs
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
-        cp LocalEGA-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
-        cp LocalEGA-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
+        cp sda-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
+        cp sda-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
+        cp sda-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
     - name: Deploy SDA message broker
       run: |
         helm install broker sda-mq \
@@ -467,13 +467,13 @@ jobs:
       run: kubectl logs broker-sda-mq-0
     - name: Prepare for deployment
       run: |
-        cp LocalEGA-deploy-init/config/certs/root.ca.crt sda-orch/files/ca.crt
-        cp LocalEGA-deploy-init/config/certs/orchestrate.ca.crt sda-orch/files/orch.crt
-        cp LocalEGA-deploy-init/config/certs/orchestrate.ca.key sda-orch/files/orch.key
+        cp sda-deploy-init/config/certs/root.ca.crt sda-orch/files/ca.crt
+        cp sda-deploy-init/config/certs/orchestrate.ca.crt sda-orch/files/orch.crt
+        cp sda-deploy-init/config/certs/orchestrate.ca.key sda-orch/files/orch.key
     - name: Deploy the SDA orch
       run: |
-        DB_IN_PASS=$(grep pg_in_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
-        DB_OUT_PASS=$(grep pg_out_password LocalEGA-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_IN_PASS=$(grep pg_in_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
+        DB_OUT_PASS=$(grep pg_out_password sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
         helm install orch sda-orch \
         --set podSecurityPolicy.create=false,\
         broker.password="admin",\

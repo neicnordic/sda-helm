@@ -1,6 +1,6 @@
 # SDA Database
 
-Source repository: https://github.com/neicnordic/LocalEGA-db 
+Source repository: https://github.com/neicnordic/sda-db 
 
 ## Installing the Chart
 

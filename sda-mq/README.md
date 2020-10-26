@@ -1,6 +1,6 @@
 # SDA Message broker
 
-Source repository: https://github.com/neicnordic/LocalEGA-mq
+Source repository: https://github.com/neicnordic/sda-mq
 
 ## Installing the Chart
 
