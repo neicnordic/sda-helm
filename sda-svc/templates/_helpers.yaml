@@ -186,7 +186,7 @@ Create chart name and version as used by the chart label.
 {{- ternary "lega_out" .Values.credentials.mapper.dbUser (empty .Values.credentials.mapper.dbUser) -}}
 {{- end -}}
 {{- define "dbPassMapper" -}}
-{{- ternary .Values.global.db.passpassOutgest .Values.credentials.mapper.dbPassword (empty .Values.credentials.mapper.dbPassword) -}}
+{{- ternary .Values.global.db.passOutgest .Values.credentials.mapper.dbPassword (empty .Values.credentials.mapper.dbPassword) -}}
 {{- end -}}
 {{- define "mqUserMapper" -}}
 {{- ternary .Values.global.broker.username .Values.credentials.mapper.mqUser (empty .Values.credentials.mapper.mqUser) -}}
