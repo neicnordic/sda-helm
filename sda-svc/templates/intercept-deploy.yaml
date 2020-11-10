@@ -11,6 +11,7 @@ metadata:
     component: {{ .Release.Name }}-intercept
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
 spec:
   replicas: 1
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
@@ -24,6 +25,7 @@ spec:
         app: {{ template "sda.name" . }}-intercept
         role: intercept
         release: {{ .Release.Name }}
+        {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
         {{- if not .Values.global.secretsService }}
         checksum/config: {{ include (print $.Template.BasePath "/intercept-secrets.yaml") . | sha256sum }}

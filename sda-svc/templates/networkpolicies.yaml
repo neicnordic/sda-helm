@@ -71,7 +71,7 @@ spec:
   - Egress
   egress:
   - to:
-  {{- if .Values.global.broker.external }}
+  {{- if and (.Values.global.broker.external) (not (eq "external" .Values.global.deploymentType))  }}
     - ipBlock:
         cidr: {{ .Values.global.broker.ip }}/32
   {{- else }}

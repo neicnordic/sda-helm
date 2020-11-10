@@ -11,6 +11,7 @@ metadata:
     component: {{ .Release.Name }}-inbox
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
 spec:
   replicas: 1
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
@@ -25,6 +26,7 @@ spec:
         role: inbox
         release: {{ .Release.Name }}
         type: sftp-inbox
+        {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
         {{- if not .Values.global.confFile }}
         checksum/config: {{ include (print $.Template.BasePath "/sftp-inbox-secrets.yaml") . | sha256sum }}
