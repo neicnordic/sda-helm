@@ -68,11 +68,11 @@ broker:
   username: ""
   vhost: "/"
   queue:
-    inbox: ""
-    completed: ""
-    verify: ""
-    stableid: ""
-    files: ""
+    inbox: "inbox"
+    completed: "completed"
+    verify: "verify"
+    stableid: "accessionIDs"
+    files: "files"
 
 
 resources:
