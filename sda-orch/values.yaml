@@ -32,8 +32,8 @@ podSecurityPolicy:
 # Calico, Cilium, Kube-router, Romana and Weave Net
 networkPolicy:
   create: false
-  brokerNamespace: ""
-  databaseNamespace: ""
+  brokerNamespace: "mq"
+  databaseNamespace: "db"
 
 tlsPath: "/tls/certs"
 
