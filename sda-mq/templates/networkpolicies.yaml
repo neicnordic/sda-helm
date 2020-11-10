@@ -2,31 +2,15 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: default-deny-all
+  name: deny-ingress-other-namespaces
   namespace: {{ .Release.Namespace }}
-spec:
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-dns-access
-  namespace: {{ .Release.Namespace }}
-spec:
-  podSelector: {}
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kube-system: networkpolicy
-    ports:
-    - protocol: UDP
-      port: 53
+  spec:
+    ingress:
+    - from:
+      - podSelector: {}
+    podSelector: {}
+    policyTypes:
+    - Ingress
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
