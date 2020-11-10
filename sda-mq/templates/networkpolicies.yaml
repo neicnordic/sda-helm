@@ -43,7 +43,7 @@ spec:
   - from:
   {{- if .Values.networkPolicy.twoClusterSetup }}
     - ipBlock:
-        cidr: {{ .Values.networkPolicy.externalClusterIp }}
+        cidr: {{ .Values.networkPolicy.internalClusterIp }}/32
   {{- else }}
     - podSelector:
         matchLabels:
@@ -58,6 +58,14 @@ spec:
       namespaceSelector:
         matchLabels:
           networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-external
+  {{- if .Values.networkPolicy.testEnv }}
+    - podSelector:
+        matchLabels:
+          {{ .Values.networkPolicy.nsprefix }}mq: allowtraffic
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-orch
+  {{- end }}
     ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
