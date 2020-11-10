@@ -150,7 +150,7 @@ spec:
           claimName: {{ .Values.persistence.existingClaim | quote }}
     {{- else if and (not .Values.persistence.existingClaim) .Values.persistence.nfs }}
         nfs:
-          server: {{ required "An MQ NFS server is required" .Values.persistence.nfsServer | quote }}
+          server: {{ required "An DB NFS server is required" .Values.persistence.nfsServer | quote }}
           path: {{ if .Values.persistence.nfsPath }}{{ .Values.persistence.nfsPath | quote}}{{ else }}{{ "/" }}{{ end }}
     {{- else if and (not .Values.persistence.existingClaim) (not .Values.persistence.nfs) }}
   volumeClaimTemplates:
