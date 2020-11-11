@@ -83,7 +83,7 @@ spec:
         - name: BROKER_ROUTINGERROR
           value: {{ .Values.global.broker.routingError }}
         - name: BROKER_ROUTINGKEY
-          value: "completed"
+          value: "backup"
         - name: BROKER_VHOST
           value: {{ .Values.global.broker.vhost | quote }}
         - name: BROKER_SERVERNAME

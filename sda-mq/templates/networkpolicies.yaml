@@ -35,14 +35,6 @@ spec:
       namespaceSelector:
         matchLabels:
           networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-internal
-  {{- end }}
-    - podSelector:
-        matchLabels:
-          {{ .Values.networkPolicy.nsprefix }}mq: allowtraffic
-      namespaceSelector:
-        matchLabels:
-          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-external
-  {{- if .Values.networkPolicy.testEnv }}
     - podSelector:
         matchLabels:
           {{ .Values.networkPolicy.nsprefix }}mq: allowtraffic
@@ -50,6 +42,12 @@ spec:
         matchLabels:
           networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-orch
   {{- end }}
+    - podSelector:
+        matchLabels:
+          {{ .Values.networkPolicy.nsprefix }}mq: allowtraffic
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-external
     ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
