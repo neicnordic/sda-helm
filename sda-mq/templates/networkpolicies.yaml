@@ -4,7 +4,7 @@ kind: NetworkPolicy
 metadata:
   name: deny-ingress-other-namespaces
   namespace: {{ .Release.Namespace }}
-  spec:
+spec:
     ingress:
     - from:
       - podSelector: {}
