@@ -51,6 +51,8 @@ sslmode:
   verifyPeer: true
 
 db:
+  external: false
+  ip: ""
   host: ""
   name: "lega"
   userIngest: ""
@@ -61,6 +63,8 @@ db:
   sslMode: "verify-full"
 
 broker:
+  external: false
+  ip: ""
   exchange: ""
   host: ""
   password: ""
