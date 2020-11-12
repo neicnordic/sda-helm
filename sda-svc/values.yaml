@@ -158,6 +158,8 @@ global:
   doa:
     servicePort: 8080
     ingressips: "0.0.0.0/0"
+    egressips: "0.0.0.0/0"
+    egressPort: 443
     outbox:
       enabled: false
       # MQ queue name for files/datasets export requests
@@ -205,6 +207,8 @@ global:
     s3region: ""
     allowedips: false
     ingressips: "0.0.0.0/0"
+    egressips: "0.0.0.0/0"
+    egressPort: 443
 
 ##################################
 # service specific credentials

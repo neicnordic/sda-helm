@@ -10,6 +10,8 @@ metadata:
     component: {{ .Release.Name }}-mapper
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{ .Values.global.networkPolicy.databaseNamespace }}: allowtraffic
+    {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
 spec:
   replicas: 1
   revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
@@ -23,6 +25,8 @@ spec:
         app: {{ template "sda.name" . }}-mapper
         role: mapper
         release: {{ .Release.Name }}
+        {{ .Values.global.networkPolicy.databaseNamespace }}: allowtraffic
+        {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
         {{- if not .Values.global.secretsService }}
         checksum/config: {{ include (print $.Template.BasePath "/mapper-secrets.yaml") . | sha256sum }}

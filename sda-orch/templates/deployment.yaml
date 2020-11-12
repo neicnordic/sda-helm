@@ -9,6 +9,8 @@ metadata:
     component: {{ .Release.Name }}-orchestrate
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{ .Values.networkPolicy.databaseNamespace }}: allowtraffic
+    {{ .Values.networkPolicy.brokerNamespace }}: allowtraffic
 spec:
   replicas: 1
   revisionHistoryLimit: {{ default "3" .Values.revisionHistory }}
@@ -22,6 +24,8 @@ spec:
         app: {{ template "sda.name" . }}-orchestrate
         role: orchestrate
         release: {{ .Release.Name }}
+        {{ .Values.networkPolicy.databaseNamespace }}: allowtraffic
+        {{ .Values.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
         {{- if not .Values.secretsService }}
         checksum/config: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}

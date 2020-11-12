@@ -32,8 +32,8 @@ podSecurityPolicy:
 # Calico, Cilium, Kube-router, Romana and Weave Net
 networkPolicy:
   create: false
-  brokerNamespace: ""
-  databaseNamespace: ""
+  brokerNamespace: "mq"
+  databaseNamespace: "db"
 
 tlsPath: "/tls/certs"
 
@@ -51,6 +51,8 @@ sslmode:
   verifyPeer: true
 
 db:
+  external: false
+  ip: ""
   host: ""
   name: "lega"
   userIngest: ""
@@ -61,6 +63,8 @@ db:
   sslMode: "verify-full"
 
 broker:
+  external: false
+  ip: ""
   exchange: ""
   host: ""
   password: ""
@@ -68,11 +72,11 @@ broker:
   username: ""
   vhost: "/"
   queue:
-    inbox: ""
-    completed: ""
-    verify: ""
-    stableid: ""
-    files: ""
+    inbox: "inbox"
+    completed: "completed"
+    verify: "verify"
+    stableid: "accessionIDs"
+    files: "files"
 
 
 resources:

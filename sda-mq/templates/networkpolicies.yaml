@@ -2,31 +2,15 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: default-deny-all
+  name: deny-ingress-other-namespaces
   namespace: {{ .Release.Namespace }}
 spec:
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-dns-access
-  namespace: {{ .Release.Namespace }}
-spec:
-  podSelector: {}
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kube-system: networkpolicy
-    ports:
-    - protocol: UDP
-      port: 53
+    ingress:
+    - from:
+      - podSelector: {}
+    podSelector: {}
+    policyTypes:
+    - Ingress
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -43,7 +27,7 @@ spec:
   - from:
   {{- if .Values.networkPolicy.twoClusterSetup }}
     - ipBlock:
-        cidr: {{ .Values.networkPolicy.externalClusterIp }}
+        cidr: {{ .Values.networkPolicy.internalClusterIp }}/32
   {{- else }}
     - podSelector:
         matchLabels:
@@ -51,6 +35,12 @@ spec:
       namespaceSelector:
         matchLabels:
           networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-internal
+    - podSelector:
+        matchLabels:
+          {{ .Values.networkPolicy.nsprefix }}mq: allowtraffic
+      namespaceSelector:
+        matchLabels:
+          networkpolicy: {{ .Values.networkPolicy.nsprefix }}sda-orch
   {{- end }}
     - podSelector:
         matchLabels:

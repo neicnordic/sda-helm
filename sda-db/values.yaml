@@ -48,6 +48,9 @@ persistence:
   existingClaim: null
 ## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup
   volumePermissions: true
+  nfs: false
+  nfsServer: ""
+  nfsPath: ""
 
 # Annotations applied to the pod.
 # This should be a multi-line string mapping directly to the a map of

@@ -71,7 +71,7 @@ spec:
   - Egress
   egress:
   - to:
-  {{- if .Values.global.broker.external }}
+  {{- if and (.Values.global.broker.external) (not (eq "external" .Values.global.deploymentType))  }}
     - ipBlock:
         cidr: {{ .Values.global.broker.ip }}/32
   {{- else }}
@@ -92,7 +92,7 @@ spec:
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: doa-ingress
+  name: doa
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
@@ -105,13 +105,20 @@ spec:
     ports:
     - protocol: TCP
       port: {{ .Values.global.doa.servicePort }}
+  egress:
+  - to:
+    - ipBlock:
+        cidr: {{ .Values.global.doa.egressips }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.global.doa.egressPort }}
 ---
 {{- end }}
 {{- if  or  (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: inbox-ingress
+  name: inbox
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
@@ -124,6 +131,12 @@ spec:
     ports:
     - protocol: TCP
       port: {{ .Values.global.inbox.servicePort }}
-
+  egress:
+  - to:
+    - ipBlock:
+        cidr: {{ .Values.global.inbox.egressips }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.global.inbox.egressPort }}
 {{- end }}
 {{- end }}
