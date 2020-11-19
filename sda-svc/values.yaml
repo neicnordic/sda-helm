@@ -236,7 +236,7 @@ auth:
   name: auth
   replicaCount: 1
   repository: neicnordic/sda-auth
-  imageTag: latest
+  imageTag: release-v0.5.0
   imagePullPolicy: Always
   resources:
     requests:
