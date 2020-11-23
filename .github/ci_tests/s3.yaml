@@ -49,4 +49,4 @@ global:
   ingress:
     hostName:
       auth: sda-sda-svc-auth
-  log: debug
+  logLevel: debug
