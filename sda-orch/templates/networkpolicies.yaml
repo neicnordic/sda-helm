@@ -31,36 +31,6 @@ spec:
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: db-policy
-  namespace: {{ .Release.Namespace }}
-spec:
-  podSelector:
-    matchLabels:
-      {{ .Values.networkPolicy.databaseNamespace }}: allowtraffic
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-  {{- if .Values.db.external }}
-    - ipBlock:
-        cidr: {{ .Values.db.ip }}/32
-  {{- else }}
-    - podSelector:
-        matchLabels:
-          role: database
-    {{- if .Values.networkPolicy.databaseNamespace }}
-      namespaceSelector:
-        matchLabels:
-          networkpolicy: {{ .Values.networkPolicy.databaseNamespace }}
-    {{- end }}
-  {{- end }}
-    ports:
-    - protocol: TCP
-      port: {{ .Values.db.port }}
----
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
   name: broker-policy
   namespace: {{ .Release.Namespace }}
 spec:
