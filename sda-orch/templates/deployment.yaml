@@ -81,10 +81,12 @@ spec:
           value: {{ .Values.broker.queue.completed | quote }}
         - name: INBOX_QUEUE
           value: {{ .Values.broker.queue.inbox | quote }}
-        - name: FILES_QUEUE
-          value: {{ .Values.broker.queue.files | quote }}
-        - name: STABLEIDS_QUEUE
-          value: {{ .Values.broker.queue.stableid | quote }}
+        - name: INGEST_QUEUE
+          value: {{ .Values.broker.queue.ingest | quote }}
+        - name: ACCESSIONIDS_QUEUE
+          value: {{ .Values.broker.queue.accessionids | quote }}
+        - name: MAPPINGS_QUEUE
+          value: {{ .Values.broker.queue.mappings | quote }}
         {{- if .Values.sslmode.ssl }}
         - name: SSL_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
