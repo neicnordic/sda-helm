@@ -51,17 +51,6 @@ spec:
           role: broker
     ports:
     - protocol: TCP
-      port: 5432
-    {{- if .Values.networkPolicy.databaseNamespace }}
-    - namespaceSelector:
-        matchLabels:
-          name: {{ .Values.networkPolicy.databaseNamespace }}
-    {{- end }}
-    - podSelector:
-        matchLabels:
-          role: database
-    ports:
-    - protocol: TCP
-      port: 5432
+      port: 5672
 ---
 {{- end }}

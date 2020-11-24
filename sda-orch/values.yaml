@@ -33,7 +33,6 @@ podSecurityPolicy:
 networkPolicy:
   create: false
   brokerNamespace: ""
-  databaseNamespace: ""
 
 tlsPath: "/tls/certs"
 
@@ -49,16 +48,6 @@ secretsService: false
 sslmode:
   ssl: true
   verifyPeer: true
-
-db:
-  host: ""
-  name: "lega"
-  userIngest: ""
-  userOutgest: ""
-  passIngest: ""
-  passOutgest: ""
-  port: 5432
-  sslMode: "verify-full"
 
 broker:
   exchange: ""
