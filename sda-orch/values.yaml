@@ -33,7 +33,6 @@ podSecurityPolicy:
 networkPolicy:
   create: false
   brokerNamespace: "mq"
-  databaseNamespace: "db"
 
 tlsPath: "/tls/certs"
 

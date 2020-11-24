@@ -9,7 +9,6 @@ metadata:
     component: {{ .Release.Name }}-orchestrate
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    {{ .Values.networkPolicy.databaseNamespace }}: allowtraffic
     {{ .Values.networkPolicy.brokerNamespace }}: allowtraffic
 spec:
   replicas: 1
@@ -24,7 +23,6 @@ spec:
         app: {{ template "sda.name" . }}-orchestrate
         role: orchestrate
         release: {{ .Release.Name }}
-        {{ .Values.networkPolicy.databaseNamespace }}: allowtraffic
         {{ .Values.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
         {{- if not .Values.secretsService }}
