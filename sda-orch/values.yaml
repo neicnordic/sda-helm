@@ -50,18 +50,6 @@ sslmode:
   ssl: true
   verifyPeer: true
 
-db:
-  external: false
-  ip: ""
-  host: ""
-  name: "lega"
-  userIngest: ""
-  userOutgest: ""
-  passIngest: ""
-  passOutgest: ""
-  port: 5432
-  sslMode: "verify-full"
-
 broker:
   external: false
   ip: ""
@@ -74,9 +62,10 @@ broker:
   queue:
     inbox: "inbox"
     completed: "completed"
-    verify: "verify"
-    stableid: "accessionIDs"
-    files: "files"
+    verify: "verified"
+    accessionids: "accessionIDs"
+    ingest: "ingest"
+    mappings: "mappings"
 
 
 resources:
