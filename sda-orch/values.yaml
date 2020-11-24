@@ -57,11 +57,12 @@ broker:
   username: ""
   vhost: "/"
   queue:
-    inbox: ""
-    completed: ""
-    verify: ""
-    stableid: ""
-    files: ""
+    inbox: "inbox"
+    completed: "completed"
+    verify: "verified"
+    accessionids: "accessionIDs"
+    ingest: "ingest"
+    mappings: "mappings"
 
 
 resources:
