@@ -98,7 +98,7 @@ spec:
           value: "{{ template "tlsPath" . }}/auth.key"
         {{- end }}
         - name: S3INBOX
-          value: {{ .Values.global.inbox.s3Url }}
+          value: {{ .Values.global.ingress.hostName.s3Inbox }}
         ports:
         - name: auth
           containerPort: 8080
