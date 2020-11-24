@@ -34,18 +34,6 @@ Create chart name and version as used by the chart label.
 {{- ternary "/tls/certs" .Values.tlsPath (empty .Values.tlsPath) -}}
 {{- end -}}
 
-
-{{/**/}}
-{{- define "dbOutPass" -}}
-{{- .Values.db.passOutgest -}}
-{{- end -}}
-
-{{/**/}}
-{{- define "dbInPass" -}}
-{{- .Values.db.passIngest -}}
-{{- end -}}
-
-
 {{/**/}}
 {{- define "mqPass" -}}
 {{- .Values.broker.password -}}
