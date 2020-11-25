@@ -85,7 +85,7 @@ Parameter | Description | Default
 `global.doa.outbox.s3CaFile` | Outbox S3 CA certificate to use | `null`
 `global.doa.outbox.s3AccessKey` | Outbox S3 Access Key | `null`
 `global.doa.outbox.s3SecretKey` | Outbox S3 Secret key | `null`
-`global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org"`
+`global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org/oidc/"`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
 `global.inbox.storageType` | Storage type for the inbox, available options are `s3` and `posix`. |`posix`
 `global.inbox.path` | Path to the mounted `posix` volume. |`/inbox`

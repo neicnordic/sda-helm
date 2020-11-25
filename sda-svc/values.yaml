@@ -162,7 +162,7 @@ global:
     servicePort: 443
 
   elixir:
-    oidcdHost: "https://login.elixir-czech.org"
+    oidcdHost: "https://login.elixir-czech.org/oidc/"
 
   inbox:
     servicePort: 2222
