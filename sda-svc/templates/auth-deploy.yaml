@@ -76,56 +76,32 @@ spec:
               name: {{ template "sda.fullname" . }}-auth
               key: cegaSecret
       {{- else }}
-        - name: CONF_FILE_PATH
+        - name: SERVER_CONFFILE
           value: {{ include "confFile" . }}
       {{- end }}
-        - name: ELIXIR_REDIRECT_URI
+        - name: ELIXIR_REDIRECTURL
           value: "https://{{ .Values.global.ingress.hostName.auth }}/elixir/login"
-        - name: ELIXIR_AUTH_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}/oidc/authorize"
-        - name: ELIXIR_TOKEN_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}/oidc/token"
-        - name: ELIXIR_CERTS_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}/oidc/jwk"
-        - name: ELIXIR_USERINFO_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}/oidc/userinfo"
-        - name: ELIXIR_ISSUER_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}/oidc"
-        - name: ELIXIR_REVOCATION_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}/oidc/revoke"
+        - name: ELIXIR_ISSUER
+          value: "{{ .Values.global.elixir.oidcdHost }}"
         - name: ELIXIR_SCOPE
-          value: "openid ga4gh_passport_v1"
-        - name: CEGA_AUTH_URL
+          value: "ga4gh_passport_v1"
+        - name: CEGA_AUTHURL
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/" | quote }}
-        - name: JWT_PRIVATE_KEY
+        - name: CEGA_JWTPRIVATEKEY
           value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtKey }}"
-        - name: JWT_SIGNATURE_ALG
+        - name: CEGA_JWTSIGNATUREALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
-        - name: BIND_ADDRESS
-          value: "0.0.0.0"
-        - name: PORT
-          value: {{ ternary 8080 8443 ( empty .Values.global.auth.useTLS ) | quote }}
-        - name: SERVER_NAME
-          value: {{ .Values.global.ingress.hostName.auth | quote }}
-        - name: URL_SCHEME
-          value: {{ ternary "http" "https" ( empty .Values.global.auth.useTLS ) | quote }}
-        - name: SECRET_KEY
-          value: {{ randAlphaNum 12 | quote }}
-        - name: ENABLE_TLS
-          value: {{ toString .Values.global.auth.useTLS | camelcase | quote }}
         {{- if .Values.global.auth.useTLS }}
-        - name: CERT_FILE
+        - name: SERVER_CERT
           value: "{{ template "tlsPath" . }}/auth.crt"
-        - name: KEY_FILE
+        - name: SERVER_KEY
           value: "{{ template "tlsPath" . }}/auth.key"
-        {{- if .Values.global.auth.cacert }}
-        - name: CA_CERTS
-          value: "{{ template "tlsPath" . }}/ca.crt"
         {{- end }}
-        {{- end }}
+        - name: S3INBOX
+          value: {{ .Values.global.ingress.hostName.s3Inbox }}
         ports:
         - name: auth
-          containerPort: {{ ternary 8080 8443 ( empty .Values.global.auth.useTLS ) }}
+          containerPort: 8080
           protocol: TCP
         livenessProbe:
           httpGet:
@@ -135,8 +111,8 @@ spec:
             httpHeaders:
             - name: Host
               value: {{ .Values.global.ingress.hostName.auth }}
-          initialDelaySeconds: 10
-          periodSeconds: 5
+          initialDelaySeconds: 20
+          periodSeconds: 10
         readinessProbe:
           httpGet:
             port: auth
@@ -145,7 +121,8 @@ spec:
             httpHeaders:
             - name: Host
               value: {{ .Values.global.ingress.hostName.auth }}
-          periodSeconds: 5
+          initialDelaySeconds: 20
+          periodSeconds: 10
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
         volumeMounts:

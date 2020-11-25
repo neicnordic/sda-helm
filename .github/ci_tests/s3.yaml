@@ -35,7 +35,7 @@ global:
     passphrase: oaagCP1YgAZeEyl2eJAkHv9lkcWXWFgm
   elixir:
     pubKey: token.pub
-    oidcdHost: "http://oidc-server"
+    oidcdHost: "http://oidc-server:8080"
     jwkPath: ""
   inbox:
     storageType: s3
@@ -49,4 +49,4 @@ global:
   ingress:
     hostName:
       auth: sda-sda-svc-auth
-  log: debug
+  logLevel: debug
