@@ -93,7 +93,7 @@ spec:
           value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: BROKER_VHOST
           value: {{ .Values.global.broker.vhost | quote }}
-      {{- if .Values.global.log }}
+      {{- if .Values.global.logLevel }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
