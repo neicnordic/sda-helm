@@ -63,7 +63,7 @@ spec:
 {{ toYaml .Values.sftpInbox.resources | trim | indent 10 }}
         env:
         - name: LOGGING_LEVEL_SE_NBIS_LEGA_INBOX
-          value: {{ .Values.global.log | quote }}
+          value: {{ .Values.global.logLevel | quote }}
         - name: BROKER_HOST
           value: {{ required "A valid MQ host is required" .Values.global.broker.host | quote }}
         - name: BROKER_PASSWORD

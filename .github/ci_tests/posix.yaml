@@ -26,4 +26,4 @@ global:
     path: "/inbox"
     user: "lega"
     existingClaim: inbox-volume
-  log: debug
+  logLevel: debug
