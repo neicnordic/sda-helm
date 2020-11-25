@@ -19,8 +19,8 @@ Parameter | Description | Default
 `networkPolicy.create` | Use network isolation. | `false`
 `podSecurityPolicy.create` | Use pod security policy. | `false`
 `secretsService.create` | Use If secrets are managed externally. | `false`
-`sslmode.ssl` | Enable SSL for DB and MQ | `true`
-`sslmode.verifyPeer` | Use Client/Server verification (used by BD and MQ connection). | `true`
+`sslmode.ssl` | Enable SSL for MQ | `true`
+`sslmode.verifyPeer` | Use Client/Server verification (used by MQ connection). | `true`
 `broker.host` | Domain name or IP address to the message broker. |`""`
 `broker.exchange` | Exchange to publish messages to. |`""`
 `broker.port` | Port for the message broker. |`5671`
@@ -33,14 +33,6 @@ Parameter | Description | Default
 `broker.queue.verify` | Verify queue for MQ connection. | `""`
 `broker.queue.stableid` | Accession IDs queue for MQ connection. | `""`
 `broker.queue.files` | Files queue for MQ connection, general file operations. | `""`
-`db.host` | Hostname for the database. |`""`
-`db.name` | Database to connect to. |`lega`
-`db.userIngest` | User `data in` services. |`""`
-`db.userOutgest` | User for `data out` services. |`""`
-`db.passIngest` | Password used for `data in` services. |`""`
-`db.passOutgest` | Password used for `data out` services. |`""`
-`db.port` | Port that the database is listening on. |`5432`
-`db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. | `verify-full`
 
 
 

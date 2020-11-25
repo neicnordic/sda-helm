@@ -33,7 +33,6 @@ podSecurityPolicy:
 networkPolicy:
   create: false
   brokerNamespace: ""
-  databaseNamespace: ""
 
 tlsPath: "/tls/certs"
 
@@ -50,16 +49,6 @@ sslmode:
   ssl: true
   verifyPeer: true
 
-db:
-  host: ""
-  name: "lega"
-  userIngest: ""
-  userOutgest: ""
-  passIngest: ""
-  passOutgest: ""
-  port: 5432
-  sslMode: "verify-full"
-
 broker:
   exchange: ""
   host: ""
@@ -68,11 +57,12 @@ broker:
   username: ""
   vhost: "/"
   queue:
-    inbox: ""
-    completed: ""
-    verify: ""
-    stableid: ""
-    files: ""
+    inbox: "inbox"
+    completed: "completed"
+    verify: "verified"
+    accessionids: "accessionIDs"
+    ingest: "ingest"
+    mappings: "mappings"
 
 
 resources:
