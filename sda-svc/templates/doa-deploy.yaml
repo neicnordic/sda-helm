@@ -122,7 +122,7 @@ spec:
         - name: CRYPT4GH_PRIVATE_KEY_PASSWORD_PATH
           value: "{{ template "c4ghPath" . }}/passphrase"
         - name: OPENID_CONFIGURATION_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}/oidc/.well-known/openid-configuration"
+          value: "{{ .Values.global.elixir.oidcdHost }}.well-known/openid-configuration"
       {{- if .Values.global.doa.outbox.enabled }}
         - name: OUTBOX_ENABLED
           value: {{ .Values.doa.outbox.enabled }}
