@@ -162,8 +162,6 @@ global:
     servicePort: 443
 
   elixir:
-    pubKey: ""
-    jwkPath: "/oidc/jwk"
     oidcdHost: "https://login.elixir-czech.org"
 
   inbox:
