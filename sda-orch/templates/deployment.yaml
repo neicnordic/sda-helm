@@ -9,7 +9,6 @@ metadata:
     component: {{ .Release.Name }}-orchestrate
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    {{ .Values.networkPolicy.databaseNamespace }}: allowtraffic
     {{ .Values.networkPolicy.brokerNamespace }}: allowtraffic
 spec:
   replicas: 1
@@ -24,7 +23,6 @@ spec:
         app: {{ template "sda.name" . }}-orchestrate
         role: orchestrate
         release: {{ .Release.Name }}
-        {{ .Values.networkPolicy.databaseNamespace }}: allowtraffic
         {{ .Values.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
         {{- if not .Values.secretsService }}
@@ -71,28 +69,6 @@ spec:
               key: mqPassword
         - name: BROKER_USER
           value: {{ .Values.broker.username | quote }}
-        - name: DB_IN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-orchestrate
-              key: dbInPass
-        - name: DB_OUT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-orchestrate
-              key: dbOutPass
-        - name: DB_IN_USER
-          value: {{ default "lega_in" .Values.db.userIngest }}
-        - name: DB_OUT_USER
-          value: {{ default "lega_out" .Values.db.userOutgest }}
-        - name: DB_HOST
-          value: {{ required "A valid DB host is required" .Values.db.host | quote }}
-        - name: DB_DATABASE
-          value: {{ default "lega" .Values.db.name | quote }}
-        - name: DB_PORT
-          value: {{ .Values.db.port | quote }}
-        - name: DB_SSLMODE
-          value: {{ .Values.db.sslMode | quote }}
         - name: BROKER_HOST
           value: {{ required "A valid MQ Host is required" .Values.broker.host | quote }}
         - name: BROKER_PORT
@@ -107,10 +83,12 @@ spec:
           value: {{ .Values.broker.queue.completed | quote }}
         - name: INBOX_QUEUE
           value: {{ .Values.broker.queue.inbox | quote }}
-        - name: FILES_QUEUE
-          value: {{ .Values.broker.queue.files | quote }}
-        - name: STABLEIDS_QUEUE
-          value: {{ .Values.broker.queue.stableid | quote }}
+        - name: INGEST_QUEUE
+          value: {{ .Values.broker.queue.ingest | quote }}
+        - name: ACCESSIONIDS_QUEUE
+          value: {{ .Values.broker.queue.accessionids | quote }}
+        - name: MAPPINGS_QUEUE
+          value: {{ .Values.broker.queue.mappings | quote }}
         {{- if .Values.sslmode.ssl }}
         - name: SSL_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
