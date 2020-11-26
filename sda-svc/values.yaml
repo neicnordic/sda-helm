@@ -181,9 +181,7 @@ global:
       s3SecretKey: null
 
   elixir:
-    pubKey: ""
-    jwkPath: "/oidc/jwk"
-    oidcdHost: "https://login.elixir-czech.org"
+    oidcdHost: "https://login.elixir-czech.org/oidc/"
 
   # enable custom OIDC endpoint
   oidc:
