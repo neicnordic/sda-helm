@@ -117,7 +117,7 @@ Create chart name and version as used by the chart label.
   {{- if .Values.global.oidc.enable -}}
     {{- printf "%s/.well-known/openid-configuration" (required "An oidc host is required" .Values.global.oidc.host) }}
   {{- else }}
-    {{- printf "%s/oidc/.well-known/openid-configuration" .Values.global.elixir.oidcdHost -}}
+    {{- printf "%s.well-known/openid-configuration" .Values.global.elixir.oidcdHost -}}
   {{ end }}
 {{- end -}}
 
@@ -125,7 +125,7 @@ Create chart name and version as used by the chart label.
   {{- if .Values.global.oidc.enable -}}
     {{- printf "%s/idp/profile/oidc/userinfo" (required "An oidc host is required" .Values.global.oidc.host) }}
   {{- else }}
-    {{- printf "%s/oidc/userinfo" .Values.global.elixir.oidcdHost -}}
+    {{- printf "%suserinfo" .Values.global.elixir.oidcdHost -}}
   {{ end }}
 {{- end -}}
 
