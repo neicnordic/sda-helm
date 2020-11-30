@@ -85,6 +85,8 @@ spec:
           value: "{{ .Values.global.elixir.oidcdHost }}"
         - name: ELIXIR_SCOPE
           value: "ga4gh_passport_v1"
+        - name: CEGA_JWTISSUER
+          value: "https://{{ .Values.global.ingress.hostName.auth }}"
         - name: CEGA_AUTHURL
           value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/" | quote }}
         - name: CEGA_JWTPRIVATEKEY
