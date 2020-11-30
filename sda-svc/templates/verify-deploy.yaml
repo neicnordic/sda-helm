@@ -183,6 +183,9 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-verify
                 key: dbUser
+      {{- else }}
+        - name: CONFIGFILE
+          value: {{ include "confFile" . }}
       {{- end }}
         resources:
 {{ toYaml .Values.verify.resources | trim | indent 10 }}

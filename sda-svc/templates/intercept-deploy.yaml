@@ -64,6 +64,9 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-intercept
                 key: mqUser
+      {{- else }}
+        - name: CONFIGFILE
+          value: {{ include "confFile" . }}
       {{- end }}
         {{- if .Values.global.broker.ssl }}
         - name: BROKER_CACERT

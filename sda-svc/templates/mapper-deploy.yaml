@@ -139,6 +139,9 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-mapper
                 key: dbUser
+      {{ else }}
+        - name: CONFIGFILE
+          value: {{ include "confFile" . }}
       {{- end }}
         resources:
 {{ toYaml .Values.mapper.resources | trim | indent 10 }}

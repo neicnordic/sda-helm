@@ -211,6 +211,9 @@ spec:
               name: {{ template "sda.fullname" . }}-s3inbox-keys
               key: s3InboxSecretKey
       {{- end }}
+      {{ else }}
+        - name: CONFIGFILE
+          value: {{ include "confFile" . }}
       {{- end }}
         resources:
 {{ toYaml .Values.ingest.resources | trim | indent 10 }}
