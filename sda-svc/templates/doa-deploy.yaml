@@ -24,7 +24,7 @@ spec:
         role: doa
         release: {{ .Release.Name }}
       annotations:
-        {{- if not .Values.global.confFile }}
+        {{- if not .Values.global.secretsService }}
         checksum/secret: {{ include (print $.Template.BasePath "/doa-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
@@ -50,6 +50,10 @@ spec:
 {{- if .Values.global.extraSecurityContext }}
 {{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
 {{- end }}
+      {{- if .Values.global.secretsService }}
+        command: ["/bin/sh"]
+        args: ["-c", "source {{ include "secretsPath" . }}/{{.Values.global.confFile}} && docker-entrypoint.sh && java -jar /localega-doa.jar"]
+      {{- end }}
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: no-oss,LocalEGA
@@ -65,20 +69,23 @@ spec:
           value: {{ required "A valid database host is required" .Values.global.db.host | quote}}
         - name: POSTGRES_DB
           value: {{ required "A database name is required" .Values.global.db.name | quote }}
-        - name: POSTGRES_USER
-          value: {{ include "dbUserDoa" . | quote }}
         - name: SSL_MODE
           value: {{ .Values.global.db.sslMode | quote }}
+        {{- if not .Values.global.secretsService }}
+        - name: POSTGRES_USER
+          value: {{ include "dbUserDoa" . | quote }}
         - name: POSTGRES_PASSWORD
           valueFrom:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-doa
                 key: dbPassword
+        {{- end }}
       {{- if eq "s3" .Values.global.archive.storageType }}
         - name: S3_ENDPOINT
           value: {{ required "A valid archive S3 URL entry is required!" .Values.global.archive.s3Url | quote }}
         - name: S3_PORT
           value: {{ .Values.global.archive.s3Port | quote }}
+        {{- if not .Values.global.secretsService }}
         - name: S3_ACCESS_KEY
           valueFrom:
               secretKeyRef:
@@ -89,6 +96,7 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-s3archive-keys
                 key: s3ArchiveSecretKey
+        {{- end }}
         - name: S3_REGION
           value: {{ .Values.global.archive.s3Region }}
         - name: S3_SECURE
@@ -99,7 +107,7 @@ spec:
         - name: S3_ROOT_CERT_PATH
           value: "/etc/ssl/certs/java/ca.crt"
         {{- end }}
-      {{ else }}
+      {{- else }}
         - name: ARCHIVE_PATH
           value: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
@@ -107,8 +115,10 @@ spec:
         - name: PASSPORT_PUBLIC_KEY_PATH
           value: "{{ include "secretsPath" . }}/{{ .Values.global.elixir.pubKey }}"
       {{- end }}
+      {{- if not .Values.global.secretsService }}
         - name: KEYSTORE_PATH
           value: {{ ternary "/etc/ssl/certs/java/doa.p12" (printf "%s/doa.p12" .Values.global.secretsPath ) (empty .Values.global.pkiService) }}
+      {{- end }}
         - name: KEYSTORE_PASSWORD
           value: {{ .Values.doa.keystorePass | quote }}
         - name: ROOT_CERT_PATH
@@ -185,7 +195,7 @@ spec:
         - name: tls-certs
           mountPath: "/etc/ssl/certs/java"
       {{- end }}
-      {{- if not .Values.global.confFile }}
+      {{- if not .Values.global.secretsService }}
       {{- if .Values.global.elixir.pubKey }}
         - name: jwt-token
           mountPath: {{ include "secretsPath" . }}
@@ -204,7 +214,7 @@ spec:
             secretName: {{ template "sda.fullname" . }}-doa-certs
             defaultMode: 0440
       {{- end }}
-      {{- if not .Values.global.confFile }}
+      {{- if not .Values.global.secretsService }}
       {{- if .Values.global.elixir.pubKey }}
         - name: jwt-token
           projected:
