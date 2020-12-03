@@ -163,6 +163,7 @@ global:
 
   elixir:
     oidcdHost: "https://login.elixir-czech.org/oidc/"
+    jwkPath: "jwk"
 
   inbox:
     servicePort: 2222
