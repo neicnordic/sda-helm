@@ -77,6 +77,7 @@ Parameter | Description | Default
 `global.db.passOutgest` | Password used for `data out` services. |`""`
 `global.db.port` | Port that the database is listening on. |`5432`
 `global.db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. |`verify-full`
+`global.doa.envFile` | File to source when credentials are managed by Hasicorp vault | `env`
 `global.doa.serviceport` | Port that the DOA service is accessible on | `443`
 `global.doa.outbox.enabled` | Enable Outbox functionality of Data Out API | `false`
 `global.doa.outbox.queue` | MQ queue name for files/datasets export requests | `""`

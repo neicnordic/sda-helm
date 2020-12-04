@@ -52,7 +52,7 @@ spec:
 {{- end }}
       {{- if .Values.global.vaultSecrets }}
         command: ["/bin/sh"]
-        args: ["-c", "source {{ include "secretsPath" . }}/{{.Values.global.confFile}} && docker-entrypoint.sh && java -jar /localega-doa.jar"]
+        args: ["-c", "source {{ include "secretsPath" . }}/{{ .Values.global.doa.envFile }} && docker-entrypoint.sh && java -jar /localega-doa.jar"]
       {{- end }}
         env:
         - name: SPRING_PROFILES_ACTIVE

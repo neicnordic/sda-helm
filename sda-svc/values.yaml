@@ -160,6 +160,7 @@ global:
       s3AccessKey: null
       s3SecretKey: null
     servicePort: 443
+    envFile: env
 
   elixir:
     oidcdHost: "https://login.elixir-czech.org/oidc/"
