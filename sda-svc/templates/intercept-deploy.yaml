@@ -25,7 +25,7 @@ spec:
         role: intercept
         release: {{ .Release.Name }}
       annotations:
-        {{- if not .Values.global.secretsService }}
+        {{- if not .Values.global.vaultSecrets }}
         checksum/config: {{ include (print $.Template.BasePath "/intercept-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
@@ -53,7 +53,7 @@ spec:
 {{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
 {{- end }}
         env:
-      {{- if not .Values.global.secretsService }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: BROKER_PASSWORD
           valueFrom:
               secretKeyRef:

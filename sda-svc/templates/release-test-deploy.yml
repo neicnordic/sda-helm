@@ -139,7 +139,7 @@ spec:
           value: {{ required "Broker host must be set" .Values.global.broker.host | quote }}
         - name: MQ_EXCHANGE
           value: {{ default "lega" .Values.global.broker.exchange | quote }}
-      {{- if not .Values.global.secretsService }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: MQ_PASSWORD
           valueFrom:
               secretKeyRef:

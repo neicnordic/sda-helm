@@ -24,7 +24,7 @@ spec:
         role: ingest
         release: {{ .Release.Name }}
       annotations:
-        {{- if not .Values.global.secretsService }}
+        {{- if not .Values.global.vaultSecrets }}
         checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
         checksum/config: {{ include (print $.Template.BasePath "/ingest-secrets.yaml") . | sha256sum }}
         {{- end }}
@@ -161,7 +161,7 @@ spec:
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
-      {{- if not .Values.global.secretsService }}
+      {{- if not .Values.global.vaultSecrets }}
       {{- if eq "s3" .Values.global.archive.storageType }}
         - name: ARCHIVE_ACCESSKEY
           valueFrom:
@@ -218,7 +218,7 @@ spec:
         resources:
 {{ toYaml .Values.ingest.resources | trim | indent 10 }}
         volumeMounts:
-      {{- if not .Values.global.secretsService }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: c4gh
           mountPath: {{ template "c4ghPath" . }}
       {{- end }}
@@ -235,7 +235,7 @@ spec:
           mountPath: {{ .Values.global.inbox.path | quote }}
       {{- end }}
       volumes:
-    {{- if not .Values.global.secretsService }}
+    {{- if not .Values.global.vaultSecrets }}
         - name: c4gh
           secret:
             defaultMode: 0440

@@ -14,8 +14,8 @@ global:
 # Name of an injected config file, located in the secretsPath
 # If the file is located in a subpath it can be set using the confFilePath
 # If no conf file is specified DB and MQ connections will be configured via ENVs
-  # confFile: config.yaml
-  # confFilePath: ""
+  confFile: config.yaml
+  confFilePath: ""
 
 # Deployment can be split into `external` and `internal` components
 # by setting deploymentType to the desired type
@@ -86,7 +86,7 @@ global:
   extraSecurityContext: {}
 
 # If an external secrets management service is used set this to true
-  secretsService: false
+  vaultSecrets: false
 
 # global configurations
   archive:

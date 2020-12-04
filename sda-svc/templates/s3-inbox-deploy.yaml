@@ -25,7 +25,7 @@ spec:
         role: inbox
         release: {{ .Release.Name }}
       annotations:
-        {{- if not .Values.global.confFile }}
+        {{- if not .Values.global.vaultSecrets }}
         checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
         checksum/config: {{ include (print $.Template.BasePath "/s3-inbox-secrets.yaml") . | sha256sum }}
         {{- end }}
@@ -53,7 +53,7 @@ spec:
 {{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
 {{- end }}
         env:
-      {{- if not .Values.global.confFile }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: AWS_ACCESSKEY
           valueFrom:
               secretKeyRef:
