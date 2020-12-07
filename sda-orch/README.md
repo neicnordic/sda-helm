@@ -18,7 +18,7 @@ Parameter | Description | Default
 `rbacEnabled` | Use role based access control. |`true`
 `networkPolicy.create` | Use network isolation. | `false`
 `podSecurityPolicy.create` | Use pod security policy. | `false`
-`secretsService.create` | Use If secrets are managed externally. | `false`
+`vaultSecrets` | Use If Hasicort Vault is used for secrets management. | `false`
 `sslmode.ssl` | Enable SSL for MQ | `true`
 `sslmode.verifyPeer` | Use Client/Server verification (used by MQ connection). | `true`
 `broker.host` | Domain name or IP address to the message broker. |`""`

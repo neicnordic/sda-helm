@@ -24,7 +24,7 @@ spec:
         role: finalize
         release: {{ .Release.Name }}
       annotations:
-        {{- if not .Values.global.secretsService }}
+        {{- if not .Values.global.vaultSecrets }}
         checksum/config: {{ include (print $.Template.BasePath "/finalize-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
@@ -120,7 +120,7 @@ spec:
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
-      {{- if not .Values.global.secretsService }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: BROKER_PASSWORD
           valueFrom:
               secretKeyRef:
@@ -141,6 +141,9 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-finalize
                 key: dbUser
+      {{ else }}
+        - name: CONFIGFILE
+          value: {{ include "confFile" . }}
       {{- end }}
         resources:
 {{ toYaml .Values.finalize.resources | trim | indent 10 }}

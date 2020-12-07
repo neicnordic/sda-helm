@@ -15,9 +15,12 @@ The following table lists the configurable parameters of the `sda-svc` chart and
 
 Parameter | Description | Default
 --------- | ----------- | -------
-`global.secretsPath` |  | `/.secrets`
-`global.c4ghPath` |  | `""`
-`global.tlsPath` |  | `""`
+`global.secretsPath` | Path where the sensitive files can be found | `/.secrets`
+`global.c4ghPath` | This path will be a subpath to the secretsPath | `""`
+`global.tlsPath` | This path will be a subpath to the secretsPath | `""`
+`global.jwtPath` | This path will be a subpath to the secretsPath | `""`
+`global.confFile` | Name of config file, used when secrets are handled by hasicorp vault | `config.yaml`
+`global.confFilePath` | This path will be a subpath to the secretsPath | `""`
 `global.deploymentType` | Deployment can be split into `external` and `internal` components, available options are `all`, `external` and `internal`. | `all`
 `global.ingress.deploy` |  | `false`
 `global.ingress.hostName.auth` |  | `""`
@@ -38,6 +41,7 @@ Parameter | Description | Default
 `global.podAnnotations` | Annotations applied to pods of all services. |`{}`
 `global.pkiService` | If an external PKI infrastructure is used set this to true. |`false`
 `global.rbacEnabled` | Use role based access control. |`true`
+`global.vaultSecrets` | If Hashicorp Vault is used for secrets management | `false`
 `global.archive.storageType` | Storage type for the data archive, available options are `s3` and `posix`. |`s3`
 `global.archive.s3Url` | URL to S3 archive instance. |`""`
 `global.archive.s3Bucket` | S3 archive bucket. |`""`
@@ -73,6 +77,7 @@ Parameter | Description | Default
 `global.db.passOutgest` | Password used for `data out` services. |`""`
 `global.db.port` | Port that the database is listening on. |`5432`
 `global.db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. |`verify-full`
+`global.doa.envFile` | File to source when credentials are managed by Hasicorp vault | `env`
 `global.doa.serviceport` | Port that the DOA service is accessible on | `443`
 `global.doa.outbox.enabled` | Enable Outbox functionality of Data Out API | `false`
 `global.doa.outbox.queue` | MQ queue name for files/datasets export requests | `""`

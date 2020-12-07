@@ -23,7 +23,7 @@ spec:
         role: orchestrate
         release: {{ .Release.Name }}
       annotations:
-        {{- if not .Values.secretsService }}
+        {{- if not .Values.vaultSecrets }}
         checksum/config: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.podAnnotations }}
@@ -55,11 +55,16 @@ spec:
       - name: orchestrate
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.imagePullPolicy | quote }}
+      {{- if .Values.vaultSecrets }}
+        command: ["/bin/sh", "-c"]
+        args: ["source {{ include "tlsPath" . }}/{{ .Values.envFile }} && supervisord --configuration /etc/supervisor.conf"]
+      {{- end }}
         securityContext:
           allowPrivilegeEscalation: false
         env:
         - name: LOG_LEVEL
           value: {{ .Values.logLevel | quote }}
+      {{- if not .Values.vaultSecrets }}
         - name: BROKER_PASSWORD
           valueFrom:
               secretKeyRef:
@@ -67,6 +72,7 @@ spec:
                 key: mqPassword
         - name: BROKER_USER
           value: {{ .Values.broker.username | quote }}
+      {{- end }}
         - name: BROKER_HOST
           value: {{ required "A valid MQ Host is required" .Values.broker.host | quote }}
         - name: BROKER_PORT
@@ -109,6 +115,7 @@ spec:
       volumes:
       - name: tmp
         emptyDir: {}
+    {{- if not .Values.pkiService }}
       - name: {{ ternary "tls" "tls-certs" (empty .Values.pkiPermissions) }}
         secret:
           defaultMode: 0440
@@ -119,3 +126,4 @@ spec:
           medium: Memory
           sizeLimit: 10Mi
       {{- end }}
+    {{- end }}

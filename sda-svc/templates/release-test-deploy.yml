@@ -9,9 +9,9 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
 data:
-  {{- ( .Files.Glob ( "files/{trigger-ingest.py,accession.py}" )).AsConfig | nindent 2 }}
-  {{- ( .Files.Glob ( "files/{verify-inboxes.py,verify-doa.py}" )).AsConfig | nindent 2 }}
-  {{- ( .Files.Glob ( "files/release-test.sh" )).AsConfig | nindent 2 }}
+  {{- ( .Files.Glob ( "test/{trigger-ingest.py,accession.py}" )).AsConfig | nindent 2 }}
+  {{- ( .Files.Glob ( "test/{verify-inboxes.py,verify-doa.py}" )).AsConfig | nindent 2 }}
+  {{- ( .Files.Glob ( "test/release-test.sh" )).AsConfig | nindent 2 }}
   {{- ( .Files.Glob ( printf "files/%s" .Values.global.c4gh.publicFile )).AsConfig | nindent 2 }}
 
 ---
@@ -139,7 +139,7 @@ spec:
           value: {{ required "Broker host must be set" .Values.global.broker.host | quote }}
         - name: MQ_EXCHANGE
           value: {{ default "lega" .Values.global.broker.exchange | quote }}
-      {{- if not .Values.global.secretsService }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: MQ_PASSWORD
           valueFrom:
               secretKeyRef:

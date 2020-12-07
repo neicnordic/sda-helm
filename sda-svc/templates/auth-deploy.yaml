@@ -25,7 +25,7 @@ spec:
         role: auth
         release: {{ .Release.Name }}
       annotations:
-        {{- if not .Values.global.confFile }}
+        {{- if not .Values.global.vaultSecrets }}
         checksum/secret: {{ include (print $.Template.BasePath "/auth-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
@@ -54,7 +54,7 @@ spec:
         env:
         - name: LOG_LEVEL
           value: {{ upper .Values.global.logLevel }}
-      {{- if not .Values.global.confFile }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: ELIXIR_ID
           valueFrom:
             secretKeyRef:
