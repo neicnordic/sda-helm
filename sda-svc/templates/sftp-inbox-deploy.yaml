@@ -28,7 +28,7 @@ spec:
         type: sftp-inbox
         {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
-        {{- if not .Values.global.confFile }}
+        {{- if not .Values.global.vaultSecrets }}
         checksum/config: {{ include (print $.Template.BasePath "/sftp-inbox-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
