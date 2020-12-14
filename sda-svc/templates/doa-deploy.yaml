@@ -40,7 +40,7 @@ spec:
       serviceAccountName: {{ .Release.Name }}
     {{- end }}
       securityContext:
-        runAsUser: 65534
+        runAsUser: 65534 
         runAsGroup: 65534
         fsGroup: 65534
       containers:
@@ -81,6 +81,7 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-doa
               key: dbPassword
+        {{- end }}
       {{- if eq "s3" .Values.global.archive.storageType }}
         - name: S3_ENDPOINT
           value: {{ required "A valid archive S3 URL entry is required!" .Values.global.archive.s3Url | quote }}
@@ -97,6 +98,7 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-s3archive-keys
               key: s3ArchiveSecretKey
+        {{- end }}
         - name: S3_REGION
           value: {{ .Values.global.archive.s3Region }}
         - name: S3_SECURE
