@@ -47,7 +47,7 @@ spec:
         fsGroup: 65534
       containers:
       - name: s3inbox
-        image: "{{ .Values.s3Inbox.repository }}:{{ .Values.s3Inbox.imageTag }}"
+        image: "{{ include "image.registry" . }}{{ .Values.s3Inbox.repository }}:{{ .Values.s3Inbox.imageTag }}"
         imagePullPolicy: {{ .Values.s3Inbox.imagePullPolicy | quote }}
         securityContext:
           allowPrivilegeEscalation: false

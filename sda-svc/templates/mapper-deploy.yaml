@@ -48,7 +48,7 @@ spec:
     {{- if .Values.global.pkiPermissions }}
       initContainers:
       - name: tls-init
-        image: busybox
+        image: "{{ include "image.registry" . }}busybox"
         command: ["/bin/sh", "-c"]
         args: ["/bin/cp /tls-certs/* /tls/ && chown 65534:65534 /tls/* && chmod 0600 /tls/*"]
         securityContext:
@@ -64,7 +64,7 @@ spec:
     {{- end }}
       containers:
       - name: mapper
-        image: "{{ .Values.mapper.repository }}:{{ .Values.mapper.imageTag }}"
+        image: "{{ include "image.registry" . }}{{ .Values.mapper.repository }}:{{ .Values.mapper.imageTag }}"
         imagePullPolicy: {{ .Values.mapper.imagePullPolicy | quote }}
         command: ["sda-mapper"]
         securityContext:

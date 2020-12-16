@@ -44,7 +44,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: auth
-        image: "{{ .Values.auth.repository }}:{{ .Values.auth.imageTag }}"
+        image: "{{ include "image.registry" . }}{{ .Values.auth.repository }}:{{ .Values.auth.imageTag }}"
         imagePullPolicy: {{ .Values.auth.imagePullPolicy | quote }}
         securityContext:
           allowPrivilegeEscalation: false

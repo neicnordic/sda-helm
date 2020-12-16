@@ -51,7 +51,7 @@ spec:
         fsGroup: 65534
       containers:
       - name: inbox
-        image: "{{ .Values.sftpInbox.repository }}:{{ .Values.sftpInbox.imageTag }}"
+        image: "{{ include "image.registry" . }}{{ .Values.sftpInbox.repository }}:{{ .Values.sftpInbox.imageTag }}"
         imagePullPolicy: {{ .Values.sftpInbox.imagePullPolicy | quote }}
         command: ["java", "-jar", "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts", "-Djavax.net.ssl.trustStorePassword={{ .Values.sftpInbox.keystorePass }}" ,"inbox-0.0.3-SNAPSHOT.jar"]
         securityContext:

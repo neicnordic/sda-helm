@@ -40,7 +40,7 @@ spec:
     {{- if or .Values.persistence.volumePermissions }}
       initContainers:
       - name: init-data-chmod
-        image: busybox
+        image: "{{ include "image.registry" . }}busybox"
         command:
           - /bin/sh
           - -cx
@@ -60,7 +60,7 @@ spec:
     {{- end }}
       containers:
       - name: postgresql
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ include "image.registry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         securityContext:
           allowPrivilegeEscalation: false

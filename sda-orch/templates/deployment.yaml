@@ -42,7 +42,7 @@ spec:
     {{- if .Values.pkiPermissions }}
       initContainers:
       - name: tls-init
-        image: busybox
+        image: "{{ include "image.registry" . }}busybox"
         command: ["/bin/sh", "-c"]
         args: ["/bin/cp /tls-certs/* /tls/ && chown 1000:1000 /tls/* && chmod 0400 /tls/*"]
         securityContext:
@@ -55,7 +55,7 @@ spec:
     {{- end }}
       containers:
       - name: orchestrate
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ include "image.registry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.imagePullPolicy | quote }}
       {{- if .Values.vaultSecrets }}
         command: ["/bin/sh", "-c"]
