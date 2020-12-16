@@ -27,7 +27,7 @@ spec:
         release: {{ .Release.Name }}
         {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
-        {{- if not .Values.global.secretsService }}
+        {{- if not .Values.global.vaultSecrets }}
         checksum/config: {{ include (print $.Template.BasePath "/intercept-secrets.yaml") . | sha256sum }}
         {{- end }}
 {{- if .Values.global.podAnnotations }}
@@ -55,7 +55,7 @@ spec:
 {{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
 {{- end }}
         env:
-      {{- if not .Values.global.secretsService }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: BROKER_PASSWORD
           valueFrom:
               secretKeyRef:
@@ -66,6 +66,9 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-intercept
                 key: mqUser
+      {{- else }}
+        - name: CONFIGFILE
+          value: {{ include "confFile" . }}
       {{- end }}
         {{- if .Values.global.broker.ssl }}
         - name: BROKER_CACERT

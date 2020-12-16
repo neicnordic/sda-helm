@@ -42,7 +42,10 @@ tlsPath: "/tls/certs"
   # revisionHistory: 3
 
 # If an external secrets management service is used set this to true
-secretsService: false
+vaultSecrets: false
+
+# env file for use with secretsservice
+envFile: "env"
 
 # used by both Message Broker and Database
 sslmode:

@@ -27,7 +27,7 @@ spec:
         release: {{ .Release.Name }}
         {{ .Values.global.networkPolicy.brokerNamespace }}: allowtraffic
       annotations:
-        {{- if not .Values.global.confFile }}
+        {{- if not .Values.global.vaultSecrets }}
         checksum/secret: {{ include (print $.Template.BasePath "/shared-secrets.yaml") . | sha256sum }}
         checksum/config: {{ include (print $.Template.BasePath "/s3-inbox-secrets.yaml") . | sha256sum }}
         {{- end }}
@@ -55,7 +55,7 @@ spec:
 {{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
 {{- end }}
         env:
-      {{- if not .Values.global.confFile }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: AWS_ACCESSKEY
           valueFrom:
             secretKeyRef:
@@ -123,12 +123,14 @@ spec:
           value: {{ include "tlsPath" . }}/inbox.crt
         - name: SERVER_KEY
           value: {{ include "tlsPath" . }}/inbox.key
+      {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
         - name: SERVER_JWTPUBKEYPATH
           value: {{ include "jwtPath" . }}
-        {{- if and .Values.global.elixir.oidcdHost .Values.global.elixir.jwkPath }}
+      {{- end }}
+      {{- if and .Values.global.elixir.oidcdHost .Values.global.elixir.jwkPath }}
         - name: SERVER_JWTPUBKEYURL
           value: "{{ .Values.global.elixir.oidcdHost }}{{ .Values.global.elixir.jwkPath }}"
-        {{- end }}
+      {{- end }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel }}
         ports:
