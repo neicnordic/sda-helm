@@ -38,3 +38,7 @@ Create chart name and version as used by the chart label.
 {{- define "mqPass" -}}
 {{- .Values.broker.password -}}
 {{- end -}}
+
+{{- define "image.registry" -}}
+{{- ternary "" (printf "%s/" .Values.image.registry) (empty .Values.image.registry) -}}
+{{- end -}}

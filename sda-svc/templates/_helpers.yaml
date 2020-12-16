@@ -113,6 +113,10 @@ Create chart name and version as used by the chart label.
 {{- ternary .Values.global.secretsPath (printf "%s/%s" .Values.global.secretsPath .Values.global.jwtPath) (empty .Values.global.jwtPath) -}}
 {{- end -}}
 
+{{- define "image.registry" -}}
+{{- ternary "" (printf "%s/" .Values.global.imageRegistry) (empty .Values.global.imageRegistry) -}}
+{{- end -}}
+
 {{- define "openid.endpoint" -}}
   {{- if .Values.global.oidc.enable -}}
     {{- printf "%s/.well-known/openid-configuration" (required "An oidc host is required" .Values.global.oidc.host) }}
