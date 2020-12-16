@@ -1,5 +1,7 @@
 
 image:
+# Image registry if an private registry is used
+  registry: ""
   repository: neicnordic/sda-orch
   tag: latest
   pullPolicy: Always
