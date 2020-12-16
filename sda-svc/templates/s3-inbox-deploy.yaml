@@ -123,14 +123,14 @@ spec:
           value: {{ include "tlsPath" . }}/inbox.crt
         - name: SERVER_KEY
           value: {{ include "tlsPath" . }}/inbox.key
-        {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
+      {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
         - name: SERVER_JWTPUBKEYPATH
           value: {{ include "jwtPath" . }}
-        {{- end }}
-        {{- if and .Values.global.elixir.oidcdHost .Values.global.elixir.jwkPath }}
+      {{- end }}
+      {{- if and .Values.global.elixir.oidcdHost .Values.global.elixir.jwkPath }}
         - name: SERVER_JWTPUBKEYURL
           value: "{{ .Values.global.elixir.oidcdHost }}{{ .Values.global.elixir.jwkPath }}"
-        {{- end }}
+      {{- end }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel }}
         ports:
