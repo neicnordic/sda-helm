@@ -298,7 +298,7 @@ jobs:
       run: kubectl logs broker-sda-mq-0
     - name: Helm add stable repo
       run: |
-        helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+        helm repo add minio https://helm.min.io/
         helm repo update
     - name: Install minio
       run: |
@@ -310,7 +310,7 @@ jobs:
         helm install minio \
         --set accessKey=$MINIO_ACCESS,secretKey=$MINIO_SECRET,\
         tls.enabled=true,tls.certSecret=minio-certs,\
-        persistence.enabled=false,service.port=443 stable/minio --version 5.0.0
+        persistence.enabled=false,service.port=443 minio/minio --version 5.0.32
     - name: Wait for minio to become ready
       run: |
         RETRY_TIMES=0
