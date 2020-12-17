@@ -61,7 +61,7 @@ spec:
       initContainers:
       {{- if .Values.ha.enabled }}
       - name: erlang
-        image: busybox
+        image: "{{ include "image.registry" . }}busybox"
         command:
           - /bin/sh
           - -cx
@@ -80,7 +80,7 @@ spec:
        {{- end }}
        {{- if and .Values.persistence.volumePermissions .Values.persistence.enabled }}
       - name: init-data-chmod
-        image: busybox
+        image: "{{ include "image.registry" . }}busybox"
         command:
           - /bin/sh
           - -cx
@@ -96,7 +96,7 @@ spec:
     {{- end }}
       containers:
       - name: broker
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ include "image.registry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         securityContext:
           allowPrivilegeEscalation: false

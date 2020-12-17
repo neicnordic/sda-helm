@@ -37,3 +37,7 @@ Create chart name and version as used by the chart label.
 {{- define "pgOutPassword" -}}
     {{- ternary (randAlphaNum 12) .Values.global.pg_out_password (empty .Values.global.pg_out_password) -}}
 {{- end -}}
+
+{{- define "image.registry" -}}
+{{- ternary "" (printf "%s/" .Values.image.registry) (empty .Values.image.registry) -}}
+{{- end -}}

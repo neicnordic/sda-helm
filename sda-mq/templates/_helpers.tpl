@@ -37,3 +37,7 @@ Create chart name and version as used by the chart label.
     {{-  print "verify_none" -}}
   {{ end }}
 {{- end -}}
+
+{{- define "image.registry" -}}
+{{- ternary "" (printf "%s/" .Values.image.registry) (empty .Values.image.registry) -}}
+{{- end -}}

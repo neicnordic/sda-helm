@@ -48,7 +48,7 @@ spec:
     {{- if .Values.global.pkiPermissions }}
       initContainers:
       - name: tls-init
-        image: busybox
+        image: "{{ include "image.registry" . }}busybox"
         command: ["/bin/sh", "-c"]
         args: ["/bin/cp /tls-certs/* /tls/ && chown 65534:65534 /tls/* && chmod 0600 /tls/*"]
         securityContext:
@@ -64,7 +64,7 @@ spec:
     {{- end }}
       containers:
       - name: finalize
-        image: "{{ .Values.finalize.repository }}:{{ .Values.finalize.imageTag }}"
+        image: "{{ include "image.registry" . }}{{ .Values.finalize.repository }}:{{ .Values.finalize.imageTag }}"
         imagePullPolicy: {{ .Values.finalize.imagePullPolicy | quote }}
         command: ["sda-finalize"]
         securityContext:

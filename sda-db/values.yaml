@@ -16,6 +16,8 @@ externalPkiService:
 extraSecurityContext: {}
 
 image:
+# Image registry if an private registry is used
+  registry: ""
   repository: neicnordic/sda-db
   tag: latest
   pullPolicy: Always

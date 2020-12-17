@@ -3,6 +3,10 @@
 # Declare variables to be passed into your templates.
 global:
 
+# Image registry if an private registry is used
+  image:
+    registry: ""
+
 # Path where the sensitive files can be found, default is "/.secrets".
 # TLS certificates or C4GH key locations can be set using global.tlsPath or global.c4ghPath respectively,
 # this path will be a subpath to the secretsPath.

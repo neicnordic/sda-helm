@@ -28,6 +28,8 @@ ha:
 extraSecurityContext: {}
 
 image:
+# Image registry if an private registry is used
+  registry: ""
   repository: neicnordic/sda-mq
   tag: latest
   pullPolicy: Always
