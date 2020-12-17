@@ -114,7 +114,7 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "image.registry" -}}
-{{- ternary "" (printf "%s/" .Values.global.imageRegistry) (empty .Values.global.imageRegistry) -}}
+{{- ternary "" (printf "%s/" .Values.global.image.registry) (empty .Values.global.image.registry) -}}
 {{- end -}}
 
 {{- define "openid.endpoint" -}}
