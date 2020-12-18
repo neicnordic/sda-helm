@@ -105,6 +105,22 @@ global:
     nfsServer: ""
     nfsPath: ""
 
+  backupArchive:
+    storageType: "s3" # s3 or posix
+  # The six lines below is only used with S3 backend
+    s3Url: ""
+    s3Bucket: ""
+    s3Region: "us-east-1"
+    s3ChunkSize: 15 # Chunk size in MB > 5
+    s3AccessKey: null
+    s3SecretKey: null
+    s3CaFile: null
+    s3Port: 443
+  # The lines below is only used with POSIX backend
+    volumePath: "/backup"
+    nfsServer: ""
+    nfsPath: ""
+
   auth:
     jwtAlg: ES256
     jwtKey: ""
@@ -118,6 +134,7 @@ global:
     password: ""
     port: 5671
     routingError: ""
+    backupRoutingKey: ""
     ssl: true
     username: ""
     verifyPeer: true
@@ -187,6 +204,12 @@ global:
 ##################################
 # service specific credentials
 credentials:
+  backup:
+    mqUser: ""
+    mqPassword: ""
+    dbUser: ""
+    dbPassword: ""
+
   doa:
     dbUser: ""
     dbPassword: ""
@@ -238,6 +261,25 @@ auth:
   repository: neicnordic/sda-auth
   imageTag: latest
   imagePullPolicy: Always
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "250m"
+# Extra annotations to attach to the service pods
+# This should be a multi-line string mapping directly to the a map of
+# the annotations to apply to the service pods
+  annotations: {}
+
+backup:
+  name: backup
+  deploy: false
+  replicaCount: 1
+  repository: neicnordic/sda-pipeline
+  imageTag: latest
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
