@@ -256,7 +256,7 @@ spec:
             claimName: {{ .Values.global.backupArchive.existingClaim }}
     {{- else }}
           nfs:
-            server: {{ required "An archive NFS server is required" .Values.global.backupArchive.nfsServer | quote }}
+            server: {{ required "An backup NFS server is required" .Values.global.backupArchive.nfsServer | quote }}
             path: {{ if .Values.global.backupArchive.nfsPath }}{{ .Values.global.backupArchive.nfsPath | quote }}{{ else }}{{ "/" }}{{ end }}
     {{- end }}
   {{- end }}
