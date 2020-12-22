@@ -129,10 +129,10 @@ jobs:
         cp sda-deploy-init/config/certs/*.p12 sda-svc/files/
         cp sda-deploy-init/config/certs/cacerts sda-svc/files/
         cp sda-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
-        for n in doa finalize ingest intercept verify mapper
+        for n in backup doa finalize ingest intercept verify mapper
           do cp sda-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
         done
-        for n in doa finalize ingest intercept verify mapper
+        for n in backup doa finalize ingest intercept verify mapper
           do cp sda-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
     - name: Deploy the SDA stack
@@ -154,7 +154,7 @@ jobs:
     - name: Wait for SDA stack to become ready
       run: |
         RETRY_TIMES=0
-        for p in doa finalize inbox ingest verify
+        for p in backup doa finalize inbox ingest mapper verify
         do
         until kubectl get pods -lrole=$p -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True"
         do echo "waiting for $p to become ready"
@@ -166,13 +166,13 @@ jobs:
     - name: debug sda
       if: failure()
       run: |
-        for s in doa finalize ingest verify inbox
+        for s in backup doa finalize inbox ingest mapper verify
         do kubectl describe pod -l role=$s
         done
     - name: log sda
       if: failure()
       run: |
-        for s in doa finalize ingest verify inbox
+        for s in backup doa finalize inbox ingest mapper verify
         do kubectl logs $(kubectl get pods | grep $s | awk '{print $1}')
         done 
 
@@ -333,10 +333,10 @@ jobs:
         cp sda-deploy-init/config/certs/doa.p12 sda-svc/files/
         cp sda-deploy-init/config/certs/cacerts sda-svc/files/
         cp sda-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
-        for n in doa finalize ingest verify inbox intercept mapper inbox
+        for n in backup doa finalize inbox ingest intercept mapper verify
           do cp sda-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
         done
-        for n in doa finalize ingest verify inbox intercept mapper inbox
+        for n in backup doa finalize inbox ingest intercept mapper verify
           do cp sda-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
         done
         cp sda-deploy-init/config/certs/res.ca.crt sda-svc/files/auth.crt
@@ -352,6 +352,8 @@ jobs:
         helm install sda sda-svc -f .github/ci_tests/s3.yaml \
         --set global.archive.s3AccessKey="$S3_ACCESS_KEY",\
         global.archive.s3SecretKey="$S3_SECRET_KEY",\
+        global.backupArchive.s3AccessKey="$S3_ACCESS_KEY",\
+        global.backupArchive.s3SecretKey="$S3_SECRET_KEY",\
         global.c4gh.passphrase="$C4GH_PASSPHRASE",\
         global.cega.password="$CEGA_USERS_PASS",\
         global.db.passIngest="$DB_IN_PASS",\
@@ -361,7 +363,7 @@ jobs:
     - name: Wait for SDA stack to become ready
       run: |
         RETRY_TIMES=0
-        for p in auth doa finalize inbox ingest verify
+        for p in auth backup doa finalize inbox ingest intercept mapper verify
         do
         until kubectl get pods -lrole=$p -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status}' | grep "Ready=True"
         do echo "waiting for $p to become ready"
@@ -373,13 +375,13 @@ jobs:
     - name: debug sda
       if: failure()
       run: |
-        for s in auth doa finalize ingest verify inbox
+        for s in auth backup doa finalize inbox ingest intercept mapper verify
         do kubectl describe pod -l role=$s
         done
     - name: log sda
       if: failure()
       run: |
-        for s in auth doa finalize ingest verify inbox
+        for s in auth backup doa finalize inbox ingest intercept mapper verify
         do kubectl logs $(kubectl get pods | grep $s | awk '{print $1}')
         done 
 
