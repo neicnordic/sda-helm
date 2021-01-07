@@ -7,6 +7,11 @@ global:
   archive:
     storageType: posix
     existingClaim: archive-volume
+    volumePath: "/archive"
+  backupArchive:
+    storageType: posix
+    existingClaim: backup-volume
+    volumePath: "/backup"
   broker:
     host: "broker-sda-mq"
     exchange: "sda"
@@ -14,6 +19,7 @@ global:
     verifyPeer: true
     password: "admin"
     username: "admin"
+    backupRoutingKey: "backup"
   cega:
     host: "cega-users"
     user: "legatest"
@@ -27,3 +33,5 @@ global:
     user: "lega"
     existingClaim: inbox-volume
   logLevel: debug
+backup:
+  deploy: true

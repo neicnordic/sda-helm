@@ -54,6 +54,18 @@ Parameter | Description | Default
 `global.archive.volumePath` | Path to the mounted `posix` volume. |`/archive`
 `global.archive.nfsServer` | URL or IP address to a NFS server. |`""`
 `global.archive.nfsPath` | Path on the NFS server for the archive. |`""`
+`global.backupArchive.storageType` | Storage type for the backup of the data archive, available options are `s3` and `posix`. |`s3`
+`global.backupArchive.s3Url` | URL to S3 backup archive instance. |`""`
+`global.backupArchive.s3Bucket` | S3 backup archive bucket. |`""`
+`global.backupArchive.s3Region` | S3 backup archive region. |`us-east-1`
+`global.backupArchive.s3ChunkSize` | S3 chunk size in MB. |`15`
+`global.backupArchive.s3AccessKey` | Access key to S3 backup archive . |`null`
+`global.backupArchive.s3SecretKey` | Secret key to S3 backup archive. |`null`
+`global.backupArchive.s3CaFile` | CA certificate to use if the S3 backup archive is internal. |`null`
+`global.backupArchive.s3Port` | Port that the S3 S3 backup archive is available on. |`443`
+`global.backupArchive.volumePath` | Path to the mounted `posix` volume. |`/backup`
+`global.backupArchive.nfsServer` | URL or IP address to a NFS server. |`""`
+`global.backupArchive.nfsPath` | Path on the NFS server for the backup archive. |`""`
 `global.auth.jwtAlg` | Key type to sign the JWT, available options are RS265 & ES256, Must match the key type |`"ES256"`
 `global.auth.jwtKey` | Private key used to sign the JWT. |`""`
 `global.auth.jwtPub` | Public key ues to verify the JWT. |`""`
@@ -65,6 +77,7 @@ Parameter | Description | Default
 `global.broker.vhost` | Virtual host to connect to. |`/`
 `global.broker.password` | Shared password to the message broker. |`/`
 `global.broker.username` | Shared user to the message broker. |`/`
+`global.broker.backupRoutingKey` | routing key used to send messages to backup service |`""`
 `global.cega.host` | Domain name for the EGA user authentication service. |`""`
 `global.cega.user` | Username for the EGA user authentication service. |`""`
 `global.cega.password` | Password for the EGA user authentication service. |`""`
@@ -113,6 +126,10 @@ If no shared credentials for the message broker and database are used these shou
 
 Parameter | Description | Default
 --------- | ----------- | -------
+`credentials.backup.dbUser` | Databse user for backup | `""`
+`credentials.backup.dbPassword` | Database password for backup | `""`
+`credentials.backup.mqUser` | Broker user for backup | `""`
+`credentials.backup.mqPassword` | Broker password for backup | `""`
 `credentials.doa.dbUser` | Databse user for doa | `""`
 `credentials.doa.dbPassword` | Database password for doa| `""`
 `credentials.finalize.dbUser` | Databse user for finalize | `""`
@@ -149,6 +166,15 @@ Parameter | Description | Default
 `auth.resources.requests.cpu` | CPU request for container. |`100m`
 `auth.resources.limits.memory` | Memory limit for container. |`256Mi`
 `auth.resources.limits.cpu` | CPU limit for container. |`250m`
+`backup.repository` | inbox container image repository | `neicnordic/sda-pipeline`
+`backup.imageTag` | inbox container image version | `latest`
+`backup.imagePullPolicy` | inbox container image pull policy | `Always`
+`backup.annotations` | Specific annotation for the backup pod | `{}`
+`backup.resources.requests.memory` | Memory request for backup container. |`128Mi`
+`backup.resources.requests.cpu` | CPU request for backup container. |`100m`
+`backup.resources.limits.memory` | Memory limit for backup container. |`256Mi`
+`backup.resources.limits.cpu` | CPU limit for backup container. |`250m`
+`backup.deploy` | Set to true if the backup service should be active | `false`
 `doa.replicaCount` | desired number of replicas | `1`
 `doa.repository` | dataedge container image repository | `neicnordic/sda-doa`
 `doa.imageTag` | dataedge container image version | `"latest"`
