@@ -22,6 +22,11 @@ global:
 # if left undefined or `all`, all services are deployed.
   deploymentType: "all"
 
+# standalone version requires a custom schema e.g. isolated
+# the files can still be overwritten in container with no change
+# options are `federated` or `isolated`
+  schemaType: ""
+
   ingress:
     deploy: false
     hostName:
