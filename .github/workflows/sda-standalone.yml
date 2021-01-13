@@ -1,0 +1,53 @@
+name: sda standalone deployment
+
+on: [push,pull_request]
+
+env:
+  svc_list: 'auth backup doa finalize inbox ingest intercept mapper verify'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        test: [sda-standalone]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install kube dependencies
+      run: bash ./dev_tools/scripts/install-kube-deps.sh
+    - name: Initialise k3d
+      run: bash ./dev_tools/scripts/init-k3d.sh
+    - name: Wait for k3d to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh metrics-server k8s-app kube-system
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install sda dependencies
+      run: bash ./dev_tools/scripts/install-sda-deps.sh
+    - name: Set up services configuration
+      run: bash ./dev_tools/scripts/svc-setup.sh
+    - name: Deploy SDA database
+      run: bash ./dev_tools/scripts/deploy-db.sh
+    - name: Wait for database to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh database
+    - name: Deploy SDA message broker
+      run: bash ./dev_tools/scripts/deploy-mq-standalone.sh
+    - name: Wait for broker to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh broker
+    - name: Deploy mock oidc server
+      run: bash ./dev_tools/scripts/deploy-oidc.sh
+    - name: Deploy the SDA orch
+      run: bash ./dev_tools/scripts/deploy-sda-orch.sh
+    - name: Wait for orchestrate to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh orchestrate
+    - name: Deploy minio
+      run: bash ./dev_tools/scripts/deploy-minio.sh
+    - name: Wait for minio to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh minio app
+    - name: Create s3 buckets
+      run: bash ./dev_tools/scripts/create-s3-buckets.sh
+    - name: Deploy the SDA stack
+      run: bash ./dev_tools/scripts/deploy-sda-standalone.sh
+    - name: Wait for sda to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh "${{ env.svc_list }}"
