@@ -3,7 +3,6 @@ set -e
 
 pushd sda-helm
 
-CEGA_MQ_PASS=$(grep cega_mq_pass sda-deploy-init/config/trace.yml | awk {'print $2'} | sed --expression 's/\"//g')
 
 helm install broker sda-mq \
 --set securityPolicy.create=false,\
