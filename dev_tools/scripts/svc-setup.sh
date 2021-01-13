@@ -22,7 +22,6 @@ cp sda-deploy-init/config/certs/root.ca.crt sda-mq/files/ca.crt
 cp sda-deploy-init/config/certs/mq-server.ca.crt sda-mq/files/server.crt
 cp sda-deploy-init/config/certs/mq-server.ca.key sda-mq/files/server.key
 
-git clone https://github.com/nbisweden/LocalEGA-helm
 cp -r sda-deploy-init/config LocalEGA-helm/ega-charts/cega/config
 
 ## sda-svc certs

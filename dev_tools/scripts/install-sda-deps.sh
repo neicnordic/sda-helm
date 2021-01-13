@@ -10,6 +10,10 @@ fi
 
 pushd sda-helm
 
+if [[ ! -d LocalEGA-helm ]]; then
+  git clone https://github.com/nbisweden/LocalEGA-helm
+fi
+
 if [[ ! -d sda-deploy-init ]]; then
   git clone https://github.com/neicnordic/sda-deploy-init
 fi
