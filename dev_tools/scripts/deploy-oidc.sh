@@ -3,6 +3,6 @@ set -e
 
 pushd sda-helm
 
-kubectl apply -f .github/ci_tests/oidc.yaml
+kubectl apply -f dev_tools/config/oidc.yaml
 
 popd

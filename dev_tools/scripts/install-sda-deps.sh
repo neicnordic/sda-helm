@@ -21,6 +21,6 @@ fi
 pip3 install sda-deploy-init/
 
 legainit --cega --config-path sda-deploy-init/config \
-                 --svc-config .github/ci_tests/svc.conf
+                 --svc-config dev_tools/config/svc.conf
 
 popd
