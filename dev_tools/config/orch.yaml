@@ -1,0 +1,19 @@
+global:
+  c4ghPath: c4gh
+  jwtPath: jwt
+  tlsPath: tls
+  podSecurityPolicy:
+    create: false
+broker:
+  vhost: "sda"
+  host: "broker-sda-mq"
+  exchange: "sda"
+  password: "admin"
+  username: "admin"
+  queue:
+    inbox: inbox
+    completed: completed
+    verify: archived
+    files: files
+    stableid: accessionIDs
+logLevel: debug
