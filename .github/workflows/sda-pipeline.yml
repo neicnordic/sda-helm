@@ -1,0 +1,70 @@
+name: sda-pipeline deployment
+
+on: [push,pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        test: [sftp-inbox, s3-inbox]
+    runs-on: ubuntu-latest
+    steps:
+    - name: ACTIONS_ALLOW_UNSECURE_COMMANDS
+      id: ACTIONS_ALLOW_UNSECURE_COMMANDS
+      run: echo 'ACTIONS_ALLOW_UNSECURE_COMMANDS=true' >> $GITHUB_ENV
+    - name: fixup env
+      run: |
+        if [ "${{ matrix.test }}" = "sftp-inbox" ]; then
+          echo "SVCS=backup doa finalize inbox ingest intercept mapper verify" >> "$GITHUB_ENV";
+        else
+          echo "SVCS=auth backup doa finalize inbox ingest intercept mapper verify" >> "$GITHUB_ENV";
+        fi
+    - uses: actions/checkout@v2
+    - name: Install kube dependencies
+      run: bash ./dev_tools/scripts/install-kube-deps.sh
+    - name: Initialise k3d
+      run: bash ./dev_tools/scripts/init-k3d.sh
+    - name: Wait for k3d to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh metrics-server k8s-app kube-system
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install sda dependencies
+      run: bash ./dev_tools/scripts/install-sda-deps.sh
+    - name: Set up services configuration
+      run: bash ./dev_tools/scripts/svc-setup.sh
+    - name: Deploy SDA database
+      run: bash ./dev_tools/scripts/deploy-db.sh
+    - name: Wait for database to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh database
+    - name: Deploy mock oidc server
+      if: matrix.test == 's3-inbox'
+      run: bash ./dev_tools/scripts/deploy-oidc.sh
+    - name: Deploy minio
+      if: matrix.test == 's3-inbox'
+      run: bash ./dev_tools/scripts/deploy-minio.sh
+    - name: Wait for minio to become ready
+      if: matrix.test == 's3-inbox'
+      run: bash ./dev_tools/scripts/wait-for-pods.sh minio app
+    - name: Create s3 buckets
+      if: matrix.test == 's3-inbox'
+      run: bash ./dev_tools/scripts/create-s3-buckets.sh
+    - name: Start CEGA services
+      run: bash ./dev_tools/scripts/deploy-cega.sh
+    - name: Wait for CEGA to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh cega-mq app
+    - name: Deploy SDA message broker
+      run: bash ./dev_tools/scripts/deploy-mq.sh
+    - name: Wait for broker to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh broker
+    - name: Deploy the SDA stack for posix
+      if: matrix.test == 'sftp-inbox'
+      run: |
+        kubectl apply -f dev_tools/config/posix-volumes.yaml;
+        bash ./dev_tools/scripts/deploy-sda-posix.sh;
+    - name: Deploy the SDA stack for s3
+      if: matrix.test == 's3-inbox'
+      run: bash ./dev_tools/scripts/deploy-sda-s3.sh
+    - name: Wait for sda to become ready
+      run: bash ./dev_tools/scripts/wait-for-pods.sh "${{ env.SVCS }}"
