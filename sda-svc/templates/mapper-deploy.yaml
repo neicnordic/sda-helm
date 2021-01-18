@@ -70,8 +70,6 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
         env:
-        - name: SCHEMA_TYPE
-          value: {{ default "federated" .Values.global.schemaType }}
         - name: BROKER_DURABLE
           value: {{ .Values.global.broker.durable | quote }}
         - name: BROKER_EXCHANGE
