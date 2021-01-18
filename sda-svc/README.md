@@ -22,6 +22,7 @@ Parameter | Description | Default
 `global.confFile` | Name of config file, used when secrets are handled by hasicorp vault | `config.yaml`
 `global.confFilePath` | This path will be a subpath to the secretsPath | `""`
 `global.deploymentType` | Deployment can be split into `external` and `internal` components, available options are `all`, `external` and `internal`. | `all`
+`global.schemaType` | Standalone version requires a custom JOSN schema, available options are `federated` or `isolated`, unset defaults to federated. | `""`
 `global.ingress.deploy` |  | `false`
 `global.ingress.hostName.auth` |  | `""`
 `global.ingress.hostName.doa` |  | `""`

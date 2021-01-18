@@ -28,6 +28,7 @@ global:
 
 # standalone version requires a custom schema e.g. isolated
 # the files can still be overwritten in container with no change
+# options are `federated` or `isolated`
   schemaType: ""
 
   ingress:
