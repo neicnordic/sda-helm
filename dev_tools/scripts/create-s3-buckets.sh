@@ -18,7 +18,7 @@ if [ ! -f s3cmd.conf ]; then
 EOF
 fi
 
-kubectl port-forward $(kubectl get pods | grep minio | awk '{print $1}') 9000:9000 &
+kubectl port-forward "$(kubectl get pods | grep minio | awk '{print $1}')" 9000:9000 &
 
 # Wait for port forwarding to be active
 sleep 3
