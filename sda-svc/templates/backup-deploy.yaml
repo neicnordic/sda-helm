@@ -220,7 +220,7 @@ spec:
           mountPath: {{ .Values.global.archive.volumePath | quote }}
   {{- end }}
   {{- if eq "posix" .Values.global.backupArchive.storageType }}
-        - name: archive
+        - name: backup
           mountPath: {{ .Values.global.backupArchive.volumePath | quote }}
   {{- end }}
   {{- if not .Values.global.pkiService }}
