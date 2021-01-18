@@ -65,6 +65,7 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-auth
               key: elixirSecret
+        {{- if or ( eq "federated" .Values.global.schemaType) ( eq "" .Values.global.schemaType) }}
         - name: CEGA_ID
           valueFrom:
             secretKeyRef:
@@ -75,6 +76,7 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-auth
               key: cegaSecret
+        {{- end }}
       {{- else }}
         - name: SERVER_CONFFILE
           value: {{ include "confFile" . }}
@@ -85,6 +87,7 @@ spec:
           value: "{{ .Values.global.elixir.oidcdHost }}"
         - name: ELIXIR_SCOPE
           value: "ga4gh_passport_v1"
+        {{- if or ( eq "federated" .Values.global.schemaType) ( eq "" .Values.global.schemaType) }}
         - name: CEGA_JWTISSUER
           value: "https://{{ .Values.global.ingress.hostName.auth }}"
         - name: CEGA_AUTHURL
@@ -93,6 +96,7 @@ spec:
           value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtKey }}"
         - name: CEGA_JWTSIGNATUREALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
+        {{- end }}
         {{- if .Values.global.auth.useTLS }}
         - name: SERVER_CERT
           value: "{{ template "tlsPath" . }}/auth.crt"
