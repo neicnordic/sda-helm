@@ -4,8 +4,8 @@ set -e
 if [ ! -f s3cmd.conf ]; then
   cat >> "s3cmd.conf" <<EOF
   [default]
-  access_key=$(grep s3_archive_access_key sda-deploy-init/config/trace.yml | awk {'print $2'} | sed -e 's/\"//g')
-  secret_key=$(grep s3_archive_secret_key sda-deploy-init/config/trace.yml | awk {'print $2'} | sed -e 's/\"//g')
+  access_key=$(grep s3_archive_access_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
+  secret_key=$(grep s3_archive_secret_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
   check_ssl_certificate = False
   encoding = UTF-8
   encrypt = False
@@ -18,7 +18,7 @@ if [ ! -f s3cmd.conf ]; then
 EOF
 fi
 
-kubectl port-forward $(kubectl get pods | grep minio | awk '{print $1}') 9000:9000 &
+kubectl port-forward "$(kubectl get pods | grep minio | awk '{print $1}')" 9000:9000 &
 
 # Wait for port forwarding to be active
 sleep 3

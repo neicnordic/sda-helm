@@ -31,11 +31,11 @@ cp sda-deploy-init/config/certs/cacerts sda-svc/files/
 cp sda-deploy-init/config/certs/root.ca.crt sda-svc/files/ca.crt
 
 for n in backup doa finalize ingest intercept verify mapper inbox
-  do cp sda-deploy-init/config/certs/$n.ca.crt sda-svc/files/$(echo $n.ca.crt | cut -d '.' -f1,3)
+  do cp sda-deploy-init/config/certs/$n.ca.crt sda-svc/files/"$(echo $n.ca.crt | cut -d '.' -f1,3)"
 done
 
 for n in backup doa finalize ingest intercept verify mapper inbox
-  do cp sda-deploy-init/config/certs/$n.ca.key sda-svc/files/$(echo $n.ca.key | cut -d '.' -f1,3)
+  do cp sda-deploy-init/config/certs/$n.ca.key sda-svc/files/"$(echo $n.ca.key | cut -d '.' -f1,3)"
 done
 
 cp sda-deploy-init/config/certs/res.ca.crt sda-svc/files/auth.crt
