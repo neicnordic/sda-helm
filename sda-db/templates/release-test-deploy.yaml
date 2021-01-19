@@ -54,7 +54,7 @@ spec:
            s=${PKI_VOLUME_PATH:-/certs};
            cp "$s/tester.ca.key" $PGSSL/postgresql.key;
            cp "$s/tester.ca.crt" $PGSSL/postgresql.crt;
-           cp "$s/CA.crt" $PGSSL/root.crt;
+           cp "$s/ca.crt" $PGSSL/root.crt;
            chmod -R og-rw $PGSSL;
            count=1;
            until (psql -h ${DB_HOST} -U lega_in lega -c "select * from local_ega.dbschema_version" || [ "$count" -ge 10 ]); do 
@@ -74,8 +74,8 @@ spec:
                 path: tester.ca.key
               - key: tester.ca.crt
                 path: tester.ca.crt
-              - key: CA.crt
-                path: CA.crt
+              - key: ca.crt
+                path: ca.crt
     {{- end }}
   restartPolicy: Never
 
