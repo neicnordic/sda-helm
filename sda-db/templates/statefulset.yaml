@@ -86,7 +86,7 @@ spec:
           value: {{ .Values.persistence.mountPath }}/tls/pg.key
         {{- if .Values.global.verifyPeer }}
         - name: PG_CA
-          value: {{ .Values.persistence.mountPath }}/tls/CA.crt
+          value: {{ .Values.persistence.mountPath }}/tls/ca.crt
         - name: PG_VERIFY_PEER
           value: {{ ternary 1 0 (.Values.global.verifyPeer) | quote }}
         {{- end }}
@@ -135,8 +135,8 @@ spec:
               name: {{ template "sda.fullname" . }}
               items:
               {{- if .Values.global.verifyPeer }}
-              - key: CA.crt
-                path: CA.crt
+              - key: ca.crt
+                path: ca.crt
               {{- end }}
               - key: pg.crt
                 path: pg.crt

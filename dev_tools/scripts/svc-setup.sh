@@ -11,7 +11,7 @@ cp sda-deploy-init/config/certs/orchestrate.ca.crt sda-orch/files/orch.crt
 cp sda-deploy-init/config/certs/orchestrate.ca.key sda-orch/files/orch.key
 
 ## sda-db certs
-cp sda-deploy-init/config/certs/root.ca.crt sda-db/files/CA.crt
+cp sda-deploy-init/config/certs/root.ca.crt sda-db/files/ca.crt
 cp sda-deploy-init/config/certs/db.ca.crt sda-db/files/pg.crt
 cp sda-deploy-init/config/certs/db.ca.key sda-db/files/pg.key
 
