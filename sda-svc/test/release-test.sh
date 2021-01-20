@@ -96,6 +96,15 @@ count=0
 
 export MQ_EXCHANGE=''
 
+
+echo "Trying connection"
+echo
+
+openssl s_client -connect "${MQ_HOST}:5671" -verify 50 -key "/certs/tester.ca.key" -cert "/certs/tester.ca.crt" -verify_return_error -verifyCAfile "/certs/ca.crt" </dev/null
+
+echo "Now continuing"
+echo
+
 echo "Trying to trigger ingestion by message through mq"
 until python3 /release-test-app/trigger-ingest.py "$user" "$uploaded"; do
     echo "MQ failed, will wait and retry"
