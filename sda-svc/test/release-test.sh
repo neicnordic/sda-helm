@@ -100,6 +100,12 @@ export MQ_EXCHANGE=''
 echo "Trying connection"
 echo
 
+echo
+env  |grep PKI
+echo "certs"
+ls ${PKI_PATH}
+
+echo "openssl"
 openssl s_client -connect "${MQ_HOST}:5671" -verify 50 -key "/certs/tester.ca.key" -cert "/certs/tester.ca.crt" -verify_return_error -verifyCAfile "/certs/ca.crt" </dev/null
 
 echo "Now continuing"
