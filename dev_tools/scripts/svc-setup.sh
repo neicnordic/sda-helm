@@ -40,3 +40,7 @@ done
 
 cp sda-deploy-init/config/certs/res.ca.crt sda-svc/files/auth.crt
 cp sda-deploy-init/config/certs/res.ca.key sda-svc/files/auth.key
+
+for p in sda-svc sda-db sda-mq sda-orch
+  do cp sda-deploy-init/config/certs/tester.ca.* "$p/files/"
+done
