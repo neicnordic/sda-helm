@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--connection', help="of the form 'amqp://<user>:<password>@<host>:<port>/<vhost>'")
 parser.add_argument('--latest_message', action='store_true')
 parser.add_argument('user')
-parser.add_argument('archivepath')
+parser.add_argument('inboxpath')
 parser.add_argument('accessionid')
 parser.add_argument('decsha256')
 parser.add_argument('decmd5')
@@ -56,7 +56,7 @@ if mq_connection.startswith('amqps'):
     if cacertfile.exists():
         context.verify_mode = ssl.CERT_REQUIRED
         context.load_verify_locations(cafile=str(cacertfile))
-        
+
     # If client verification is required
     if certfile.exists():
         assert( keyfile.exists() )
@@ -83,16 +83,16 @@ message = """
                           "type": "md5",
                           "value": "%s"
                          }
-                        ] 
+                        ]
 }
 """ % (args.user,
-       args.archivepath,
+       args.inboxpath,
        args.accessionid,
        args.decsha256,
        args.decmd5)
 
 channel.basic_publish(exchange=exchange,
-                      routing_key= 'stableIDs',
+                      routing_key= 'files',
                       body=message,
                       properties=pika.BasicProperties(correlation_id="1",
                                                       content_type='application/json',

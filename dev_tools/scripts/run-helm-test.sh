@@ -1,6 +1,8 @@
 #!/bin/bash
 
-helm list --short 2>/dev/null | while read -r release; do
+if [ -n "$1" ]; then RELEASE_LIST=$1; else RELEASE_LIST="broker postgres sda"; fi
+
+for release in $RELEASE_LIST ; do
     echo "Testing $release"
     helm test "$release"
     r=$?
@@ -13,4 +15,3 @@ helm list --short 2>/dev/null | while read -r release; do
 	exit "$r"
     fi
 done
-							  

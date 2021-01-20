@@ -53,7 +53,7 @@ if mq_connection.startswith('amqps'):
     if cacertfile.exists():
         context.verify_mode = ssl.CERT_REQUIRED
         context.load_verify_locations(cafile=str(cacertfile))
-        
+
     # If client verification is required
     if certfile.exists():
         assert( keyfile.exists() )
