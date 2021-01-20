@@ -20,6 +20,8 @@ global:
     password: "admin"
     username: "admin"
     backupRoutingKey: "backup"
+  c4gh:
+    publicFile: "c4gh.pub"
   cega:
     host: "cega-users"
     user: "legatest"

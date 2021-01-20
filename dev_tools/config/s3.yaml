@@ -41,6 +41,7 @@ global:
   c4gh:
     file: c4gh.key
     passphrase: oaagCP1YgAZeEyl2eJAkHv9lkcWXWFgm
+    publicFile: "c4gh.pub"
   elixir:
     pubKey: token.pub
     oidcdHost: "http://oidc-server:8080"
