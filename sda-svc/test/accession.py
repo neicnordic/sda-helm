@@ -26,12 +26,13 @@ parser.add_argument('decmd5')
 args = parser.parse_args()
 
 exchange = os.getenv('MQ_EXCHANGE','localega')
+mq_vhost = os.getenv('MQ_VHOST', '/').lstrip("/")
 
 env_connection = "amqps://%s:%s@%s/%s" % (
     os.getenv('MQ_USER', 'user'),
     os.getenv('MQ_PASSWORD', 'password'),
     os.getenv('MQ_HOST', 'mq'),
-    urllib.parse.quote(os.getenv('MQ_VHOST', '/'), safe=''))
+    urllib.parse.quote(mq_vhost, safe=''))
 
 
 # MQ Connection
