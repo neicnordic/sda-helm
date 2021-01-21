@@ -1,5 +1,15 @@
 #!/bin/bash
 
+if [ "${DEPLOYMENT_TOPOLOGY}" = "standalone" ]; then
+  ingest_routing_key="files";
+  accession_routing_key="files";
+else
+  ingest_routing_key="ingest";
+  accession_routing_key="accessionIDs";
+fi
+
+export MQ_EXCHANGE=''
+
 if [ "${DEPLOYMENT_TYPE}" = all -o "${DEPLOYMENT_TYPE}" = external ]; then
 
     python3 /release-test-app/verify-inboxes.py
@@ -94,10 +104,8 @@ fi
 
 count=0
 
-export MQ_EXCHANGE=''
-
-echo "Trying to trigger ingestion by message through mq"
-until python3 /release-test-app/trigger-ingest.py "$user" "$uploaded"; do
+echo "Trying to trigger ingestion by message through the routing key $ingest_routing_key"
+until python3 /release-test-app/trigger-ingest.py "$user" "$uploaded" "$ingest_routing_key"; do
     echo "MQ failed, will wait and retry"
     sleep 10
     count=$((count+1))
@@ -163,8 +171,8 @@ echo "File was archived as $archivepath"
 
 access=$(printf "EGAF%011d" "${RANDOM}${RANDOM}" )
 
-echo "Will send an accession id message"
-until python3 /release-test-app/accession.py "$user" "$uploaded" "$access" "$decsha" "$decmd"; do
+echo "Will send an accession id message through the routing key $accession_routing_key"
+until python3 /release-test-app/accession.py "$user" "$uploaded" "$access" "$decsha" "$decmd" "$accession_routing_key"; do
     sleep 10
     count=$((count+1))
     if [ "$count" -gt 10 ]; then

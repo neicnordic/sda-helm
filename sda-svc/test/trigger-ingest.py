@@ -20,9 +20,10 @@ parser.add_argument('--connection', help="of the form 'amqp://<user>:<password>@
 parser.add_argument('--latest_message', action='store_true')
 parser.add_argument('user')
 parser.add_argument('filepath')
+parser.add_argument('routing_key')
 args = parser.parse_args()
 
-exchange = os.getenv('MQ_EXCHANGE','localega')
+exchange = os.getenv('MQ_EXCHANGE','sda')
 mq_vhost = os.getenv('MQ_VHOST', '/').lstrip("/")
 
 pki_path = os.getenv('PKI_PATH' '/certs')
@@ -74,7 +75,7 @@ message = """
 """ % (args.user, args.filepath)
 
 channel.basic_publish(exchange=exchange,
-                      routing_key= 'files',
+                      routing_key=args.routing_key,
                       body=message,
                       properties=pika.BasicProperties(correlation_id="1",
                                                       content_type='application/json',
