@@ -68,3 +68,5 @@ jobs:
       run: bash ./dev_tools/scripts/deploy-sda-s3.sh
     - name: Wait for sda to become ready
       run: bash ./dev_tools/scripts/wait-for-pods.sh "${{ env.SVCS }}"
+    - name: Run helm test
+      run: bash ./dev_tools/scripts/run-helm-test.sh

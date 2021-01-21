@@ -86,7 +86,7 @@ EOF
   s3cmd  --region="${INBOX_REGION}" -c /tmp/s3cmd.cfg put  "${tmpfile}.encrypted" "s3://${INBOX_BUCKET}"
 
   echo "Waiting for s3 consistency"
-  
+
   sleep 60
   s3cmd  --region="${INBOX_REGION}" -c /tmp/s3cmd.cfg ls "s3://${INBOX_BUCKET}/${uploaded}"
 
@@ -135,9 +135,9 @@ export PGPASSWORD
 echo "Will check in DB if file is archived"
 echo
 echo "Command used: psql -A -t  -h \"${DB_HOST}\" -U lega_in lega -c \
-	 \"select archive_path from local_ega.files where 
+	 \"select archive_path from local_ega.files where
           inbox_file_checksum='$sha' and
-          inbox_path='${uploaded}' and 
+          inbox_path='${uploaded}' and
           elixir_id='$user' and
           status in ('ARCHIVED', 'COMPLETED', 'READY');\""
 echo
@@ -145,11 +145,11 @@ echo
 
 count=1
 until archivepath=$(psql -A -t  -h "${DB_HOST}" -U lega_in lega -c \
-	 "select archive_path from local_ega.files where 
+	 "select archive_path from local_ega.files where
           inbox_file_checksum='$sha' and
-          inbox_path='${uploaded}' and 
+          inbox_path='${uploaded}' and
           elixir_id='$user' and
-          status in ('ARCHIVED', 'COMPLETED', 'READY');" | grep '.') || [ "$count" -ge 12 ]; do 
+          status in ('ARCHIVED', 'COMPLETED', 'READY');" | grep '.') || [ "$count" -ge 12 ]; do
     sleep 10;
     count=$((count+1));
 done
@@ -164,7 +164,7 @@ echo "File was archived as $archivepath"
 access=$(printf "EGAF%011d" "${RANDOM}${RANDOM}" )
 
 echo "Will send an accession id message"
-until python3 /release-test-app/accession.py "$user" "$archivepath" "$access" "$decsha" "$decmd"; do
+until python3 /release-test-app/accession.py "$user" "$uploaded" "$access" "$decsha" "$decmd"; do
     sleep 10
     count=$((count+1))
     if [ "$count" -gt 10 ]; then
@@ -175,11 +175,11 @@ done
 
 
 echo "Will check database for ready file"
-echo 
+echo
 echo "Command used: psql -A -t  -h \"${DB_HOST}\" -U lega_in lega -c \
-	 \"select archive_path from local_ega.files where 
+	 \"select archive_path from local_ega.files where
           inbox_file_checksum='$sha' and
-          inbox_path='$uploaded' and 
+          inbox_path='$uploaded' and
           stable_id='$access' and
           elixir_id='$user' and
           status='READY';\""
@@ -187,12 +187,12 @@ echo
 
 count=0
 until readypath=$(psql -A -t  -h "${DB_HOST}" -U lega_in lega -c \
-	 "select archive_path from local_ega.files where 
+	 "select archive_path from local_ega.files where
           inbox_file_checksum='$sha' and
-          inbox_path='$uploaded' and 
+          inbox_path='$uploaded' and
           stable_id='$access' and
           elixir_id='$user' and
-          status='READY';" | grep '.') || [ "$count" -ge 12 ]; do 
+          status='READY';" | grep '.') || [ "$count" -ge 12 ]; do
     sleep 10;
     echo "Not completed yet, will wait and retry"
     count=$((count+1));
@@ -213,9 +213,9 @@ echo
 echo "Removing from database"
 echo
 psql -A -t  -h "${DB_HOST}" -U lega_in lega -c \
-	 "delete from local_ega.files where 
+	 "delete from local_ega.files where
           inbox_file_checksum='$sha' and
-          inbox_path='$uploaded' and 
+          inbox_path='$uploaded' and
 	  archive_path='$archivepath' and
           stable_id='$access' and
           elixir_id='$user' and
@@ -224,7 +224,7 @@ psql -A -t  -h "${DB_HOST}" -U lega_in lega -c \
 echo
 if [ "${INBOX_STORAGE_TYPE}" = posix ]; then
     echo "Removing ${uploaded} from posix inbox if it's there"
-    rm -f "/posix_inbox/${uploaded}" 
+    rm -f "/posix_inbox/${uploaded}"
 else
   echo "Removing  s3://${INBOX_BUCKET}/${uploaded}"
   s3cmd  --region="${INBOX_REGION}" -c /tmp/s3cmd.cfg del "s3://${INBOX_BUCKET}/${uploaded}"
