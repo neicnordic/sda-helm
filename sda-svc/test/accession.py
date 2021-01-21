@@ -92,7 +92,7 @@ message = """
        args.decmd5)
 
 channel.basic_publish(exchange=exchange,
-                      routing_key= 'files',
+                      routing_key= 'accessionIDs',
                       body=message,
                       properties=pika.BasicProperties(correlation_id="1",
                                                       content_type='application/json',
