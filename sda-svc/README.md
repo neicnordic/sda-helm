@@ -1,8 +1,8 @@
 # SDA services
 
 Source repositories:
-    - https://github.com/neicnordic/sda-pipeline
-    - https://github.com/neicnordic/sda-doa
+- https://github.com/neicnordic/sda-pipeline
+- https://github.com/neicnordic/sda-doa
 
 ## Installing the Chart
 
