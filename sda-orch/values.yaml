@@ -73,8 +73,8 @@ broker:
 # internally with no visibility to the user.
 datasetID:
   external: false
-  # if custom config is enabled it expects a file in file with the name
-  # config.json so that it can load it as configuration for sda-orch
+  # If `customConfig` is enabled it expects a file
+  # with the name `config.json` so that it can load it as configuration from it.
   customConfig: false
   datacite:
     apiURL: ""
