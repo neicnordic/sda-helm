@@ -93,6 +93,26 @@ spec:
           value: {{ .Values.broker.queue.accessionids | quote }}
         - name: MAPPINGS_QUEUE
           value: {{ .Values.broker.queue.mappings | quote }}
+      {{- if .Values.datasetID.external }}
+        - name: DOI_API
+          value: {{ required "DOI API url missing" .Values.datasetID.datacite.apiURL }}
+        - name: DOI_USER
+          value: {{ required "DOI API user missing" .Values.datasetID.datacite.user }}
+        - name: DOI_KEY
+          value: {{ required "DOI API key missing" .Values.datasetID.datacite.key }}
+        - name: DOI_PREFIX
+          value: {{ required "DOI datacite prefix missing" .Values.datasetID.datacite.prefix }}
+        - name: REMS_API
+          value: {{ required "REMS API url missing" .Values.datasetID.rems.apiURL }}
+        - name: REMS_USER
+          value: {{ required "REMS API user missing" .Values.datasetID.rems.user }}
+        - name: REMS_KEY
+          value: {{ required "REMS API key missing" .Values.datasetID.rems.key }}
+        {{- if .Values.datasetID.customConfig  }}
+        - name: CONFIG_FILE
+          value: /config/config.json
+        {{- end }}
+      {{- end }}
         {{- if .Values.sslmode.ssl }}
         - name: SSL_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
@@ -112,6 +132,10 @@ spec:
         {{- end }}
         - name: tmp
           mountPath: "/tmp"
+        {{- if and .Values.datasetID.external .Values.datasetID.customConfig  }}
+        - name: service-config
+          mountPath: /config
+        {{- end }}
       volumes:
       - name: tmp
         emptyDir: {}
@@ -126,4 +150,9 @@ spec:
           medium: Memory
           sizeLimit: 10Mi
       {{- end }}
+    {{- end }}
+    {{- if and .Values.datasetID.external .Values.datasetID.customConfig  }}
+      - name: service-config
+        configMap:
+          name: {{ template "sda.fullname" . }}-orchestrate-config
     {{- end }}
