@@ -61,6 +61,12 @@ spec:
         - name: PKI_PATH
           value: {{ template "tlsPath" . }}
       {{- end }}
+        - name: DEPLOYMENT_TOPOLOGY
+      {{- if .Values.intercept.deploy }}
+          value: "standalone"
+      {{- else }}
+          value: "federated"
+      {{- end }}
         - name: DEPLOYMENT_TYPE
           value: "{{ .Values.global.deploymentType }}"
         - name: INBOX_SERVICE_NAME

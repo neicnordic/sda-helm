@@ -23,9 +23,10 @@ parser.add_argument('inboxpath')
 parser.add_argument('accessionid')
 parser.add_argument('decsha256')
 parser.add_argument('decmd5')
+parser.add_argument('routing_key')
 args = parser.parse_args()
 
-exchange = os.getenv('MQ_EXCHANGE','localega')
+exchange = os.getenv('MQ_EXCHANGE','sda')
 mq_vhost = os.getenv('MQ_VHOST', '/').lstrip("/")
 
 pki_path = os.getenv('PKI_PATH' '/certs')
@@ -92,7 +93,7 @@ message = """
        args.decmd5)
 
 channel.basic_publish(exchange=exchange,
-                      routing_key= 'accessionIDs',
+                      routing_key=args.routing_key,
                       body=message,
                       properties=pika.BasicProperties(correlation_id="1",
                                                       content_type='application/json',

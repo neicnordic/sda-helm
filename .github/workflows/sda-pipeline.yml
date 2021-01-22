@@ -12,12 +12,13 @@ jobs:
     - name: ACTIONS_ALLOW_UNSECURE_COMMANDS
       id: ACTIONS_ALLOW_UNSECURE_COMMANDS
       run: echo 'ACTIONS_ALLOW_UNSECURE_COMMANDS=true' >> $GITHUB_ENV
+    # Currently the sftp inbox test covers the standalone test, whereas the s3 test checks the federated topology
     - name: fixup env
       run: |
         if [ "${{ matrix.test }}" = "sftp-inbox" ]; then
           echo "SVCS=backup doa finalize inbox ingest intercept mapper verify" >> "$GITHUB_ENV";
         else
-          echo "SVCS=auth backup doa finalize inbox ingest intercept mapper verify" >> "$GITHUB_ENV";
+          echo "SVCS=auth backup doa finalize inbox ingest mapper verify" >> "$GITHUB_ENV";
         fi
     - uses: actions/checkout@v2
     - name: Install kube dependencies
@@ -62,10 +63,10 @@ jobs:
       if: matrix.test == 'sftp-inbox'
       run: |
         kubectl apply -f dev_tools/config/posix-volumes.yaml;
-        bash ./dev_tools/scripts/deploy-sda-posix.sh;
+        bash ./dev_tools/scripts/sda/deploy-posix-standalone.sh "not-orchestrated";
     - name: Deploy the SDA stack for s3
       if: matrix.test == 's3-inbox'
-      run: bash ./dev_tools/scripts/deploy-sda-s3.sh
+      run: bash ./dev_tools/scripts/sda/deploy-s3-federated.sh
     - name: Wait for sda to become ready
       run: bash ./dev_tools/scripts/wait-for-pods.sh "${{ env.SVCS }}"
     - name: Run helm test

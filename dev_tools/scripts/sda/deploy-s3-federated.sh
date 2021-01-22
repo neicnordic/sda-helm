@@ -19,4 +19,5 @@ global.cega.password="$CEGA_USERS_PASS",\
 global.db.passIngest="$DB_IN_PASS",\
 global.db.passOutgest="$DB_OUT_PASS",\
 global.inbox.s3AccessKey="$S3_ACCESS_KEY",\
-global.inbox.s3SecretKey="$S3_SECRET_KEY"
+global.inbox.s3SecretKey="$S3_SECRET_KEY",\
+intercept.deploy=false
