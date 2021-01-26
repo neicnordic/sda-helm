@@ -96,18 +96,25 @@ spec:
       {{- if .Values.datasetID.external }}
         - name: DOI_API
           value: {{ required "DOI API url missing" .Values.datasetID.datacite.apiURL }}
+        - name: REMS_API
+          value: {{ required "REMS API url missing" .Values.datasetID.rems.apiURL }}
+        - name: DOI_PREFIX
+          value: {{ required "DOI datacite prefix missing" .Values.datasetID.datacite.prefix }}
+        {{- if not .Values.vaultSecrets }}
         - name: DOI_USER
           value: {{ required "DOI API user missing" .Values.datasetID.datacite.user }}
         - name: DOI_KEY
-          value: {{ required "DOI API key missing" .Values.datasetID.datacite.key }}
-        - name: DOI_PREFIX
-          value: {{ required "DOI datacite prefix missing" .Values.datasetID.datacite.prefix }}
-        - name: REMS_API
-          value: {{ required "REMS API url missing" .Values.datasetID.rems.apiURL }}
+          secretKeyRef:
+                name: {{ template "sda.fullname" . }}-orchestrate
+                key: dataciteKey
         - name: REMS_USER
           value: {{ required "REMS API user missing" .Values.datasetID.rems.user }}
         - name: REMS_KEY
-          value: {{ required "REMS API key missing" .Values.datasetID.rems.key }}
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-orchestrate
+                key: remsKey
+        {{- end }}
         {{- if .Values.datasetID.customConfig  }}
         - name: CONFIG_FILE
           value: /config/config.json
