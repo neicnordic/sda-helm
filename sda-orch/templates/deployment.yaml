@@ -99,12 +99,13 @@ spec:
         - name: REMS_API
           value: {{ required "REMS API url missing" .Values.datasetID.rems.apiURL }}
         - name: DOI_PREFIX
-          value: {{ required "DOI datacite prefix missing" .Values.datasetID.datacite.prefix }}
+          value: {{ required "DOI datacite prefix missing" .Values.datasetID.datacite.prefix | quote }}
         {{- if not .Values.vaultSecrets }}
         - name: DOI_USER
-          value: {{ required "DOI API user missing" .Values.datasetID.datacite.user }}
+          value: {{ required "DOI API user missing" .Values.datasetID.datacite.user | quote }}
         - name: DOI_KEY
-          secretKeyRef:
+          valueFrom:
+            secretKeyRef:
                 name: {{ template "sda.fullname" . }}-orchestrate
                 key: dataciteKey
         - name: REMS_USER
