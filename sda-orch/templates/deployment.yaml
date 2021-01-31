@@ -95,9 +95,9 @@ spec:
           value: {{ .Values.broker.queue.mappings | quote }}
       {{- if .Values.datasetID.external }}
         - name: DOI_API
-          value: {{ required "DOI API url missing" .Values.datasetID.datacite.apiURL }}
+          value: {{ required "DOI API url missing" .Values.datasetID.datacite.apiURL | quote }}
         - name: REMS_API
-          value: {{ required "REMS API url missing" .Values.datasetID.rems.apiURL }}
+          value: {{ required "REMS API url missing" .Values.datasetID.rems.apiURL | quote }}
         - name: DOI_PREFIX
           value: {{ required "DOI datacite prefix missing" .Values.datasetID.datacite.prefix | quote }}
         {{- if not .Values.vaultSecrets }}
@@ -109,7 +109,7 @@ spec:
                 name: {{ template "sda.fullname" . }}-orchestrate
                 key: dataciteKey
         - name: REMS_USER
-          value: {{ required "REMS API user missing" .Values.datasetID.rems.user }}
+          value: {{ required "REMS API user missing" .Values.datasetID.rems.user | quote }}
         - name: REMS_KEY
           valueFrom:
               secretKeyRef:
