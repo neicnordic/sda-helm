@@ -30,20 +30,20 @@ Parameter | Description | Default
 `broker.vhost` | Virtual host to connect to. | `/`
 `broker.password` | Shared password to the message broker. | `""`
 `broker.username` | Shared user to the message broker. | `""`
-`broker.queue.inbox` | Inbox queue for MQ connection. | `"inbox"`
-`broker.queue.completed` | Completed queue for MQ connection. | `"completed"`
-`broker.queue.verify` | Verify queue for MQ connection. | `"verify"`
-`broker.queue.accessionids` | Accession IDs queue for MQ connection. | `"accessionIDs"`
-`broker.queue.mapping` | Mappings for Accession IDs to DatasetIDs queue for MQ connection. | `"mappings"`
-`datasetID.external` | if the datasetids will be used by external system set this to true  | false
-`datasetID.customConfig` | if custom config is enabled it expects a file in file with the name config.json so that it can load it as configuration | false
-`datasetID.datacite.apiURL` | Datacite API URL  | ""
-`datasetID.datacite.user` |  Datacite API user  | ""
-`datasetID.datacite.key` | Datacite API key  | ""
-`datasetID.datacite.prefix` | Datacite DOI prefix. only one prefix can be used at this time  | ""
-`datasetID.rems.apiURL` | REMS API URL  | ""
-`datasetID.rems.user` |  REMS API user | ""
-`datasetID.rems.key` |  REMS API key | ""
+`broker.queue.inbox` | Inbox queue for MQ connection. | `inbox`
+`broker.queue.completed` | Completed queue for MQ connection. | `completed`
+`broker.queue.verify` | Verify queue for MQ connection. | `verify`
+`broker.queue.accessionids` | Accession IDs queue for MQ connection. | `accessionIDs`
+`broker.queue.mapping` | Mappings for Accession IDs to DatasetIDs queue for MQ connection. | `mappings`
+`datasetID.external` | If the DatasetIDs will be used by external system set this to `true`  | `false`
+`datasetID.customConfig` | If a custom config is used set this value to `true`. Using custom configuration expects a file under the name `config.json` in `files` folder. | `false`
+`datasetID.datacite.apiURL` | Datacite API URL  | `""`
+`datasetID.datacite.user` |  Datacite API user  | `""`
+`datasetID.datacite.key` | Datacite API key  | `""`
+`datasetID.datacite.prefix` | Datacite DOI prefix. Only one prefix can be used at this time. | `""`
+`datasetID.rems.apiURL` | REMS API URL  | `""`
+`datasetID.rems.user` |  REMS API user. Resources will belong to this user by default. | `""`
+`datasetID.rems.key` |  REMS API key | `""`
 
 ### TLS
 
