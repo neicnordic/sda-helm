@@ -1,4 +1,4 @@
-{{- if and .Values.datasetID.external .Values.datasetID.customConfig }}
+{{- if and .Values.datasetID.external .Values.datasetID.useCustomConfig }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

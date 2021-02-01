@@ -73,9 +73,9 @@ broker:
 # internally with no visibility to the user.
 datasetID:
   external: false
-  # If `customConfig` is enabled it expects a file
+  # If `useCustomConfig` is enabled it expects a file
   # with the name `config.json` so that it can load it as configuration from it.
-  customConfig: false
+  useCustomConfig: false
   datacite:
     apiURL: ""
     user: ""

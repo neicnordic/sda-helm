@@ -116,7 +116,7 @@ spec:
                 name: {{ template "sda.fullname" . }}-orchestrate
                 key: remsKey
         {{- end }}
-        {{- if .Values.datasetID.customConfig  }}
+        {{- if .Values.datasetID.useCustomConfig  }}
         - name: CONFIG_FILE
           value: /config/config.json
         {{- end }}
@@ -140,7 +140,7 @@ spec:
         {{- end }}
         - name: tmp
           mountPath: "/tmp"
-        {{- if and .Values.datasetID.external .Values.datasetID.customConfig  }}
+        {{- if and .Values.datasetID.external .Values.datasetID.useCustomConfig  }}
         - name: service-config
           mountPath: /config
         {{- end }}
@@ -159,7 +159,7 @@ spec:
           sizeLimit: 10Mi
       {{- end }}
     {{- end }}
-    {{- if and .Values.datasetID.external .Values.datasetID.customConfig  }}
+    {{- if and .Values.datasetID.external .Values.datasetID.useCustomConfig  }}
       - name: service-config
         configMap:
           name: {{ template "sda.fullname" . }}-orchestrate-config

@@ -36,7 +36,7 @@ Parameter | Description | Default
 `broker.queue.accessionids` | Accession IDs queue for MQ connection. | `accessionIDs`
 `broker.queue.mapping` | Mappings for Accession IDs to DatasetIDs queue for MQ connection. | `mappings`
 `datasetID.external` | If the DatasetIDs will be used by external system set this to `true`  | `false`
-`datasetID.customConfig` | If a custom config is used set this value to `true`. Using custom configuration expects a file under the name `config.json` in `files` folder. | `false`
+`datasetID.useCustomConfig` | If a custom config is used set this value to `true`. Using custom configuration expects a file under the name `config.json` in `files` folder. | `false`
 `datasetID.datacite.apiURL` | Datacite API URL  | `""`
 `datasetID.datacite.user` |  Datacite API user  | `""`
 `datasetID.datacite.key` | Datacite API key  | `""`
