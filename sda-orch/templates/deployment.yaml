@@ -93,6 +93,34 @@ spec:
           value: {{ .Values.broker.queue.accessionids | quote }}
         - name: MAPPINGS_QUEUE
           value: {{ .Values.broker.queue.mappings | quote }}
+      {{- if .Values.datasetID.external }}
+        - name: DOI_API
+          value: {{ required "DOI API url missing" .Values.datasetID.datacite.apiURL | quote }}
+        - name: REMS_API
+          value: {{ required "REMS API url missing" .Values.datasetID.rems.apiURL | quote }}
+        - name: DOI_PREFIX
+          value: {{ required "DOI datacite prefix missing" .Values.datasetID.datacite.prefix | quote }}
+        {{- if not .Values.vaultSecrets }}
+        - name: DOI_USER
+          value: {{ required "DOI API user missing" .Values.datasetID.datacite.user | quote }}
+        - name: DOI_KEY
+          valueFrom:
+            secretKeyRef:
+                name: {{ template "sda.fullname" . }}-orchestrate
+                key: dataciteKey
+        - name: REMS_USER
+          value: {{ required "REMS API user missing" .Values.datasetID.rems.user | quote }}
+        - name: REMS_KEY
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-orchestrate
+                key: remsKey
+        {{- end }}
+        {{- if .Values.datasetID.useCustomConfig  }}
+        - name: CONFIG_FILE
+          value: /config/config.json
+        {{- end }}
+      {{- end }}
         {{- if .Values.sslmode.ssl }}
         - name: SSL_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
@@ -112,6 +140,10 @@ spec:
         {{- end }}
         - name: tmp
           mountPath: "/tmp"
+        {{- if and .Values.datasetID.external .Values.datasetID.useCustomConfig  }}
+        - name: service-config
+          mountPath: /config
+        {{- end }}
       volumes:
       - name: tmp
         emptyDir: {}
@@ -126,4 +158,9 @@ spec:
           medium: Memory
           sizeLimit: 10Mi
       {{- end }}
+    {{- end }}
+    {{- if and .Values.datasetID.external .Values.datasetID.useCustomConfig  }}
+      - name: service-config
+        configMap:
+          name: {{ template "sda.fullname" . }}-orchestrate-config
     {{- end }}

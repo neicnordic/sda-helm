@@ -47,7 +47,7 @@ vaultSecrets: false
 # env file for use with secretsservice
 envFile: "env"
 
-# used by both Message Broker and Database
+# used by Message Broker
 sslmode:
   ssl: true
   verifyPeer: true
@@ -67,6 +67,26 @@ broker:
     ingest: "ingest"
     mappings: "mappings"
 
+# Datacite and REMS depend on one another
+# if we set one the other one needs to be configured
+# By default the dataset IDs are not exposed and are assigned
+# internally with no visibility to the user.
+datasetID:
+  external: false
+  # If `useCustomConfig` is enabled it expects a file
+  # with the name `config.json` so that it can load it as configuration from it.
+  # config example: https://github.com/neicnordic/sda-orchestration/blob/master/sda_orchestrator/config/config.json
+  useCustomConfig: false
+  datacite:
+    apiURL: ""
+    user: ""
+    key: ""
+    # only one prefix can be used at this time
+    prefix: ""
+  rems:
+    apiURL: ""
+    user: ""
+    key: ""
 
 resources:
   requests:
