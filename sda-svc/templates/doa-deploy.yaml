@@ -115,10 +115,8 @@ spec:
         - name: PASSPORT_PUBLIC_KEY_PATH
           value: "{{ include "secretsPath" . }}/{{ .Values.global.elixir.pubKey }}"
       {{- end }}
-      {{- if not .Values.global.vaultSecrets }}
         - name: KEYSTORE_PATH
           value: {{ ternary "/etc/ssl/certs/java/doa.p12" (printf "%s/doa.p12" .Values.global.secretsPath ) (empty .Values.global.pkiService) }}
-      {{- end }}
         - name: KEYSTORE_PASSWORD
           value: {{ .Values.doa.keystorePass | quote }}
         - name: ROOT_CERT_PATH
