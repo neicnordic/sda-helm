@@ -150,6 +150,12 @@ Create chart name and version as used by the chart label.
 {{- define "dbPassDoa" -}}
 {{- ternary .Values.global.db.passOutgest .Values.credentials.doa.dbPassword (empty .Values.credentials.doa.dbPassword) -}}
 {{- end -}}
+{{- define "mqUserDoa" -}}
+{{- ternary .Values.global.broker.username .Values.credentials.doa.mqUser (empty .Values.credentials.doa.mqUser) -}}
+{{- end -}}
+{{- define "mqPassDoa" -}}
+{{- ternary .Values.global.broker.password .Values.credentials.doa.mqPassword (empty .Values.credentials.doa.mqPassword) -}}
+{{- end -}}
 
 {{/**/}}
 {{- define "dbUserFinalize" -}}
