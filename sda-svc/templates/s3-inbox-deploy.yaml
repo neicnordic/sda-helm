@@ -96,7 +96,7 @@ spec:
         - name: BROKER_PORT
           value: {{ .Values.global.broker.port | quote }}
         - name: BROKER_VHOST
-          value: {{ .Values.global.broker.vhost | quote }}
+          value: {{ include "brokerVhost" . | quote }}
         - name: BROKER_EXCHANGE
           value: {{ .Values.global.broker.exchange | quote }}
         - name: BROKER_ROUTINGKEY

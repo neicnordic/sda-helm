@@ -125,7 +125,7 @@ Create chart name and version as used by the chart label.
   {{ if or (eq "/" .Values.global.broker.vhost) (not .Values.global.broker.vhost) }}
     {{- print "%2f" -}}
   {{ else }}
-    {{-  .Values.global.broker.vhost -}}
+    {{- printf "/%s" .Values.global.broker.vhost -}}
   {{ end }}
 {{- end -}}
 
