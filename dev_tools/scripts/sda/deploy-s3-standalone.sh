@@ -13,7 +13,7 @@ helm install sda sda-svc -f dev_tools/config/s3.yaml \
 global.archive.s3SecretKey="$S3_SECRET_KEY",\
 global.backupArchive.s3AccessKey="$S3_ACCESS_KEY",\
 global.backupArchive.s3SecretKey="$S3_SECRET_KEY",\
-global.broker.vhost=/sda,\
+global.broker.vhost=sda,\
 global.c4gh.passphrase="$C4GH_PASSPHRASE",\
 global.db.passIngest="$DB_IN_PASS",\
 global.db.passOutgest="$DB_OUT_PASS",\
