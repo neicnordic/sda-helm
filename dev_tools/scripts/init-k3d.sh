@@ -11,7 +11,7 @@ cluster_exists=$?
 if [ $cluster_exists -ne 0 ]; then
   sudo k3d cluster create sda
   sudo k3d kubeconfig merge sda --switch-context
-  sudo mkdir -p ~/.kube/ && sudo cp ~/.k3d/kubeconfig-sda.yaml ~/.kube/config
+  sudo mkdir -p ~/.kube/ && sudo cp /root/.k3d/kubeconfig-sda.yaml ~/.kube/config
   sudo chmod 666 ~/.kube/config
 else
   echo "Cluster sda already exists!"
