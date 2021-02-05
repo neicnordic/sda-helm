@@ -81,6 +81,8 @@ spec:
       {{- end }}
         - name: DB_INSTANCE
           value: {{ required "A valid database host is required" .Values.global.db.host | quote}}
+        - name: DB_PORT
+          value: {{ .Values.global.db.port | quote }}
         - name: POSTGRES_DB
           value: {{ required "A database name is required" .Values.global.db.name | quote }}
         - name: SSL_MODE
