@@ -3,7 +3,6 @@ name: Publish charts
 on:
   push:
     branches:
-      - master
       - test
 
 jobs:
