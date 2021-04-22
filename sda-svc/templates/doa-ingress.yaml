@@ -1,6 +1,6 @@
 {{- if (or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType)) (not .Values.global.deploymentType)) }}
 {{- if .Values.global.ingress.deploy }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "sda.fullname" . }}-doa-ingress
@@ -26,8 +26,9 @@ spec:
       paths:
         - path: "/"
           backend:
-            serviceName: {{ template "sda.fullname" . }}-doa
-            servicePort: 443
+            service:
+              name: {{ template "sda.fullname" . }}-doa
+              port: 443
   tls:
   - hosts:
     - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.doa }}
