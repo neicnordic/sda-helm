@@ -2,6 +2,18 @@ apiVersion: v1
 entries:
   sda-db:
   - apiVersion: v2
+    created: "2021-05-25T10:17:29.177029764Z"
+    description: Database component for Sensitive Data Archive (SDA) installation
+    digest: e0d4164f3a2501e842259659f223e1e938d23556894d5449d0bc55404eaa9f70
+    home: https://neic-sda.readthedocs.io
+    icon: https://neic.no/assets/images/logo.png
+    name: sda-db
+    sources:
+    - https://github.com/neicnordic/sda-helm
+    urls:
+    - https://github.com/neicnordic/sda-helm/releases/download/sda-db-0.3.1/sda-db-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     created: "2021-03-01T09:57:24.568859513Z"
     description: Database component for Sensitive Data Archive (SDA) installation
     digest: 2150a5fb937ad826266aad0b308854a0b94c53482acea9a4dfc879c123651411
@@ -12,7 +24,7 @@ entries:
     - https://github.com/neicnordic/sda-helm
     urls:
     - https://github.com/neicnordic/sda-helm/releases/download/sda-db-0.3.0/sda-db-0.3.0.tgz
-    version: "0.3.0"
+    version: 0.3.0
   - apiVersion: v2
     created: "2021-02-26T09:57:24.448545469Z"
     description: Database component for Sensitive Data Archive (SDA) installation
@@ -51,6 +63,18 @@ entries:
     version: "0.1"
   sda-mq:
   - apiVersion: v2
+    created: "2021-05-25T10:17:29.271394023Z"
+    description: RabbitMQ component for Sensitive Data Archive (SDA) installation
+    digest: 9904b5e7f267043f613de57054ba1ff80aa316233d65fbbb863b6f7e256c0889
+    home: https://neic-sda.readthedocs.io
+    icon: https://neic.no/assets/images/logo.png
+    name: sda-mq
+    sources:
+    - https://github.com/neicnordic/sda-helm
+    urls:
+    - https://github.com/neicnordic/sda-helm/releases/download/sda-mq-0.3.1/sda-mq-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     created: "2021-03-01T09:57:24.568859513Z"
     description: RabbitMQ component for Sensitive Data Archive (SDA) installation
     digest: e5f92f2d895909ef786b9bfce11ca2ddeb8e4242145f21dbcc04be3b6cf18d8a
@@ -61,7 +85,7 @@ entries:
     - https://github.com/neicnordic/sda-helm
     urls:
     - https://github.com/neicnordic/sda-helm/releases/download/sda-mq-0.3.0/sda-mq-0.3.0.tgz
-    version: "0.3.0"
+    version: 0.3.0
   - apiVersion: v2
     created: "2021-02-26T09:57:24.568859513Z"
     description: RabbitMQ component for Sensitive Data Archive (SDA) installation
@@ -100,6 +124,19 @@ entries:
     version: "0.1"
   sda-orch:
   - apiVersion: v2
+    created: "2021-05-25T10:17:29.372301421Z"
+    description: Orchestrate component for Sensitive Data Archive (SDA) standalone
+      installation
+    digest: 78eb16734a272d0acc93349eef2db171560b7878e41e31bc3c14274a5d6ea96d
+    home: https://neic-sda.readthedocs.io
+    icon: https://neic.no/assets/images/logo.png
+    name: sda-orch
+    sources:
+    - https://github.com/neicnordic/sda-helm
+    urls:
+    - https://github.com/neicnordic/sda-helm/releases/download/sda-orch-0.6.1/sda-orch-0.6.1.tgz
+    version: 0.6.1
+  - apiVersion: v2
     created: "2021-02-26T12:37:03.522553048Z"
     description: Orchestrate component for Sensitive Data Archive (SDA) standalone
       installation
@@ -113,6 +150,19 @@ entries:
     - https://github.com/neicnordic/sda-helm/releases/download/sda-orch-0.6.0/sda-orch-0.6.0.tgz
     version: 0.6.0
   sda-svc:
+  - apiVersion: v2
+    created: "2021-05-25T10:17:29.529280952Z"
+    description: Components for Sensitive Data Archive (SDA) installation
+    digest: 84c0796b3a91c91623c27c429574f2850ded73185ca95d82e9b38072fffd2056
+    home: https://neic-sda.readthedocs.io
+    icon: https://neic.no/assets/images/logo.png
+    kubeVersion: '>= 1.19.0'
+    name: sda-svc
+    sources:
+    - https://github.com/neicnordic/sda-helm
+    urls:
+    - https://github.com/neicnordic/sda-helm/releases/download/sda-svc-0.14.0/sda-svc-0.14.0.tgz
+    version: 0.14.0
   - apiVersion: v2
     created: "2021-02-26T12:37:03.935523895Z"
     description: Components for Sensitive Data Archive (SDA) installation
@@ -161,4 +211,4 @@ entries:
     urls:
     - https://github.com/neicnordic/sda-helm/releases/download/sda-svc-0.1/sda-svc-0.1.tgz
     version: "0.1"
-generated: "2021-02-26T12:37:03.935655002Z"
+generated: "2021-05-25T10:17:29.529352652Z"
