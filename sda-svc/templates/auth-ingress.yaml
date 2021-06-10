@@ -24,11 +24,13 @@ spec:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
     http:
       paths:
-        - path: "/"
-          backend:
-            service:
-              name: {{ template "sda.fullname" . }}-auth
-              port: {{ ternary 80 443 ( empty .Values.global.auth.useTLS ) }}
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: {{ template "sda.fullname" . }}-auth
+            port:
+              number:  {{ ternary 80 443 ( empty .Values.global.auth.useTLS ) }}
   tls:
   - hosts:
     - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
