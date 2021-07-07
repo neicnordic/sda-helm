@@ -2,7 +2,7 @@
 
 if ! command -v k3d > /dev/null
 then
-  wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.4.2 bash
+  wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.4.6 bash
 fi
 
 k3d cluster list | grep "sda"
