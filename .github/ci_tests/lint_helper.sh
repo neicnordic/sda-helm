@@ -3,6 +3,8 @@ set -e
 
 ## create empty files so the linter won't give an false error
 
+pushd charts
+
 if [ $1 = "sda-db" ] || [ $1 = "sda-mq" ]; then
 touch $1/files/ca.crt
 touch $1/files/server.crt

@@ -15,7 +15,7 @@ jobs:
     - name: Lint sda-db
       run: |
         bash .github/ci_tests/lint_helper.sh sda-db
-        helm lint sda-db
+        helm lint charts/sda-db
 
   lint_sda-mq:
     name: Lint sda-mq
@@ -29,7 +29,7 @@ jobs:
     - name: Lint sda-mq
       run: |
         bash .github/ci_tests/lint_helper.sh sda-mq
-        helm lint sda-mq
+        helm lint charts/sda-mq
 
   lint_sda-svc:
     name: Lint sda-svc
@@ -43,7 +43,7 @@ jobs:
     - name: Lint sda-svc
       run: |
         bash .github/ci_tests/lint_helper.sh sda-svc
-        helm lint sda-svc
+        helm lint charts/sda-svc
 
   lint_sda-orch:
     name: Lint sda-orch
@@ -57,4 +57,4 @@ jobs:
     - name: Lint sda-orch
       run: |
         bash .github/ci_tests/lint_helper.sh sda-orch
-        helm lint sda-orch
+        helm lint charts/sda-orch
