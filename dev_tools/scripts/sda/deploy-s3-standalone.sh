@@ -8,7 +8,7 @@ S3_ACCESS_KEY=$(grep s3_archive_access_key sda-deploy-init/config/trace.yml | aw
 S3_SECRET_KEY=$(grep s3_archive_secret_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
 C4GH_PASSPHRASE=$(grep ega_c4gh_passphrase sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
 
-helm install sda sda-svc -f dev_tools/config/s3.yaml \
+helm install sda charts/sda-svc -f dev_tools/config/s3.yaml \
 --set global.archive.s3AccessKey="$S3_ACCESS_KEY",\
 global.archive.s3SecretKey="$S3_SECRET_KEY",\
 global.backupArchive.s3AccessKey="$S3_ACCESS_KEY",\
