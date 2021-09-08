@@ -79,7 +79,7 @@ Parameter | Description | Default
 `global.broker.password` | Shared password to the message broker. |`/`
 `global.broker.username` | Shared user to the message broker. |`/`
 `global.broker.backupRoutingKey` | routing key used to send messages to backup service |`""`
-`global.cega.host` | Domain name for the EGA user authentication service. |`""`
+`global.cega.host` | Full URI to the EGA user authentication service. |`""`
 `global.cega.user` | Username for the EGA user authentication service. |`""`
 `global.cega.password` | Password for the EGA user authentication service. |`""`
 `global.c4gh.file` | Private C4GH key. |`c4gh.key`
