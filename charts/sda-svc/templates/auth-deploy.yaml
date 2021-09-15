@@ -91,7 +91,7 @@ spec:
         - name: CEGA_JWTISSUER
           value: "https://{{ .Values.global.ingress.hostName.auth }}"
         - name: CEGA_AUTHURL
-          value: {{ printf "%s%s" (.Values.global.cega.host) "/lega/v1/legas/users/" | quote }}
+          value: {{ .Values.global.cega.host | quote }}
         - name: CEGA_JWTPRIVATEKEY
           value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtKey }}"
         - name: CEGA_JWTSIGNATUREALG
