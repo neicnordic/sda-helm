@@ -1,14 +1,21 @@
 global:
-  pg_in_password: null
-  pg_out_password: null
-# If client verification is to be used set verifyPeer to true
-  verifyPeer: true
+  pg_in_password:
+  pg_out_password:
+  tls:
+    enabled: true
+    secretName: 
+    certName: postgresql.crt
+    keyName: postgresql.key
+    CAFile: root.crt
+# If client verification is to be used set verifyPeer to verify-full or verify-ca
+# To disable certificate validation set to verify-none
+    verifyPeer: verify-ca
 
 
 # If an external PKI infrastructure is used to supply certificates set this to true
 externalPkiService:
 # tlsPath is the path where the external service mounts the certificates
-  tlsPath: null
+  tlsPath:
 
 # Extra security context to apply to all pods
 # This should be a multi-line string mapping directly to the a map of
@@ -16,9 +23,9 @@ externalPkiService:
 extraSecurityContext: {}
 
 image:
-  repository: neicnordic/sda-db
-  tag: latest
-  pullPolicy: Always
+  repository: ghcr.io/neicnordic/sda-db
+  tag: v1.4.0
+  pullPolicy: IfNotPresent
 
 # utilize network isolation
 # Make sure you’ve configured a network provider with network policy support.
@@ -41,8 +48,8 @@ persistence:
   enabled: true
   mountPath: /var/lib/postgresql
   storageSize: 8Gi
-  storageClass: null
-  existingClaim: null
+  storageClass:
+  existingClaim:
 ## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup
   volumePermissions: true
 
