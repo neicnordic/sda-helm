@@ -12,8 +12,10 @@ cp "${basedir}"/certs/orch.crt charts/sda-orch/files/orch.crt
 cp "${basedir}"/certs/orch.key charts/sda-orch/files/orch.key
 
 ## sda-db certs
-cp "${basedir}"/certs/pg.crt charts/sda-db/files/pg.crt
-cp "${basedir}"/certs/pg.key charts/sda-db/files/pg.key
+kubectl create secret generic db-certs \
+--from-file=root.crt="${basedir}"/certs/ca.crt \
+--from-file=postgresql.crt="${basedir}"/certs/pg.crt \
+--from-file=postgresql.key="${basedir}"/certs/pg.key
 
 ## sda-mq certs
 cp "${basedir}"/certs/server.crt charts/sda-mq/files/server.crt
@@ -41,7 +43,7 @@ for n in backup doa finalize ingest intercept verify mapper inbox auth
   cp "${basedir}"/certs/$n.key charts/sda-svc/files/$n.key
 done
 
-for p in sda-svc sda-db sda-mq sda-orch
+for p in sda-svc sda-mq sda-orch
   do 
   cp "${basedir}"/certs/ca.crt "charts/$p/files/ca.crt"
   cp "${basedir}"/certs/tester.* "charts/$p/files/"
