@@ -87,6 +87,13 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}
                 key: pgOutPasswd
+      {{- if .Values.postgresAdminPassword }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: {{ template "sda.fullname" . }}
+                key: postgresPassword
+      {{- end }}
       {{- if .Values.global.tls.enabled }}
         - name: PG_SERVER_CERT
           value: {{ template "pgCert" . }}
