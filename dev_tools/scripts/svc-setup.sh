@@ -11,12 +11,6 @@ cp "${basedir}"/certs/private.key private.key
 cp "${basedir}"/certs/orch.crt charts/sda-orch/files/orch.crt
 cp "${basedir}"/certs/orch.key charts/sda-orch/files/orch.key
 
-## sda-db certs
-kubectl create secret generic db-certs \
---from-file=root.crt="${basedir}"/certs/ca.crt \
---from-file=postgresql.crt="${basedir}"/certs/pg.crt \
---from-file=postgresql.key="${basedir}"/certs/pg.key
-
 ## sda-mq certs
 cp "${basedir}"/certs/server.crt charts/sda-mq/files/server.crt
 cp "${basedir}"/certs/server.key charts/sda-mq/files/server.key
