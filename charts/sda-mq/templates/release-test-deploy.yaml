@@ -44,7 +44,7 @@ spec:
         - "-c"
         - 'P=${PKI_VOLUME_PATH:-/certs}; 
            count=1;
-           until openssl s_client -connect "${MQ_HOST}:5671" -verify 50 -key "$P/tester.ca.key" -cert "$P/tester.ca.crt" -verify_return_error -verifyCAfile "$P/ca.crt" </dev/null; do
+           until openssl s_client -connect "${MQ_HOST}:5671" -verify 50 -key "$P/tester.key" -cert "$P/tester.crt" -verify_return_error -verifyCAfile "$P/ca.crt" </dev/null; do
              sleep 5;
              count=$((count+1));
              if [ "$count" -gt 10 ]; then
@@ -60,10 +60,10 @@ spec:
           - secret:
               name:  "{{ .Release.Name }}-test-certs"
               items:
-              - key: tester.ca.key
-                path: tester.ca.key
-              - key: tester.ca.crt
-                path: tester.ca.crt
+              - key: tester.key
+                path: tester.key
+              - key: tester.crt
+                path: tester.crt
               - key: ca.crt
                 path: ca.crt
     {{- end }}

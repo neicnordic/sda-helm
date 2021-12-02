@@ -127,9 +127,9 @@ spec:
       {{- end }}
       {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/tester.ca.crt
+          value: {{ include "tlsPath" . }}/tester.crt
         - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/tester.ca.key
+          value: {{ include "tlsPath" . }}/tester.key
       {{- end }}
         - name: DB_DATABASE
           value: {{ default "lega" .Values.global.db.name | quote }}
@@ -182,10 +182,10 @@ spec:
           - secret:
               name: "{{ .Release.Name }}-release-test-certs"
               items:
-              - key: tester.ca.key
-                path: tester.ca.key
-              - key: tester.ca.crt
-                path: tester.ca.crt
+              - key: tester.key
+                path: tester.key
+              - key: tester.crt
+                path: tester.crt
               - key: ca.crt
                 path: ca.crt
     {{- end }}
