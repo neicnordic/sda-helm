@@ -25,6 +25,8 @@ jobs:
       run: bash ./dev_tools/scripts/make-certs.sh
     - name: Create java certificates
       run: bash ./dev_tools/scripts/java-certs.sh
+    - name: Create secrets
+      run: bash ./dev_tools/scripts/create-secrets.sh
     - name: Set up services configuration
       run: bash ./dev_tools/scripts/svc-setup.sh
     - name: Deploy SDA database

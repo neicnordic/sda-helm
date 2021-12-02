@@ -4,7 +4,7 @@ set -e
 CEGA_USERS_PASS=$(grep cega_users_pass sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
 DB_IN_PASS=$(grep pg_in_password sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
 DB_OUT_PASS=$(grep pg_out_password sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
-C4GH_PASSPHRASE=$(grep ega_c4gh_passphrase sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
+C4GH_PASSPHRASE=$(grep c4gh_passphrase sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
 
 helm install sda charts/sda-svc -f dev_tools/config/posix.yaml \
 --set global.broker.vhost=/sda,\
