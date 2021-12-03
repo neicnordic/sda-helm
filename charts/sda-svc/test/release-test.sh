@@ -41,7 +41,7 @@ mkdir -p /tmp/c4gh
 
 user=release-test-${RANDOM}
 
-tmpfile=$(tempfile)
+tmpfile=$(mktemp)
 uploaded=${tmpfile##*/}.encrypted
 
 echo "Creating file $tmpfile"
@@ -131,8 +131,8 @@ export PGSSLKEY PGSSLCERT PGSSLROOTCERT
 
 s=${PKI_PATH:-/certs}
 
-cp "$s/tester.ca.key" "$PGSSL/postgresql.key"
-cp "$s/tester.ca.crt" "$PGSSL/postgresql.crt"
+cp "$s/tester.key" "$PGSSL/postgresql.key"
+cp "$s/tester.crt" "$PGSSL/postgresql.crt"
 cp "$s/ca.crt" $PGSSL/root.crt
 
 chmod -R og-rw $PGSSL

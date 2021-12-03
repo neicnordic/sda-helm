@@ -1,46 +1,48 @@
 #!/bin/bash
 set -e
 
+basedir="sda-deploy-init/config"
+
 ## S3 certs
-cp sda-deploy-init/config/certs/s3.ca.crt public.crt
-cp sda-deploy-init/config/certs/s3.ca.key private.key
+cp "${basedir}"/certs/public.crt public.crt
+cp "${basedir}"/certs/private.key private.key
 
 ## sda-orch certs
-cp sda-deploy-init/config/certs/root.ca.crt charts/sda-orch/files/ca.crt
-cp sda-deploy-init/config/certs/orchestrate.ca.crt charts/sda-orch/files/orch.crt
-cp sda-deploy-init/config/certs/orchestrate.ca.key charts/sda-orch/files/orch.key
+cp "${basedir}"/certs/orch.crt charts/sda-orch/files/orch.crt
+cp "${basedir}"/certs/orch.key charts/sda-orch/files/orch.key
 
 ## sda-db certs
-cp sda-deploy-init/config/certs/root.ca.crt charts/sda-db/files/ca.crt
-cp sda-deploy-init/config/certs/db.ca.crt charts/sda-db/files/pg.crt
-cp sda-deploy-init/config/certs/db.ca.key charts/sda-db/files/pg.key
+cp "${basedir}"/certs/pg.crt charts/sda-db/files/pg.crt
+cp "${basedir}"/certs/pg.key charts/sda-db/files/pg.key
 
 ## sda-mq certs
-cp sda-deploy-init/config/certs/root.ca.crt charts/sda-mq/files/ca.crt
-cp sda-deploy-init/config/certs/mq-server.ca.crt charts/sda-mq/files/server.crt
-cp sda-deploy-init/config/certs/mq-server.ca.key charts/sda-mq/files/server.key
+cp "${basedir}"/certs/server.crt charts/sda-mq/files/server.crt
+cp "${basedir}"/certs/server.key charts/sda-mq/files/server.key
 
-cp -r sda-deploy-init/config LocalEGA-helm/ega-charts/cega/config
+## cega config and certs
+mkdir -p LocalEGA-helm/ega-charts/cega/config/certs
+cp -r dev_tools/cega/* LocalEGA-helm/ega-charts/cega/config/
+cp "${basedir}"/certs/ca.crt LocalEGA-helm/ega-charts/cega/config/certs/root.ca.crt
+cp "${basedir}"/certs/cega-users.crt LocalEGA-helm/ega-charts/cega/config/certs/cega-users.ca.crt
+cp "${basedir}"/certs/cega-users.key LocalEGA-helm/ega-charts/cega/config/certs/cega-users.ca.key
+cp "${basedir}"/certs/cega-mq.crt LocalEGA-helm/ega-charts/cega/config/certs/cega-mq.crt
+cp "${basedir}"/certs/cega-mq.key LocalEGA-helm/ega-charts/cega/config/certs/cega-mq.key
 
 ## sda-svc certs
-cp sda-deploy-init/config/token.pub charts/sda-svc/files/
-cp sda-deploy-init/config/ega_key.c4gh.sec charts/sda-svc/files/c4gh.key
-cp sda-deploy-init/config/ega_key.c4gh.pub charts/sda-svc/files/c4gh.pub
-cp sda-deploy-init/config/certs/*.p12 charts/sda-svc/files/
-cp sda-deploy-init/config/certs/cacerts charts/sda-svc/files/
-cp sda-deploy-init/config/certs/root.ca.crt charts/sda-svc/files/ca.crt
+cp "${basedir}"/certs/token.pub charts/sda-svc/files/
+cp "${basedir}"/c4gh.key charts/sda-svc/files/c4gh.key
+cp "${basedir}"/c4gh.pub charts/sda-svc/files/c4gh.pub
+cp "${basedir}"/certs/*.p12 charts/sda-svc/files/
+cp "${basedir}"/certs/cacerts charts/sda-svc/files/
 
-for n in backup doa finalize ingest intercept verify mapper inbox
-  do cp sda-deploy-init/config/certs/$n.ca.crt charts/sda-svc/files/"$(echo $n.ca.crt | cut -d '.' -f1,3)"
+for n in backup doa finalize ingest intercept verify mapper inbox auth 
+  do
+  cp "${basedir}"/certs/$n.crt charts/sda-svc/files/$n.crt
+  cp "${basedir}"/certs/$n.key charts/sda-svc/files/$n.key
 done
-
-for n in backup doa finalize ingest intercept verify mapper inbox
-  do cp sda-deploy-init/config/certs/$n.ca.key charts/sda-svc/files/"$(echo $n.ca.key | cut -d '.' -f1,3)"
-done
-
-cp sda-deploy-init/config/certs/res.ca.crt charts/sda-svc/files/auth.crt
-cp sda-deploy-init/config/certs/res.ca.key charts/sda-svc/files/auth.key
 
 for p in sda-svc sda-db sda-mq sda-orch
-  do cp sda-deploy-init/config/certs/tester.ca.* "charts/$p/files/"
+  do 
+  cp "${basedir}"/certs/ca.crt "charts/$p/files/ca.crt"
+  cp "${basedir}"/certs/tester.* "charts/$p/files/"
 done

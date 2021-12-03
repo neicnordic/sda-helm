@@ -8,4 +8,5 @@ helm install postgres charts/sda-db \
 --set securityPolicy.create=false,\
 global.pg_in_password="$DB_IN_PASS",\
 global.pg_out_password="$DB_OUT_PASS",\
-global.verifyPeer=false
+global.verifyPeer=false,\
+image.tag=v1.3.1

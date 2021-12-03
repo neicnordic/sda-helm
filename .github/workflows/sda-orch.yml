@@ -19,12 +19,14 @@ jobs:
       run: bash ./dev_tools/scripts/init-k3d.sh
     - name: Wait for k3d to become ready
       run: bash ./dev_tools/scripts/wait-for-pods.sh metrics-server k8s-app kube-system
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
     - name: Install sda dependencies
       run: bash ./dev_tools/scripts/install-sda-deps.sh
+    - name: Create certificates
+      run: bash ./dev_tools/scripts/make-certs.sh
+    - name: Create java certificates
+      run: bash ./dev_tools/scripts/java-certs.sh
+    - name: Create secrets
+      run: bash ./dev_tools/scripts/create-secrets.sh
     - name: Set up services configuration
       run: bash ./dev_tools/scripts/svc-setup.sh
     - name: Deploy SDA database

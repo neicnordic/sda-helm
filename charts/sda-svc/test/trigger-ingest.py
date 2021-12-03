@@ -46,8 +46,8 @@ if mq_connection.startswith('amqps'):
     context.check_hostname = False
 
     cacertfile = Path('%s/ca.crt' % pki_path)
-    certfile = Path('%s/tester.ca.crt' % pki_path)
-    keyfile = Path('%s/tester.ca.key' % pki_path)
+    certfile = Path('%s/tester.crt' % pki_path)
+    keyfile = Path('%s/tester.key' % pki_path)
 
     context.verify_mode = ssl.CERT_NONE
     # Require server verification
