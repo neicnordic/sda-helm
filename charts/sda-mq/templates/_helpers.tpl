@@ -31,9 +31,33 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "verifyPeer" -}}
-  {{ if .Values.config.verifyPeer }}
+  {{ if .Values.config.tls.verifyPeer }}
     {{-  print "verify_peer" -}}
   {{ else }}
     {{-  print "verify_none" -}}
   {{ end }}
+{{- end -}}
+
+{{- define "mqCert" -}}
+    {{- if .Values.externalPkiService.tlsPath }}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a TLS certificate is required" .Values.config.tls.serverCert)) "/")}}
+    {{- else }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "a TLS certificate is required" .Values.config.tls.serverCert) }}
+    {{- end -}}
+{{- end -}}
+
+{{- define "mqKey" -}}
+    {{- if .Values.externalPkiService.tlsPath }}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a TLS key is required" .Values.config.tls.serverKey)) "/")}}
+    {{- else }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "a TLS key is required" .Values.config.tls.serverKey) }}
+    {{- end -}}
+{{- end -}}
+
+{{- define "caCert" -}}
+    {{- if .Values.externalPkiService.tlsPath }}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a CA certificate is required" .Values.config.tls.caCert)) "/")}}
+    {{- else }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "a CA certificate is required" .Values.config.tls.caCert) }}
+    {{- end -}}
 {{- end -}}
