@@ -31,10 +31,38 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "tlsPath" -}}
-{{- ternary "/tls/certs" .Values.tlsPath (empty .Values.tlsPath) -}}
+    {{- if .Values.pkiService.enabled }}
+        {{- printf "%s" (regexReplaceAll "/$"  (required "pkiService.tlsPath is required if pkiservice is enabled" .Values.pkiService.tlsPath) "" ) -}}
+    {{- else }}
+        {{- printf "/tls/certs" }}
+    {{- end -}}    
 {{- end -}}
 
 {{/**/}}
 {{- define "mqPass" -}}
 {{- .Values.broker.password -}}
+{{- end -}}
+
+{{- define "orchCert" -}}
+    {{- if .Values.pkiService.enabled }}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.pkiService.tlsPath (required "a TLS certificate is required" .Values.tls.cert)) "/")}}
+    {{- else }}
+        {{- printf "/tls/certs/%s" (required "a TLS certificate is required" .Values.tls.cert)}}
+    {{- end -}}
+{{- end -}}
+
+{{- define "orchKey" -}}
+    {{- if .Values.pkiService.enabled }}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.pkiService.tlsPath (required "a TLS key is required" .Values.tls.key)) "/")}}
+    {{- else }}
+        {{- printf "/tls/certs/%s" (required "a TLS key is required" .Values.tls.key)}}
+    {{- end -}}
+{{- end -}}
+
+{{- define "caCert" -}}
+    {{- if .Values.pkiService.enabled }}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.pkiService.tlsPath (required "a CA certificate is required" .Values.tls.caCert)) "/")}}
+    {{- else }}
+        {{- printf "/tls/certs/%s" (required "a CA certificate is required" .Values.tls.caCert) }}
+    {{- end -}}
 {{- end -}}

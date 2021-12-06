@@ -37,12 +37,12 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-    {{- if .Values.pkiPermissions }}
+    {{- if .Values.tls.permissions }}
       initContainers:
       - name: tls-init
         image: busybox
         command: ["/bin/sh", "-c"]
-        args: ["/bin/cp /tls-certs/* /tls/ && chown 1000:1000 /tls/* && chmod 0400 /tls/*"]
+        args: ["/bin/cp {{ include "tlsPath" . }}/* /tls/ && chown 1000:1000 /tls/* && chmod 0400 /tls/*"]
         securityContext:
           allowPrivilegeEscalation: false
         volumeMounts:
@@ -121,20 +121,25 @@ spec:
           value: /config/config.json
         {{- end }}
       {{- end }}
-        {{- if .Values.sslmode.ssl }}
+      {{- if .Values.tls.enabled}}
+        - name: BROKER_SSL
+          value: "true"
         - name: SSL_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
-        {{- if .Values.sslmode.verifyPeer }}
+          value: {{ include "caCert" . | quote }}
+        {{- if .Values.broker.verifyPeer }}
         - name: SSL_CLIENTCERT
-          value: {{ include "tlsPath" . }}/orch.crt
+          value: {{ include "orchCert" . | quote }}
         - name: SSL_CLIENTKEY
-          value: {{ include "tlsPath" . }}/orch.key
+          value: {{ include "orchKey" . | quote }}
         {{- end }}
+      {{- else }}
+        - name: BROKER_SSL
+          value: "false"
       {{- end }}
         resources:
 {{ toYaml .Values.resources | trim | indent 10 }}
         volumeMounts:
-        {{- if not .Values.pkiService }}
+        {{- if and .Values.tls.enabled (not .Values.pkiService.enabled) }}
         - name: tls
           mountPath: {{ template "tlsPath" . }}
         {{- end }}
@@ -147,12 +152,12 @@ spec:
       volumes:
       - name: tmp
         emptyDir: {}
-    {{- if not .Values.pkiService }}
-      - name: {{ ternary "tls" "tls-certs" (empty .Values.pkiPermissions) }}
+    {{- if and .Values.tls.enabled (not .Values.pkiService.enabled) }}
+      - name: {{ ternary "tls" "tls-certs" (empty .Values.tls.permissions) }}
         secret:
           defaultMode: 0440
-          secretName: {{ template "sda.fullname" . }}-orchestrate-certs
-      {{- if .Values.pkiPermissions }}
+          secretName: {{ required "A tls secret is required " .Values.tls.secretName }}
+      {{- if .Values.tls.permissions }}
       - name: tls
         emptyDir:
           medium: Memory

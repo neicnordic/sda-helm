@@ -15,10 +15,10 @@ logLevel: "info"
 # the annotations to apply to the service pods
 podAnnotations: {}
 
-# If an external PKI infrastructure is used set this to true
-pkiService: false
-# if permissions needs to be set on the injected certificates set this to true
-pkiPermissions: true
+# If an external PKI infrastructure is used set enabled to true
+pkiService: 
+  enabled: false
+  tlsPath: ""
 
 # Assume RBAC is enabled in the cluster
 rbacEnabled: true
@@ -34,7 +34,13 @@ networkPolicy:
   create: false
   brokerNamespace: ""
 
-tlsPath: "/tls/certs"
+tls:
+  enabled: true
+  secretName:
+  permissions: false
+  cert:
+  key:
+  caCert:
 
 ## RevisionHistory
 ##  If defined, set the revisionHistoryLimit of the deployment, defaults to 3
@@ -48,10 +54,6 @@ vaultSecrets: false
 envFile: "env"
 
 # used by Message Broker
-sslmode:
-  ssl: true
-  verifyPeer: true
-
 broker:
   exchange: ""
   host: ""
@@ -66,6 +68,7 @@ broker:
     accessionids: "accessionIDs"
     ingest: "ingest"
     mappings: "mappings"
+  verifyPeer: true
 
 # Datacite and REMS depend on one another
 # if we set one the other one needs to be configured
