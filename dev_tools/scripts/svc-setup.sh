@@ -11,12 +11,6 @@ cp "${basedir}"/certs/private.key private.key
 cp "${basedir}"/certs/orch.crt charts/sda-orch/files/orch.crt
 cp "${basedir}"/certs/orch.key charts/sda-orch/files/orch.key
 
-## sda-mq certs
-kubectl create secret generic mq-certs \
---from-file="${basedir}"/certs/ca.crt \
---from-file="${basedir}"/certs/server.crt \
---from-file="${basedir}"/certs/server.key
-
 ## cega config and certs
 mkdir -p LocalEGA-helm/ega-charts/cega/config/certs
 cp -r dev_tools/cega/* LocalEGA-helm/ega-charts/cega/config/
