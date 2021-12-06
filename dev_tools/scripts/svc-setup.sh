@@ -12,8 +12,10 @@ cp "${basedir}"/certs/orch.crt charts/sda-orch/files/orch.crt
 cp "${basedir}"/certs/orch.key charts/sda-orch/files/orch.key
 
 ## sda-mq certs
-cp "${basedir}"/certs/server.crt charts/sda-mq/files/server.crt
-cp "${basedir}"/certs/server.key charts/sda-mq/files/server.key
+kubectl create secret generic mq-certs \
+--from-file="${basedir}"/certs/ca.crt \
+--from-file="${basedir}"/certs/server.crt \
+--from-file="${basedir}"/certs/server.key
 
 ## cega config and certs
 mkdir -p LocalEGA-helm/ega-charts/cega/config/certs
@@ -37,7 +39,7 @@ for n in backup doa finalize ingest intercept verify mapper inbox auth
   cp "${basedir}"/certs/$n.key charts/sda-svc/files/$n.key
 done
 
-for p in sda-svc sda-mq sda-orch
+for p in sda-svc sda-orch
   do 
   cp "${basedir}"/certs/ca.crt "charts/$p/files/ca.crt"
   cp "${basedir}"/certs/tester.* "charts/$p/files/"
