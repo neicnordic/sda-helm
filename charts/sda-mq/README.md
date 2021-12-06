@@ -8,12 +8,17 @@ Edit the values.yaml file and specify the relevant parts of the `config` section
 
 Parameter | Description | Default
 --------- | ----------- | -------
-`image.repository` | sda-mq container image repository | `neicnordic/sda-mq`
-`image.tag` | sda-mq  container image version | `"latest"`
+`image.repository` | sda-mq container image repository | `ghcr.io/neicnordic/sda-mq`
+`image.tag` | sda-mq  container image version | `v1.3.0`
 `image.pullPolicy` | sda-mq container image pull policy | `Always`
 `config.adminUser` | Username of admin user |`""`
 `config.adminPasswordHash` | Passwordhash for admin user. |`""`
-`config.verifyPeer` | Require client certificates. |`true`
+`config.tls.enabled` | Use TLS for all connections. |`true`
+`config.tls.secretName` | Name of the secret that holds the certificates. |`""`
+`config.tls.serverKey` | Name of the certificate private key file. |`""`
+`config.tls.serverCert` | Name of the certificate file. |`""`
+`config.tls.caCert` | Name of the CA file. |`""`
+`config.tls.verifyPeer` | Require client certificates. |`true`
 `config.vhost` | default vhost is '/' unless specifically named |`""`
 `config.shovel.host` | Hostname of federated server |`""`
 `config.shovel.pass` | Password to federated server |`""`
@@ -38,22 +43,35 @@ Parameter | Description | Default
 `resources.requests.cpu` | CPU request for container. |`100m`
 `resources.limits.memory` | Memory limit for container. |`256Mi`
 `resources.limits.cpu` | CPU limit for container. |`200m`
-`podAnnotations` | Annotations applied to the pod. |`{}`
+`testimage.tls.secretName` | Name of the testers secret that holds the certificates. |`""`
+`testimage.tls.serverKey` | Name of the testers certificate private key file. |`""`
+`testimage.tls.serverCert` | Name of testers the certificate file. |`""`
+`testimage.tls.caCert` | Name of the CA file. |`""`
 
 ### TLS
 
-Certificates should be placed in the `files` folder and named accordingly.
+Create a secret that contains the certificates
 
-- ca.crt, root ca certificate.
-- server.crt, serer certificate.
-- server.key, server key.
+```cmd
+kubectl create secret generic mq-certs \
+--from-file=ca.crt \
+--from-file=server.crt \
+--from-file=server.key
+```
 
-If you want `helm test` to work, you should also put
+If helm tests are to be used the testers client certificates must be accessible as a secret.
 
-- tester.key, private key used for tests
-- tester.crt, certificate for key, used for tests
+```cmd
+kubectl create secret generic tester-certs \
+--from-file=ca.crt \
+--from-file=tester.crt \
+--from-file=tester.key
+```
 
-in the same `files` folder. Note that `helm test` for the `sda-mq`
-chart will currently only verify service availability and TLS setup,
-not accounts or other aspects (they will be verified by the `sda-svc`
-chart tests instead).
+## Password hash
+
+To create a password hash for the admin user run the followin command:
+
+```cmd
+sh ../dev_tools/scripts/mq-password-generator.sh ADMIN_PASSWORD
+```
