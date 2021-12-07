@@ -42,7 +42,7 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
-    {{- if .Values.global.pkiPermissions }}
+    {{- if and .Values.global.pkiPermissions (not .Values.global.noTLS) }}
       initContainers:
       - name: tls-init
         image: busybox
@@ -87,15 +87,22 @@ spec:
         - name: ARCHIVE_LOCATION
           value: "{{ .Values.global.archive.volumePath }}/"
       {{- end }}
-      {{- if .Values.global.broker.ssl }}
+      {{- if and .Values.global.broker.ssl (not .Values.global.noTLS ) }}
         - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.ingest.tls.caCert }}
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/ingest.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.ingest.tls.certFile }}
         - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/ingest.key
+          value: {{ template "tlsPath" . }}/{{ .Values.ingest.tls.keyFile }}
         {{- end }}
+        - name: BROKER_SSL
+          value: "true"
+        - name: BROKER_VERIFYPEER
+          value: {{ .Values.global.broker.verifyPeer | quote }}
+      {{- else }}
+        - name: BROKER_SSL
+          value: "false"
       {{- end }}
         - name: BROKER_DURABLE
           value: {{ .Values.global.broker.durable | quote }}
@@ -115,21 +122,19 @@ spec:
           value: {{ .Values.global.broker.vhost | quote }}
         - name: BROKER_SERVERNAME
           value: {{ .Values.global.broker.host | quote }}
-        - name: BROKER_SSL
-          value: "true"
-        - name: BROKER_VERIFYPEER
-          value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: C4GH_FILEPATH
-          value: {{ template "c4ghPath" . }}/{{ default "c4gh.sec.pem" .Values.global.c4gh.file }}
+          value: {{ template "c4ghPath" . }}/{{ .Values.global.c4gh.keyFile }}
+      {{- if not .Values.global.noTLS }}
       {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.ingest.tls.caCert }}
       {{- end }}
       {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/ingest.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.ingest.tls.certFile }}
         - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/ingest.key
+          value: {{ template "tlsPath" . }}/{{ .Values.ingest.tls.keyFile }}
+      {{- end }}
       {{- end }}
         - name: DB_DATABASE
           value: {{ default "lega" .Values.global.db.name | quote }}
@@ -138,7 +143,7 @@ spec:
         - name: DB_PORT
           value: {{ .Values.global.db.port | quote }}
         - name: DB_SSLMODE
-          value: {{ .Values.global.db.sslMode | quote }}
+          value: {{ template "dbSSLmode" . }}
         - name: INBOX_TYPE
       {{- if eq "s3" .Values.global.inbox.storageType }}
           value: "s3"
@@ -197,8 +202,8 @@ spec:
         - name: C4GH_PASSPHRASE
           valueFrom:
             secretKeyRef:
-              name: {{ template "sda.fullname" . }}-ingest
-              key: c4ghPassphrase
+              name: {{ required "A secret for the c4gh key is required" .Values.global.c4gh.secretName }}
+              key: passphrase
       {{- if eq "s3" .Values.global.inbox.storageType }}
         - name: INBOX_ACCESSKEY
           valueFrom:
@@ -211,7 +216,7 @@ spec:
               name: {{ template "sda.fullname" . }}-s3inbox-keys
               key: s3InboxSecretKey
       {{- end }}
-      {{ else }}
+      {{- else }}
         - name: CONFIGFILE
           value: {{ include "confFile" . }}
       {{- end }}
@@ -222,7 +227,7 @@ spec:
         - name: c4gh
           mountPath: {{ template "c4ghPath" . }}
       {{- end }}
-      {{- if not .Values.global.pkiService }}
+      {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
         - name: tls
           mountPath: "{{ template "tlsPath" . }}"
       {{- end }}
@@ -239,16 +244,16 @@ spec:
         - name: c4gh
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-c4gh
+            secretName: {{ required "A secret for the c4gh key is required" .Values.global.c4gh.secretName }}
             items:
-            - key: {{ .Values.global.c4gh.file }}
-              path: {{ .Values.global.c4gh.file }}
+            - key: {{ .Values.global.c4gh.keyFile }}
+              path: {{ .Values.global.c4gh.keyFile }}
       {{- end }}
-    {{- if not .Values.global.pkiService }}
+    {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-ingest-certs
+            secretName: {{ .Values.ingest.tls.secretName }}
       {{- if .Values.global.pkiPermissions }}
         - name: tls
           emptyDir:
