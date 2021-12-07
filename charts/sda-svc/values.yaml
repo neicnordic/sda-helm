@@ -151,10 +151,10 @@ global:
     password: ""
 
   c4gh:
-# name of the c4gh key file.
-    file: c4gh.key
-    passphrase: ""
-# name of the public file, required for testing
+    secretName: 
+  # name of the c4gh key file.
+    keyFile:
+  # name of the public file, required for testing
     publicFile: ""
 
   db:
@@ -449,3 +449,8 @@ verify:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
