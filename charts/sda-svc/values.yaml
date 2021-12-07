@@ -372,6 +372,11 @@ intercept:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 mapper:
   replicaCount: 1
