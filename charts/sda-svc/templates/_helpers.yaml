@@ -262,3 +262,11 @@ Create chart name and version as used by the chart label.
   {{- printf "https://%s/elixir/login" .Values.global.ingress.hostName.auth }}
 {{- end -}}
 {{- end -}}
+
+{{- define "inboxServicePort" -}}
+  {{- if .Values.global.noTLS }}
+    {{- printf "%d" (ternary 2222 80 ( empty .Values.global.inbox.s3Url )) }}
+  {{- else }}
+    {{- printf "%d" (ternary 2222 443 ( empty .Values.global.inbox.s3Url )) }}
+  {{- end -}}
+{{- end -}}

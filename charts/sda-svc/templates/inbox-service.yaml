@@ -8,7 +8,7 @@ metadata:
 spec:
   ports:
   - name: inbox
-    port: {{ ternary 2222 443 ( empty .Values.global.inbox.s3Url ) }}
+    port: {{ template "inboxServicePort" . }}
     targetPort: inbox
     protocol: TCP
   selector:
