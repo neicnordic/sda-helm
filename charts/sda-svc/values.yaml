@@ -28,7 +28,7 @@ global:
   schemaType: ""
 
   ingress:
-    deploy: false
+    deploy: true
     hostName:
       auth: ""
       doa: ""
@@ -90,6 +90,11 @@ global:
 # the securityContext to apply to the service pods
   extraSecurityContext: {}
 
+# If no dependency services uses TLS, postgreSQL, RabbitMQ, S3
+# TLS can be globally disabled for all serives by setting this to true
+# No to be used in production but handy for testing.
+  noTLS: false
+
 # If an external secrets management service is used set this to true
   vaultSecrets: false
 
@@ -127,10 +132,12 @@ global:
     nfsPath: ""
 
   auth:
+    elixirID:
+    elixirSecret:
+    jwtSecret:
     jwtAlg: ES256
-    jwtKey: ""
-    jwtPub: ""
-    useTLS: true
+    jwtKey:
+    jwtPub:
 
   broker:
     durable: true
@@ -151,11 +158,12 @@ global:
     password: ""
 
   c4gh:
-    secretName: 
+    secretName: ""
   # name of the c4gh key file.
-    keyFile:
+    keyFile: ""
   # name of the public file, required for testing
     publicFile: ""
+    passphrase: ""
 
   db:
     host: ""
@@ -277,6 +285,11 @@ auth:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 backup:
   name: backup
@@ -296,6 +309,11 @@ backup:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 doa:
   name: doa
@@ -317,6 +335,13 @@ doa:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: "doa.crt"
+    keyFile: "doa.key.der"
+    caCert: "ca.crt"
+    javaCert: "cacerts"
+    keyStore: "doa.p12"
 
 finalize:
   name: finalize
@@ -335,6 +360,11 @@ finalize:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 ingest:
   name: ingest
@@ -422,6 +452,11 @@ s3Inbox:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    keyStore: "inbox.p12"
+    caCert: "cacerts"
+
 
 sftpInbox:
   name: sftpInbox
@@ -442,6 +477,11 @@ sftpInbox:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 releasetest:
   repository: neicnordic/sda-helm-tests-support
