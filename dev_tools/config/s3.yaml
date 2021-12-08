@@ -14,9 +14,10 @@ global:
   auth:
     elixirID: DfCieZLuBU
     elixirSecret: DfCieZLuBU
-    jwtKey: jwt.key
+    jwtSecret: oidc
+    jwtAlg: ES256
+    jwtKey: token.key
     jwtPub: token.pub
-    useTLS: true
   backupArchive:
     storageType: s3
     s3Url: "https://minio"
@@ -39,11 +40,10 @@ global:
   db:
     host: "postgres-sda-db"
   c4gh:
-    file: c4gh.key
-    passphrase: oaagCP1YgAZeEyl2eJAkHv9lkcWXWFgm
-    publicFile: "c4gh.pub"
+    secretName: c4gh
+    keyFile: c4gh.key
+    publicFile: c4gh.pub
   elixir:
-    pubKey: token.pub
     oidcdHost: "http://oidc-server:8080"
     jwkPath: ""
   inbox:
@@ -56,8 +56,63 @@ global:
     s3CaFile: ca.crt
     s3ReadyPath: "/minio/health/ready"
   ingress:
+    deploy: false
     hostName:
       auth: sda-sda-svc-auth
   logLevel: debug
+auth:
+  tls:
+    secretName: "auth-certs"
+    certFile: "auth.crt"
+    keyFile: "auth.key"
+    caCert: "ca.crt"
 backup:
   deploy: true
+  tls:
+    secretName: "backup-certs"
+    certFile: "backup.crt"
+    keyFile: "backup.key"
+    caCert: "ca.crt"
+doa:
+  tls:
+    secretName: "doa-certs"
+    certFile: "doa.crt"
+    keyFile: "doa.key.der"
+    caCert: "ca.crt"
+    javaCert: "cacerts"
+finalize:
+  tls:
+    secretName: "finalize-certs"
+    certFile: "finalize.crt"
+    keyFile: "finalize.key"
+    caCert: "ca.crt"
+ingest:
+  tls:
+    secretName: "ingest-certs"
+    certFile: "ingest.crt"
+    keyFile: "ingest.key"
+    caCert: "ca.crt"
+intercept:
+  tls:
+    secretName: intercept-certs
+    certFile: intercept.crt
+    keyFile: intercept.key
+    caCert: ca.crt
+mapper:
+  tls:
+    secretName: mapper-certs
+    certFile: mapper.crt
+    keyFile: mapper.key
+    caCert: ca.crt
+s3Inbox:
+  tls:
+    secretName: "inbox-certs"
+    certFile: "inbox.crt"
+    keyFile: "inbox.key"
+    caCert: "ca.crt"
+verify:
+  tls:
+    secretName: verify-certs
+    certFile: verify.crt
+    keyFile: verify.key
+    caCert: ca.crt

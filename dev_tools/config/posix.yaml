@@ -16,24 +16,73 @@ global:
     host: "broker-sda-mq"
     exchange: "sda"
     port: 5671
-    verifyPeer: true
+    verifyPeer: false
     password: "admin"
     username: "admin"
     backupRoutingKey: "backup"
   c4gh:
-    publicFile: "c4gh.pub"
+    secretName: c4gh
+    keyFile: c4gh.key
+    publicFile: c4gh.pub
   cega:
     host: "cega-users"
     user: "legatest"
   db:
     host: "postgres-sda-db"
-  elixir:
-    pubKey: "token.pub"
   inbox:
     storageType: posix
     path: "/inbox"
     user: "lega"
     existingClaim: inbox-volume
+  ingress:
+    deploy: false
   logLevel: debug
 backup:
   deploy: true
+  tls:
+    secretName: "backup-certs"
+    certFile: "backup.crt"
+    keyFile: "backup.key"
+    caCert: "ca.crt"
+doa:
+  tls:
+    secretName: "doa-certs"
+    certFile: "doa.crt"
+    keyFile: "doa.key.der"
+    caCert: "ca.crt"
+    javaCert: "cacerts"
+finalize:
+  tls:
+    secretName: "finalize-certs"
+    certFile: "finalize.crt"
+    keyFile: "finalize.key"
+    caCert: "ca.crt"
+ingest:
+  tls:
+    secretName: "ingest-certs"
+    certFile: "ingest.crt"
+    keyFile: "ingest.key"
+    caCert: "ca.crt"
+intercept:
+  tls:
+    secretName: intercept-certs
+    certFile: intercept.crt
+    keyFile: intercept.key
+    caCert: ca.crt
+mapper:
+  tls:
+    secretName: mapper-certs
+    certFile: mapper.crt
+    keyFile: mapper.key
+    caCert: ca.crt
+sftpInbox:
+  tls:
+    secretName: "inbox-certs"
+    keyStore: "inbox.p12"
+    caCert: "cacerts"
+verify:
+  tls:
+    secretName: verify-certs
+    certFile: verify.crt
+    keyFile: verify.key
+    caCert: ca.crt
