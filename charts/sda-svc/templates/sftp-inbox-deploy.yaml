@@ -1,5 +1,5 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
-{{- if eq "posix" .Values.global.inbox.storageType }}
+{{- if and (eq "posix" .Values.global.inbox.storageType) (not .Values.global.noTLS) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -87,7 +87,7 @@ spec:
               name: {{ template "sda.fullname" . }}-inbox
               key: cegaCredentials
         - name: KEYSTORE_PATH
-          value: "/etc/ssl/certs/java/inbox.p12"
+          value: "/etc/ssl/certs/java/{{ .Values.sftpInbox.tls.keyStore}}"
         - name: KEYSTORE_PASSWORD
           value: {{ .Values.sftpInbox.keystorePass | quote }}
         - name: KEYSTORE_TYPE
@@ -119,7 +119,11 @@ spec:
           mountPath: "/ega/inbox"
         - name: tls
           mountPath: "/etc/ssl/certs/java"
+        - name: tmp
+          mountPath: /tmp/
       volumes:
+        - name: tmp
+          emptyDir: {}
         - name: inbox
       {{- if .Values.global.inbox.existingClaim }}
           persistentVolumeClaim:
@@ -131,7 +135,7 @@ spec:
       {{- end }}
         - name: tls
           secret:
-            secretName: {{ template "sda.fullname" . }}-inbox-certs
+            secretName: {{ .Values.sftpInbox.tls.secretName }}
             defaultMode: 0440
 {{- end }}
 {{- end }}
