@@ -246,3 +246,11 @@ Create chart name and version as used by the chart label.
 {{- ternary .Values.global.broker.password .Values.credentials.verify.mqPassword (empty .Values.credentials.verify.mqPassword) -}}
 {{- end -}}
 {{/**/}}
+
+{{- define "dbSSLmode" -}}
+{{- if not .Values.global.noTLS }}
+  {{- printf "%s" .Values.global.db.sslMode }}
+{{- else }}
+  {{- print "disable" -}}
+{{- end -}}
+{{- end -}}
