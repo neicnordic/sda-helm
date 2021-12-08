@@ -3,10 +3,6 @@ set -e
 
 basedir="sda-deploy-init/config"
 
-## S3 certs
-cp "${basedir}"/certs/public.crt public.crt
-cp "${basedir}"/certs/private.key private.key
-
 ## cega config and certs
 mkdir -p LocalEGA-helm/ega-charts/cega/config/certs
 cp -r dev_tools/cega/* LocalEGA-helm/ega-charts/cega/config/
@@ -17,17 +13,31 @@ cp "${basedir}"/certs/cega-mq.crt LocalEGA-helm/ega-charts/cega/config/certs/ceg
 cp "${basedir}"/certs/cega-mq.key LocalEGA-helm/ega-charts/cega/config/certs/cega-mq.key
 
 ## sda-svc certs
-cp "${basedir}"/certs/token.pub charts/sda-svc/files/
-cp "${basedir}"/c4gh.key charts/sda-svc/files/c4gh.key
-cp "${basedir}"/c4gh.pub charts/sda-svc/files/c4gh.pub
-cp "${basedir}"/certs/*.p12 charts/sda-svc/files/
-cp "${basedir}"/certs/cacerts charts/sda-svc/files/
 
-for n in backup doa finalize ingest intercept verify mapper inbox auth 
+for n in backup finalize ingest intercept verify mapper auth 
   do
-  cp "${basedir}"/certs/$n.crt charts/sda-svc/files/$n.crt
-  cp "${basedir}"/certs/$n.key charts/sda-svc/files/$n.key
+  kubectl create secret generic $n-certs \
+  --from-file="${basedir}"/certs/ca.crt \
+  --from-file="${basedir}"/certs/$n.crt \
+  --from-file="${basedir}"/certs/$n.key
 done
 
-cp "${basedir}"/certs/ca.crt "charts/sda-svc/files/ca.crt"
-cp "${basedir}"/certs/tester.* "charts/sda-svc/files/"
+for m in doa inbox
+  do
+  kubectl create secret generic $m-certs \
+  --from-file="${basedir}"/certs/ca.crt \
+  --from-file="${basedir}"/certs/$m.crt \
+  --from-file="${basedir}"/certs/$m.key \
+  --from-file="${basedir}"/certs/$m.key.der \
+  --from-file="${basedir}"/certs/$m.p12 \
+  --from-file="${basedir}"/certs/cacerts
+done
+
+# secret for the OIDC keypair
+kubectl create secret generic oidc --from-file="${basedir}"/certs/token.key --from-file="${basedir}"/certs/token.pub
+
+# secret for the release testers certificates
+kubectl create secret generic tester-certs \
+--from-file="${basedir}"/certs/tester.key \
+--from-file="${basedir}"/certs/tester.crt \
+--from-file="${basedir}"/certs/ca.crt
