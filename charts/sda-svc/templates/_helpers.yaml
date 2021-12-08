@@ -254,3 +254,11 @@ Create chart name and version as used by the chart label.
   {{- print "disable" -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "authRedirect" -}}
+{{- if .Values.global.noTLS }}
+  {{- printf "http://%s/elixir/login" .Values.global.ingress.hostName.auth }}
+{{- else }}
+  {{- printf "https://%s/elixir/login" .Values.global.ingress.hostName.auth }}
+{{- end -}}
+{{- end -}}
