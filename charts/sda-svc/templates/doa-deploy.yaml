@@ -1,4 +1,5 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
+{{- if not .Values.global.noTLS }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -132,17 +133,17 @@ spec:
           value: "{{ include "secretsPath" . }}/{{ .Values.global.elixir.pubKey }}"
       {{- end }}
         - name: KEYSTORE_PATH
-          value: {{ ternary "/etc/ssl/certs/java/doa.p12" (printf "%s/doa.p12" .Values.global.secretsPath ) (empty .Values.global.pkiService) }}
+          value: {{ ternary (printf "/etc/ssl/certs/java/%s" .Values.doa.tls.keyStore) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.keystore) (empty .Values.global.pkiService) }}
         - name: KEYSTORE_PASSWORD
           value: {{ .Values.doa.keystorePass | quote }}
         - name: ROOT_CERT_PATH
-          value: {{ ternary "/etc/ssl/certs/java/ca.crt" (printf "%s/ca.crt" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
+          value: {{ ternary (printf "/etc/ssl/certs/java/%s" .Values.doa.tls.caCert) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.caCert ) (empty .Values.global.pkiService) }}
         - name: CERT_PATH
-          value: {{ ternary "/etc/ssl/certs/java/doa.crt" (printf "%s/doa.crt" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
+          value: {{ ternary (printf "/etc/ssl/certs/java/%s" .Values.doa.tls.certFile) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.certFile) (empty .Values.global.pkiService) }}
         - name: CERT_KEY
-          value: {{ ternary "/etc/ssl/certs/java/doa.key.der" (printf "%s/doa.der" .Values.global.secretsPath) (empty .Values.global.pkiService) }}
+          value: {{ ternary (printf "/etc/ssl/certs/java/%s" .Values.doa.tls.keyFile) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.keyFile) (empty .Values.global.pkiService) }}
         - name: CRYPT4GH_PRIVATE_KEY_PATH
-          value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.file }}"
+          value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.keyFile }}"
         - name: CRYPT4GH_PRIVATE_KEY_PASSWORD_PATH
           value: "{{ template "c4ghPath" . }}/passphrase"
         - name: OPENID_CONFIGURATION_URL
@@ -167,7 +168,7 @@ spec:
           value: "true"
         {{- if .Values.global.doa.outbox.s3CaFile }}
         - name: S3_OUT_ROOT_CERT_PATH
-          value: "/etc/ssl/certs/java/ca.crt"
+          value: "/etc/ssl/certs/java/{{ .Values.doa.tls.caCert }}"
         {{- end }}
         - name: S3_OUT_ACCESS_KEY
           valueFrom:
@@ -205,6 +206,8 @@ spec:
         resources:
 {{ toYaml .Values.doa.resources | trim | indent 10 }}
         volumeMounts:
+        - name: tmp
+          mountPath: "/tmp"
       {{- if not .Values.global.pkiService }}
         - name: tls-certs
           mountPath: "/etc/ssl/certs/java"
@@ -222,10 +225,12 @@ spec:
           mountPath: {{ .Values.global.archive.volumePath | quote }}
       {{- end }}
       volumes:
+        - name: tmp
+          emptyDir: {}
       {{- if not .Values.global.pkiService }}
         - name: tls-certs
           secret:
-            secretName: {{ template "sda.fullname" . }}-doa-certs
+            secretName: {{ .Values.doa.tls.secretName }}
             defaultMode: 0440
       {{- end }}
       {{- if not .Values.global.vaultSecrets }}
@@ -242,7 +247,7 @@ spec:
       {{- end }}
         - name: c4gh-key
           secret:
-            secretName: {{ template "sda.fullname" . }}-c4gh
+            secretName: {{ .Values.global.c4gh.secretName }}
             defaultMode: 0440
       {{- end }}
       {{- if eq "posix" .Values.global.archive.storageType }}
@@ -256,4 +261,5 @@ spec:
             path: {{ if .Values.global.archive.nfsPath }}{{ .Values.global.archive.nfsPath | quote }}{{ else }}{{ "/" }}{{ end }}
         {{- end }}
       {{- end }}
+{{- end }}
 {{- end }}
