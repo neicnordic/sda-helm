@@ -34,5 +34,4 @@ send -- "$G4GH\r"
 expect eof
 EOD
 
-mv c4gh.key "${basedir}/c4gh.key"
-mv c4gh.pub "${basedir}/c4gh.pub"
+kubectl create secret generic c4gh --from-file=c4gh.key --from-file=c4gh.pub --from-literal=passphrase="${G4GH}"
