@@ -3,6 +3,7 @@
 Source repositories:
 - https://github.com/neicnordic/sda-pipeline
 - https://github.com/neicnordic/sda-doa
+- https://github.com/neicnordic/sda-download
 
 ## Installing the Chart
 
@@ -133,6 +134,8 @@ Parameter | Description | Default
 `credentials.backup.mqPassword` | Broker password for backup | `""`
 `credentials.doa.dbUser` | Databse user for doa | `""`
 `credentials.doa.dbPassword` | Database password for doa| `""`
+`credentials.download.dbUser` | Databse user for download | `""`
+`credentials.download.dbPassword` | Database password for download| `""`
 `credentials.finalize.dbUser` | Databse user for finalize | `""`
 `credentials.finalize.dbPassword` | Database password for finalize | `""`
 `credentials.finalize.mqUser` | Broker user for finalize | `""`
@@ -181,11 +184,21 @@ Parameter | Description | Default
 `doa.imageTag` | dataedge container image version | `"latest"`
 `doa.imagePullPolicy` | dataedge container image pull policy | `Always`
 `doa.keystorePass` | keystore password | `changeit`
-`doa.annotations` | Specific annotation for the doa pod | `{}`
+`doa.annotations` | Specific annotation for the dataedge pod | `{}`
 `doa.resources.requests.memory` | Memory request for dataedge container. |`128Mi`
 `doa.resources.requests.cpu` | CPU request for dataedge container. |`100m`
 `doa.resources.limits.memory` | Memory limit for dataedge container. |`1024Mi`
 `doa.resources.limits.cpu` | CPU limit for dataedge container. |`2000m`
+`download.replicaCount` | desired number of replicas | `1`
+`download.repository` | dataedge container image repository | `neicnordic/sda-doa`
+`download.imageTag` | dataedge container image version | `"latest"`
+`download.imagePullPolicy` | dataedge container image pull policy | `Always`
+`download.keystorePass` | keystore password | `changeit`
+`download.annotations` | Specific annotation for the dataedge pod | `{}`
+`download.resources.requests.memory` | Memory request for dataedge container. |`256Mi`
+`download.resources.requests.cpu` | CPU request for dataedge container. |`100m`
+`download.resources.limits.memory` | Memory limit for dataedge container. |`512Mi`
+`download.resources.limits.cpu` | CPU limit for dataedge container. |`1000m`
 `finalize.repository` | inbox container image repository | `neicnordic/sda-pipeline`
 `finalize.imageTag` | inbox container image version | `latest`
 `finalize.imagePullPolicy` | inbox container image pull policy | `Always`

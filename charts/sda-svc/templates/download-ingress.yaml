@@ -1,0 +1,39 @@
+{{- if (or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType)) (not .Values.global.deploymentType)) }}
+{{- if .Values.global.ingress.deploy }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "sda.fullname" . }}-download-ingress
+  labels:
+    app: {{ template "sda.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.global.ingress.labels }}
+{{ toYaml .Values.global.ingress.labels | indent 4 }}
+{{- end }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    {{- if .Values.global.ingress.issuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
+    {{- end }}
+spec:
+  rules:
+  - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.download }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: {{ template "sda.fullname" . }}-download
+            port:
+              number: {{ ternary 8080 443 ( empty .Values.global.download.useTLS ) }}
+  tls:
+  - hosts:
+    - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.download }}
+    secretName: {{ if .Values.global.ingress.secretNames.download }}{{ .Values.global.ingress.secretNames.download }}{{- else }}"{{ template "sda.fullname" . }}-ingress-download"{{- end }}
+{{- end }}
+{{- end }}

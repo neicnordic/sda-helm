@@ -158,6 +158,14 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/**/}}
+{{- define "dbUserDownload" -}}
+{{- ternary "lega_out" .Values.credentials.download.dbUser (empty .Values.credentials.download.dbUser) -}}
+{{- end -}}
+{{- define "dbPassDownload" -}}
+{{- ternary .Values.global.db.passOutgest .Values.credentials.download.dbPassword (empty .Values.credentials.download.dbPassword) -}}
+{{- end -}}
+
+{{/**/}}
 {{- define "dbUserFinalize" -}}
 {{- ternary "lega_in" .Values.credentials.finalize.dbUser (empty .Values.credentials.finalize.dbUser) -}}
 {{- end -}}
