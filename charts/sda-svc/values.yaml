@@ -271,8 +271,8 @@ credentials:
 auth:
   name: auth
   replicaCount: 1
-  repository: neicnordic/sda-auth
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-auth
+  imageTag: v0.6.1
   imagePullPolicy: Always
   resources:
     requests:
@@ -295,8 +295,8 @@ backup:
   name: backup
   deploy: false
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -346,8 +346,8 @@ doa:
 finalize:
   name: finalize
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -369,8 +369,8 @@ finalize:
 ingest:
   name: ingest
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
   imagePullPolicy: Always
   resources:
     requests:
@@ -393,8 +393,8 @@ intercept:
   deploy: true
   name: ingest
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
   imagePullPolicy: Always
   resources:
     requests:
@@ -415,8 +415,8 @@ intercept:
 
 mapper:
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
   imagePullPolicy: Always
   resources:
     requests:
@@ -437,8 +437,8 @@ mapper:
 
 s3Inbox:
   name: s3Inbox
-  repository: neicnordic/sda-s3proxy
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-s3proxy
+  imageTag: v0.1.10
   imagePullPolicy: Always
   replicaCount: 1
   resources:
@@ -490,8 +490,8 @@ releasetest:
   
 verify:
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
   imagePullPolicy: Always
   resources:
     requests:
