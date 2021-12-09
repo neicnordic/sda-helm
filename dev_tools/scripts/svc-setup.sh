@@ -31,7 +31,7 @@ cp "${basedir}"/c4gh.pub charts/sda-svc/files/c4gh.pub
 cp "${basedir}"/certs/*.p12 charts/sda-svc/files/
 cp "${basedir}"/certs/cacerts charts/sda-svc/files/
 
-for n in backup doa finalize ingest intercept verify mapper inbox auth 
+for n in backup doa finalize ingest intercept verify mapper inbox auth download
   do
   cp "${basedir}"/certs/$n.crt charts/sda-svc/files/$n.crt
   cp "${basedir}"/certs/$n.key charts/sda-svc/files/$n.key

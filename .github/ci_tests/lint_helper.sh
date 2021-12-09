@@ -17,7 +17,7 @@ touch $1/files/orch.key
 fi
 
 if [ $1 = "sda-svc" ]; then
-for n in ca backup doa finalize inbox ingest intercept verify mapper
+for n in ca backup doa finalize inbox ingest intercept verify mapper download
 do
 touch $1/files/$n.crt
 done
