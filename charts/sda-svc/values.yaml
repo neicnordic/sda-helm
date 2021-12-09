@@ -273,7 +273,7 @@ auth:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-auth
   imageTag: v0.6.1
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -319,7 +319,7 @@ doa:
   name: doa
   repository: neicnordic/sda-doa
   imageTag: latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
     requests:
@@ -371,7 +371,7 @@ ingest:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
   imageTag: v0.2.1
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -395,7 +395,7 @@ intercept:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
   imageTag: v0.2.1
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -417,7 +417,7 @@ mapper:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
   imageTag: v0.2.1
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -439,7 +439,7 @@ s3Inbox:
   name: s3Inbox
   repository: ghcr.io/neicnordic/sda-s3proxy
   imageTag: v0.1.10
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
     requests:
@@ -462,7 +462,7 @@ sftpInbox:
   name: sftpInbox
   repository: neicnordic/sda-inbox-sftp
   imageTag: latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
     requests:
@@ -486,13 +486,13 @@ sftpInbox:
 releasetest:
   repository: neicnordic/sda-helm-tests-support
   imageTag: latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   
 verify:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
   imageTag: v0.2.1
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
