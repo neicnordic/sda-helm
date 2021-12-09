@@ -1,0 +1,194 @@
+{{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "sda.fullname" . }}-download
+  labels:
+    role: download
+    app: {{ template "sda.fullname" . }}-download
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: "{{ .Values.download.name }}"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.download.replicaCount }}
+  revisionHistoryLimit: {{ default "3" .Values.global.revisionHistory }}
+  selector:
+    matchLabels:
+      app: {{ template "sda.fullname" . }}-download
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "sda.fullname" . }}-download
+        role: download
+        release: {{ .Release.Name }}
+      annotations:
+        {{- if not .Values.global.vaultSecrets }}
+        checksum/secret: {{ include (print $.Template.BasePath "/download-secrets.yaml") . | sha256sum }}
+        {{- end }}
+{{- if .Values.global.podAnnotations }}
+{{- toYaml .Values.global.podAnnotations | nindent 8 -}}
+{{- end }}
+{{- if .Values.download.annotations }}
+{{- toYaml .Values.download.annotations | nindent 8 -}}
+{{- end }}
+    spec:
+    {{- if .Values.global.rbacEnabled}}
+      serviceAccountName: {{ .Release.Name }}
+    {{- end }}
+      securityContext:
+        runAsUser: 65534 
+        runAsGroup: 65534
+        fsGroup: 65534
+    {{- if .Values.global.pkiPermissions }}
+      initContainers:
+      - name: tls-init
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args: ["/bin/cp /tls-certs/* /tls/ && chown 65534:65534 /tls/* && chmod 0600 /tls/*"]
+        securityContext:
+          allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /tls-certs
+        - name: tls
+          mountPath: /tls
+    {{- end }}
+      containers:
+      - name: download
+        image: "{{ .Values.download.repository }}:{{ .Values.download.imageTag }}"
+        imagePullPolicy: {{ .Values.download.imagePullPolicy | quote }}
+        securityContext:
+          allowPrivilegeEscalation: false
+        command: ["sda-download"]
+        env:
+        - name: ARCHIVE_TYPE
+          value: "posix"
+        - name: ARCHIVE_LOCATION
+          value: "{{ .Values.global.archive.volumePath }}/"
+        - name: OIDC_CONFIGURATION_URL
+          value: "{{ .Values.global.elixir.oidcdHost }}.well-known/openid-configuration"
+        - name: C4GH_FILEPATH
+          value: {{ template "c4ghPath" . }}/{{ default "c4gh.sec.pem" .Values.global.c4gh.file }}
+      {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
+        - name: DB_CACERT
+          value: {{ include "tlsPath" . }}/ca.crt
+      {{- end }}
+      {{- if eq "verify-full" .Values.global.db.sslMode }}
+        - name: DB_CLIENTCERT
+          value: {{ include "tlsPath" . }}/download.crt
+        - name: DB_CLIENTKEY
+          value: {{ include "tlsPath" . }}/download.key
+      {{- end }}
+        - name: DB_DATABASE
+          value: {{ default "lega" .Values.global.db.name | quote }}
+        - name: DB_HOST
+          value: {{ required "A valid DB host is required" .Values.global.db.host | quote }}
+        - name: DB_PORT
+          value: {{ .Values.global.db.port | quote }}
+        - name: DB_SSLMODE
+          value: {{ .Values.global.db.sslMode | quote }}
+      {{- if .Values.global.logLevel }}
+        - name: LOG_LEVEL
+          value: {{ .Values.global.logLevel | quote }}
+      {{- end }}
+        - name: SESSION_DOMAIN
+          value: {{ .Values.global.ingress.hostName.download | quote}}
+        - name: SESSION_EXPIRATION
+          value: {{ .Values.global.download.sessionExpiration | quote}}
+      {{- if not .Values.global.vaultSecrets }}
+        - name: C4GH_PASSPHRASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-download
+              key: c4ghPassphrase
+        - name: DB_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-download
+                key: dbPassword
+        - name: DB_USER
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-download
+                key: dbUser
+      {{- else }}
+        - name: CONFIGFILE
+          value: {{ include "confFile" . }}
+      {{- end }}
+        ports:
+        - name: download
+          containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            port: download
+            path: /health
+            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.download.useTLS ) }}
+            httpHeaders:
+            - name: Host
+              value: {{ .Values.global.ingress.hostName.download }}
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            port: download
+            path: /health
+            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.download.useTLS ) }}
+            httpHeaders:
+            - name: Host
+              value: {{ .Values.global.ingress.hostName.download }}
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        resources:
+{{ toYaml .Values.download.resources | trim | indent 10 }}
+        volumeMounts:
+       {{- if not .Values.global.vaultSecrets }}
+        - name: c4gh
+          mountPath: {{ template "c4ghPath" . }}
+        {{- end }}
+        {{- if not .Values.global.pkiService }}
+        - name: tls
+          mountPath: {{ template "tlsPath" . }}
+        {{- end }}
+        - name: archive
+          mountPath: {{ .Values.global.archive.volumePath | quote }}
+      volumes:
+      {{- if not .Values.global.pkiService }}
+        - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
+          secret:
+            defaultMode: 0440
+            secretName: {{ template "sda.fullname" . }}-download-certs
+        {{- if .Values.global.pkiPermissions }}
+        - name: tls
+          emptyDir:
+            medium: Memory
+            sizeLimit: 10Mi
+        {{- end }}
+      {{- end }}
+      {{- if not .Values.global.vaultSecrets }}
+        - name: c4gh
+          secret:
+            defaultMode: 0440
+            secretName: {{ template "sda.fullname" . }}-c4gh
+            items:
+            - key: {{ .Values.global.c4gh.file }}
+              path: {{ .Values.global.c4gh.file }}
+      {{- end }}
+      {{- if eq "posix" .Values.global.archive.storageType }}
+        - name: archive
+        {{- if .Values.global.archive.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.archive.existingClaim }}
+        {{- else }}
+          nfs:
+            server: {{ required "An archive NFS server is required" .Values.global.archive.nfsServer | quote }}
+            path: {{ if .Values.global.archive.nfsPath }}{{ .Values.global.archive.nfsPath | quote }}{{ else }}{{ "/" }}{{ end }}
+        {{- end }}
+      {{- end }}
+      restartPolicy: Always
+{{- end }}
