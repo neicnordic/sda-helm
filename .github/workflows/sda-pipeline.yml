@@ -16,7 +16,7 @@ jobs:
     - name: fixup env
       run: |
         if [ "${{ matrix.test }}" = "sftp-inbox" ]; then
-          echo "SVCS=backup doa finalize inbox ingest intercept mapper verify" >> "$GITHUB_ENV";
+          echo "SVCS=backup doa download finalize inbox ingest intercept mapper verify" >> "$GITHUB_ENV";
         else
           echo "SVCS=auth backup doa finalize inbox ingest mapper verify" >> "$GITHUB_ENV";
         fi

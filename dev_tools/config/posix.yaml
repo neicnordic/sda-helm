@@ -37,6 +37,8 @@ global:
     existingClaim: inbox-volume
   ingress:
     deploy: false
+    hostName:
+      download: sda-sda-svc-download
   logLevel: debug
   tls:
     enabled: true
