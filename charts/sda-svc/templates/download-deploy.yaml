@@ -1,3 +1,4 @@
+{{- if eq "posix" .Values.global.archive.storageType }}
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 apiVersion: apps/v1
 kind: Deployment
@@ -97,9 +98,9 @@ spec:
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
         - name: SESSION_DOMAIN
-          value: {{ .Values.global.ingress.hostName.download | quote}}
+          value: {{ .Values.global.ingress.hostName.download | quote }}
         - name: SESSION_EXPIRATION
-          value: {{ .Values.global.download.sessionExpiration | quote}}
+          value: {{ .Values.global.download.sessionExpiration | quote }}
       {{- if not .Values.global.vaultSecrets }}
         - name: C4GH_PASSPHRASE
           valueFrom:
@@ -191,4 +192,5 @@ spec:
         {{- end }}
       {{- end }}
       restartPolicy: Always
+{{- end }}
 {{- end }}
