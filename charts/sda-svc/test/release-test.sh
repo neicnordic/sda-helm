@@ -30,6 +30,19 @@ if [ "${DEPLOYMENT_TYPE}" = all -o "${DEPLOYMENT_TYPE}" = external ]; then
 
     echo "DOA seems okay"
 
+
+    if [ "${ARCHIVE_STORAGE_TYPE}" = posix ]; then
+      python3 /release-test-app/verify-download.py
+    fi
+
+    if [ "$?" -ne 0 ]; then
+	echo "Failed download verification, bailing out"
+	exit 1
+    fi
+
+    echo "Download seems okay"
+
+
 fi
 
 if [ "${DEPLOYMENT_TYPE}" = external ] ; then
@@ -266,4 +279,3 @@ EOF
 fi
 
 exit 0
-

@@ -34,6 +34,9 @@ global:
     path: "/inbox"
     user: "lega"
     existingClaim: inbox-volume
+  ingress:
+    hostName:
+      download: sda-sda-svc-download
   logLevel: debug
 backup:
   deploy: true
