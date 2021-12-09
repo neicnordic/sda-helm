@@ -27,7 +27,7 @@ data:
   {{- ( .Files.Glob ( "test/{verify-inboxes.py,trigger-ingest.py,accession.py}" )).AsConfig | nindent 2 }}
   {{- ( .Files.Glob ( "test/release-test.sh" )).AsConfig | nindent 2 }}
 {{- if .Values.global.tls }}
-  {{- ( .Files.Glob ( "test/{verify-doa.py}" )).AsConfig | nindent 2 }}
+  {{- ( .Files.Glob ( "test/{verify-doa.py,verify-download.py}" )).AsConfig | nindent 2 }}
 {{- end }}
 ---
 
@@ -89,7 +89,9 @@ spec:
         - name: INBOX_SERVICE_NAME
           value: "{{ template "sda.fullname" . }}-inbox"
         - name: DOA_SERVICE_NAME
-          value: "{{ template "sda.fullname" . }}-doa"
+          value: "{{ template "sda.fullname" . }}-doa" 
+        - name: DOWNLOAD_SERVICE_NAME
+          value: "{{ template "sda.fullname" . }}-download"
         - name: INBOX_STORAGE_TYPE
           value: {{ required "Missing storage type for inbox" .Values.global.inbox.storageType | quote }}
       {{- if eq "s3" .Values.global.inbox.storageType }}
@@ -243,6 +245,8 @@ spec:
                     path: verify-inboxes.py
                   - key: verify-doa.py
                     path: verify-doa.py
+                  - key: verify-download.py
+                    path: verify-download.py
                   - key: release-test.sh
                     path: release-test.sh
             - secret:
