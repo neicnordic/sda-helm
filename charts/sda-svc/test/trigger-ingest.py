@@ -3,12 +3,9 @@
 
 """Tests the installed release"""
 
-import sys
-import json
 import argparse
 import os
 import ssl
-import sys
 import urllib.parse
 from pathlib import Path
 
