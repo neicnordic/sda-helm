@@ -3,7 +3,7 @@ name: sda standalone deployment
 on: [push,pull_request]
 
 env:
-  svc_list: 'auth backup doa finalize inbox ingest mapper verify'
+  svc_list: 'auth backup doa download finalize inbox ingest mapper verify'
 
 jobs:
   build:

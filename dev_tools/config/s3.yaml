@@ -60,6 +60,7 @@ global:
     deploy: false
     hostName:
       auth: sda-sda-svc-auth
+      download: sda-sda-svc-download
   logLevel: debug
   tls:
     enabled: true
