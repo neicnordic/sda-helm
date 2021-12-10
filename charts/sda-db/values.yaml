@@ -62,7 +62,8 @@ persistence:
 # if a port other than the default 5432 is used in the pod set the value here.
 # port: 5432
 
-# if a admin user is during the first setup, set the password below
+# if an admin user is to be created during the first setup, set the password below
+# This can only be done during the first setup
 # postgresAdminPassword:
 
 # RBAC is assumed to be enabled in the cluster
