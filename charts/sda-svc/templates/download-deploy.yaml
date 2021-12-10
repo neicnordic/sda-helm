@@ -1,4 +1,3 @@
-{{- if eq "posix" .Values.global.archive.storageType }}
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 apiVersion: apps/v1
 kind: Deployment
@@ -68,11 +67,27 @@ spec:
         command: ["sda-download"]
         env:
         - name: ARCHIVE_TYPE
+        {{- if eq "s3" .Values.global.archive.storageType }}
+          value: "s3"
+        - name: ARCHIVE_URL
+          value: {{ required "S3 archive URL missing" .Values.global.archive.s3Url }}
+        - name: ARCHIVE_BUCKET
+          value: {{ required "S3 archive bucket missing" .Values.global.archive.s3Bucket }}
+        - name: ARCHIVE_REGION
+          value: {{ default "us-east-1" .Values.global.archive.s3Region }}
+        - name: ARCHIVE_CHUNKSIZE
+          value: {{ .Values.global.archive.s3ChunkSize | quote }}
+        {{- if .Values.global.archive.s3CaFile }}
+        - name: ARCHIVE_CACERT
+          value: {{ template "tlsPath" . }}/{{ .Values.global.archive.s3CaFile }}
+        {{- end }}
+      {{- else }}
           value: "posix"
         - name: ARCHIVE_LOCATION
-          value: "{{ .Values.global.archive.volumePath }}/"
+          value: "{{ .Values.global.archive.volumePath }}"
+      {{- end }}
         - name: OIDC_CONFIGURATION_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}.well-known/openid-configuration"
+          value: "{{ .Values.global.elixir.oidcdHost }}/.well-known/openid-configuration"
         - name: C4GH_FILEPATH
           value: {{ template "c4ghPath" . }}/{{ default "c4gh.sec.pem" .Values.global.c4gh.file }}
       {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
@@ -102,6 +117,18 @@ spec:
         - name: SESSION_EXPIRATION
           value: {{ .Values.global.download.sessionExpiration | quote }}
       {{- if not .Values.global.vaultSecrets }}
+        {{- if eq "s3" .Values.global.archive.storageType }}
+        - name: ARCHIVE_ACCESSKEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-s3archive-keys
+              key: s3ArchiveAccessKey
+        - name: ARCHIVE_SECRETKEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-s3archive-keys
+              key: s3ArchiveSecretKey
+        {{- end }}
         - name: C4GH_PASSPHRASE
           valueFrom:
             secretKeyRef:
@@ -156,8 +183,10 @@ spec:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
         {{- end }}
+        {{- if eq "posix" .Values.global.archive.storageType }}
         - name: archive
           mountPath: {{ .Values.global.archive.volumePath | quote }}
+        {{- end }}
       volumes:
       {{- if not .Values.global.pkiService }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
@@ -192,5 +221,4 @@ spec:
         {{- end }}
       {{- end }}
       restartPolicy: Always
-{{- end }}
 {{- end }}
