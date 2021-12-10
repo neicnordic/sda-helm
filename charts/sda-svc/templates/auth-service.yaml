@@ -9,7 +9,7 @@ metadata:
 spec:
   ports:
   - name: auth
-    port: {{ ternary 80 443 ( .Values.global.noTLS ) }}
+    port: {{ ternary 443 80 ( .Values.global.tls.enabled ) }}
     targetPort: auth
     protocol: TCP
   selector:

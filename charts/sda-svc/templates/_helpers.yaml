@@ -248,7 +248,7 @@ Create chart name and version as used by the chart label.
 {{/**/}}
 
 {{- define "dbSSLmode" -}}
-{{- if not .Values.global.noTLS }}
+{{- if .Values.global.tls.enabled }}
   {{- printf "%s" .Values.global.db.sslMode }}
 {{- else }}
   {{- print "disable" -}}
@@ -256,17 +256,17 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "authRedirect" -}}
-{{- if .Values.global.noTLS }}
-  {{- printf "http://%s/elixir/login" .Values.global.ingress.hostName.auth }}
-{{- else }}
+{{- if .Values.global.tls.enabled }}
   {{- printf "https://%s/elixir/login" .Values.global.ingress.hostName.auth }}
+{{- else }}
+  {{- printf "http://%s/elixir/login" .Values.global.ingress.hostName.auth }}
 {{- end -}}
 {{- end -}}
 
 {{- define "inboxServicePort" -}}
-  {{- if .Values.global.noTLS }}
-    {{- printf "%d" (ternary 2222 80 ( empty .Values.global.inbox.s3Url )) }}
-  {{- else }}
+  {{- if .Values.global.tls.enabled }}
     {{- printf "%d" (ternary 2222 443 ( empty .Values.global.inbox.s3Url )) }}
+  {{- else }}
+    {{- printf "%d" (ternary 2222 80 ( empty .Values.global.inbox.s3Url )) }}
   {{- end -}}
 {{- end -}}

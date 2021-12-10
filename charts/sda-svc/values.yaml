@@ -93,7 +93,8 @@ global:
 # If no dependency services uses TLS, postgreSQL, RabbitMQ, S3
 # TLS can be globally disabled for all serives by setting this to true
 # No to be used in production but handy for testing.
-  noTLS: false
+  tls:
+    enabled: true
 
 # If an external secrets management service is used set this to true
   vaultSecrets: false

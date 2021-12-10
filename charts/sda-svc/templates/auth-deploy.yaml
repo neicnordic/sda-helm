@@ -97,7 +97,7 @@ spec:
         - name: CEGA_JWTSIGNATUREALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
         {{- end }}
-        {{- if not .Values.global.noTLS}}
+        {{- if .Values.global.tls.enabled}}
         - name: SERVER_CERT
           value: {{ template "tlsPath" . }}/{{.Values.auth.tls.certFile }}
         - name: SERVER_KEY
@@ -113,7 +113,7 @@ spec:
           httpGet:
             port: auth
             path: /
-            scheme: {{ ternary "HTTP" "HTTPS" ( .Values.global.noTLS ) }}
+            scheme: {{ ternary "HTTPS" "HTTP" ( .Values.global.tls.enabled ) }}
             httpHeaders:
             - name: Host
               value: {{ .Values.global.ingress.hostName.auth }}
@@ -123,7 +123,7 @@ spec:
           httpGet:
             port: auth
             path: /
-            scheme: {{ ternary "HTTP" "HTTPS" ( .Values.global.noTLS) }}
+            scheme: {{ ternary "HTTPS" "HTTP" ( .Values.global.tls.enabled) }}
             httpHeaders:
             - name: Host
               value: {{ .Values.global.ingress.hostName.auth }}
@@ -132,7 +132,7 @@ spec:
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
         volumeMounts:
-      {{- if and .Values.global.pkiPermissions (not .Values.global.noTLS) }}
+      {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
         - name: tls
           mountPath: {{ include "tlsPath" . }}
       {{- end }}
@@ -152,7 +152,7 @@ spec:
                   - key: {{ .Values.global.auth.jwtKey }}
                     path: {{ .Values.global.auth.jwtKey }}
       {{- end }}
-      {{- if and .Values.global.pkiPermissions (not .Values.global.noTLS) }}
+      {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
         - name: tls
           secret:
             defaultMode: 0440

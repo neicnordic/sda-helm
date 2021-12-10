@@ -41,7 +41,7 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
-    {{- if and .Values.global.pkiPermissions (not .Values.global.noTLS) }}
+    {{- if and .Values.global.pkiPermissions  .Values.global.tls.enabled }}
       initContainers:
       - name: tls-init
         image: busybox
@@ -82,7 +82,7 @@ spec:
           value: {{ .Values.global.broker.vhost | quote }}
         - name: BROKER_SERVERNAME
           value: {{ .Values.global.broker.host | quote }}
-      {{- if and .Values.global.broker.ssl (not .Values.global.noTLS ) }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_SSL
           value: "true"
         - name: BROKER_VERIFYPEER
@@ -99,7 +99,7 @@ spec:
         - name: BROKER_SSL
           value: "false"
       {{- end }}
-      {{- if not .Values.global.noTLS }}
+      {{- if .Values.global.tls.enabled }}
       {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
           value: {{ template "tlsPath" . }}/{{ .Values.mapper.tls.caCert }}
@@ -152,7 +152,7 @@ spec:
       {{- end }}
         resources:
 {{ toYaml .Values.mapper.resources | trim | indent 10 }}
-  {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
+  {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         volumeMounts:
         - name: tls
           mountPath: {{ template "tlsPath" . }}

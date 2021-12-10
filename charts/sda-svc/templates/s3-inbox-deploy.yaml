@@ -77,7 +77,7 @@ spec:
       {{- end }}
         - name: AWS_URL
           value: {{ .Values.global.inbox.s3Url | quote }}
-      {{- if .Values.global.inbox.s3CaFile }}
+      {{- if and .Values.global.inbox.s3CaFile .Values.global.tls.enabled }}
         - name: AWS_CACERT
           value: "{{ include "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}"
       {{- end }}
@@ -101,7 +101,7 @@ spec:
           value: {{ .Values.global.broker.exchange | quote }}
         - name: BROKER_ROUTINGKEY
           value: "inbox"
-      {{- if and .Values.global.broker.ssl (not .Values.global.noTLS ) }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_SSL
           value: "true"
         - name: BROKER_VERIFYPEER
@@ -118,7 +118,7 @@ spec:
         - name: BROKER_SSL
           value: "false"
       {{- end }}
-      {{- if not .Values.global.noTLS }}
+      {{- if .Values.global.tls.enabled }}
         - name: SERVER_CERT
           value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.certFile }}
         - name: SERVER_KEY
@@ -156,7 +156,7 @@ spec:
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
         volumeMounts:
-      {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           mountPath: {{ include "tlsPath" . }}
       {{- end }}
@@ -165,7 +165,7 @@ spec:
           mountPath: {{ include "jwtPath" . }}
       {{- end }}
       volumes:
-      {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           secret:
             defaultMode: 0440

@@ -42,7 +42,7 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
-  {{- if and .Values.global.pkiPermissions (not .Values.global.noTLS) }}
+  {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
       initContainers:
       - name: tls-init
         image: busybox
@@ -78,7 +78,7 @@ spec:
           value: {{ default "us-east-1" .Values.global.archive.s3Region }}
         - name: ARCHIVE_CHUNKSIZE
           value: {{ .Values.global.archive.s3ChunkSize | quote }}
-    {{- if .Values.global.archive.s3CaFile }}
+    {{- if and .Values.global.archive.s3CaFile .Values.global.tls.enabled }}
         - name: ARCHIVE_CACERT
           value: {{ template "tlsPath" . }}/{{ .Values.global.archive.s3CaFile }}
     {{- end }}
@@ -98,7 +98,7 @@ spec:
           value: {{ default "us-east-1" .Values.global.backupArchive.s3Region }}
         - name: BACKUP_CHUNKSIZE
           value: {{ .Values.global.backupArchive.s3ChunkSize | quote }}
-    {{- if .Values.global.backupArchive.s3CaFile }}
+    {{- if and .Values.global.backupArchive.s3CaFile .Values.global.tls.enabled }}
         - name: BACKUP_CACERT
           value: {{ template "tlsPath" . }}/{{ .Values.global.backupArchive.s3CaFile }}
     {{- end }}
@@ -125,7 +125,7 @@ spec:
           value: {{ .Values.global.broker.vhost | quote }}
         - name: BROKER_SERVERNAME
           value: {{ .Values.global.broker.host | quote }}
-  {{- if and .Values.global.broker.ssl (not .Values.global.noTLS ) }}
+  {{- if and .Values.global.broker.ssl  .Values.global.tls.enabled }}
         - name: BROKER_SSL
           value: "true"
         - name: BROKER_VERIFYPEER
@@ -142,7 +142,7 @@ spec:
         - name: BROKER_SSL
           value: "false"
   {{- end }}
-  {{- if not .Values.global.noTLS }}
+  {{- if .Values.global.tls.enabled }}
     {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
           value: {{ include "tlsPath" . }}/{{ .Values.backup.tls.caCert }}
@@ -228,12 +228,12 @@ spec:
         - name: backup
           mountPath: {{ .Values.global.backupArchive.volumePath | quote }}
   {{- end }}
-  {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
+  {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           mountPath: {{ template "tlsPath" . }}
   {{- end }}
       volumes:
-  {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
+  {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440

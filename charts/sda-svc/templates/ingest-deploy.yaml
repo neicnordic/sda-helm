@@ -42,7 +42,7 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
-    {{- if and .Values.global.pkiPermissions (not .Values.global.noTLS) }}
+    {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
       initContainers:
       - name: tls-init
         image: busybox
@@ -78,7 +78,7 @@ spec:
           value: {{ default "us-east-1" .Values.global.archive.s3Region }}
         - name: ARCHIVE_CHUNKSIZE
           value: {{ .Values.global.archive.s3ChunkSize | quote }}
-      {{- if .Values.global.archive.s3CaFile }}
+      {{- if and .Values.global.archive.s3CaFile .Values.global.tls.enabled }}
         - name: ARCHIVE_CACERT
           value: {{ template "tlsPath" . }}/{{ .Values.global.archive.s3CaFile }}
       {{- end }}
@@ -87,7 +87,7 @@ spec:
         - name: ARCHIVE_LOCATION
           value: "{{ .Values.global.archive.volumePath }}/"
       {{- end }}
-      {{- if and .Values.global.broker.ssl (not .Values.global.noTLS ) }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_CACERT
           value: {{ template "tlsPath" . }}/{{ .Values.ingest.tls.caCert }}
         {{- if .Values.global.broker.verifyPeer }}
@@ -124,7 +124,7 @@ spec:
           value: {{ .Values.global.broker.host | quote }}
         - name: C4GH_FILEPATH
           value: {{ template "c4ghPath" . }}/{{ .Values.global.c4gh.keyFile }}
-      {{- if not .Values.global.noTLS }}
+      {{- if .Values.global.tls.enabled }}
       {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
           value: {{ template "tlsPath" . }}/{{ .Values.ingest.tls.caCert }}
@@ -149,7 +149,7 @@ spec:
           value: "s3"
         - name: INBOX_BUCKET
           value: {{ required "S3 inbox bucket missing" .Values.global.inbox.s3Bucket }}
-      {{- if .Values.global.inbox.s3CaFile }}
+      {{- if and .Values.global.inbox.s3CaFile .Values.global.tls.enabled }}
         - name: INBOX_CACERT
           value: {{ template "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}
       {{- end }}
@@ -227,7 +227,7 @@ spec:
         - name: c4gh
           mountPath: {{ template "c4ghPath" . }}
       {{- end }}
-      {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           mountPath: "{{ template "tlsPath" . }}"
       {{- end }}
@@ -249,7 +249,7 @@ spec:
             - key: {{ .Values.global.c4gh.keyFile }}
               path: {{ .Values.global.c4gh.keyFile }}
       {{- end }}
-    {{- if and (not .Values.global.pkiService) (not .Values.global.noTLS )}}
+    {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440

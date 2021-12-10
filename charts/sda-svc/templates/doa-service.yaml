@@ -1,5 +1,5 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
-{{- if not .Values.global.noTLS }}
+{{- if .Values.global.tls.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
