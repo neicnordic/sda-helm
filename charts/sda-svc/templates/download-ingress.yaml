@@ -1,4 +1,3 @@
-{{- if eq "posix" .Values.global.archive.storageType }}
 {{- if (or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType)) (not .Values.global.deploymentType)) }}
 {{- if .Values.global.ingress.deploy }}
 apiVersion: networking.k8s.io/v1
@@ -36,6 +35,5 @@ spec:
   - hosts:
     - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.download }}
     secretName: {{ if .Values.global.ingress.secretNames.download }}{{ .Values.global.ingress.secretNames.download }}{{- else }}"{{ template "sda.fullname" . }}-ingress-download"{{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
