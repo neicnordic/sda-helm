@@ -1,5 +1,20 @@
 ---
-{{- if .Values.global.c4gh.publicFile  -}}
+{{- if and .Values.releasetest.run .Values.global.c4gh.publicFile -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "{{ .Release.Name }}-release-test-passwords"
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
+type: Opaque
+data:
+  mqPassword: {{ include "mqPassReleaseTest" . | b64enc }}
+  mqUser: {{ include "mqUserReleaseTest" . | b64enc }}
+  dbPassword: {{ include "dbPassReleaseTest" . | b64enc }}
+  dbUser: {{ include "dbUserReleaseTest" . | b64enc }}
+
+---
 
 apiVersion: v1
 kind: ConfigMap
@@ -12,7 +27,6 @@ data:
   {{- ( .Files.Glob ( "test/{trigger-ingest.py,accession.py}" )).AsConfig | nindent 2 }}
   {{- ( .Files.Glob ( "test/{verify-inboxes.py,verify-doa.py}" )).AsConfig | nindent 2 }}
   {{- ( .Files.Glob ( "test/release-test.sh" )).AsConfig | nindent 2 }}
-  {{- ( .Files.Glob ( printf "files/%s" .Values.global.c4gh.publicFile )).AsConfig | nindent 2 }}
 
 ---
 
@@ -138,7 +152,7 @@ spec:
         - name: DB_PORT
           value: {{ .Values.global.db.port | quote }}
         - name: DB_SSLMODE
-          value: {{ .Values.global.db.sslMode | quote }}
+          value: {{ template "dbSSLmode" .}}
         {{- if eq "s3" .Values.global.inbox.storageType }}
         {{- end }}
         - name: MQ_HOST
@@ -174,21 +188,12 @@ spec:
       command: [ "/bin/bash" ]
       args:
         - "/release-test-app/release-test.sh"
-  volumes:  
+  volumes:
     {{- if not .Values.global.pkiService }}
       - name: certs
-        projected:
-          sources:
-          - secret:
-              name: "{{ .Release.Name }}-release-test-certs"
-              items:
-              - key: tester.key
-                path: tester.key
-              - key: tester.crt
-                path: tester.crt
-              - key: ca.crt
-                path: ca.crt
+        secret:
     {{- end }}
+          secretName: {{ .Values.releasetest.tls.secretName }}
     {{- if eq .Values.global.inbox.storageType "posix" }}
       - name: "inbox-release-test"
     {{- if .Values.global.inbox.existingClaim }}
@@ -227,7 +232,10 @@ spec:
                     path: verify-doa.py
                   - key: release-test.sh
                     path: release-test.sh
-                  - key: {{ .Values.global.c4gh.publicFile | quote }}
+            - secret:
+                name: {{ .Values.global.c4gh.secretName}}
+                items:
+                  - key: {{ .Values.global.c4gh.publicFile }}
                     path: c4gh.pub
   restartPolicy: Never
 

@@ -484,10 +484,13 @@ sftpInbox:
     caCert: ""
 
 releasetest:
+  run: false
   repository: neicnordic/sda-helm-tests-support
   imageTag: latest
   imagePullPolicy: IfNotPresent
-  
+  tls:
+    secretName: ""
+
 verify:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline

@@ -116,3 +116,7 @@ verify:
     certFile: verify.crt
     keyFile: verify.key
     caCert: ca.crt
+releasetest:
+  run: true
+  tls:
+    secretName: "tester-certs"
