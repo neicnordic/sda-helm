@@ -35,3 +35,6 @@ expect eof
 EOD
 
 kubectl create secret generic c4gh --from-file=c4gh.key --from-file=c4gh.pub --from-literal=passphrase="${G4GH}"
+
+# secret for the OIDC keypair
+kubectl create secret generic oidc --from-file=sda-deploy-init/config/certs/token.key --from-file=sda-deploy-init/config/certs/token.pub

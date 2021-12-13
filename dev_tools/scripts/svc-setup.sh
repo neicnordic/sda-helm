@@ -33,9 +33,6 @@ for m in doa inbox
   --from-file="${basedir}"/certs/cacerts
 done
 
-# secret for the OIDC keypair
-kubectl create secret generic oidc --from-file="${basedir}"/certs/token.key --from-file="${basedir}"/certs/token.pub
-
 # secret for the release testers certificates
 kubectl create secret generic tester-certs \
 --from-file="${basedir}"/certs/tester.key \
