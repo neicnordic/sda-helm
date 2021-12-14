@@ -8,7 +8,7 @@ import urllib.request
 
 backendtype = os.environ.get('INBOX_STORAGE_TYPE','s3')
 backendhost = os.environ.get('INBOX_SERVICE_NAME','localhost')
-
+tls = os.environ.get('TLS','true')
 
 if backendtype == 'posix':
     # Connect and see that we get a ssh greeting
@@ -23,18 +23,29 @@ if backendtype == 'posix':
     sys.exit(0)
     
 if backendtype == 's3':
-    print("Will try connecting to https://%s/" % backendhost)
+    if tls == 'true':
+        print(f"Will try connecting to https://%s/" % backendhost)
+        try:
+            r = urllib.request.urlopen('https://%s/' % backendhost,
+                                    context=ssl._create_unverified_context())
 
-    try:
-        r = urllib.request.urlopen('https://%s/' % backendhost,
-                                context=ssl._create_unverified_context())
-
-        sys.exit(0)
-    except urllib.error.HTTPError as e:
-        if e.code == 403:
-            # 403 is okay here
             sys.exit(0)
-        print("Unexpected error talking to doa: \n\n%s" % e)
+        except urllib.error.HTTPError as e:
+            if e.code == 403:
+                # 403 is okay here
+                sys.exit(0)
+        print("Unexpected error talking to inbox: \n\n%s" % e)
+    else:
+        print(f"Will try connecting to http://%s/" % backendhost)
+        try:
+            r = urllib.request.urlopen('http://%s/' % backendhost)
+
+            sys.exit(0)
+        except urllib.error.HTTPError as e:
+            if e.code == 403:
+                # 403 is okay here
+                sys.exit(0)
+        print("Unexpected error talking to inbox: \n\n%s" % e)
 
 sys.exit(1)
 

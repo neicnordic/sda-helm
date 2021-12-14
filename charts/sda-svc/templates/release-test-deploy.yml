@@ -24,10 +24,11 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
 data:
-  {{- ( .Files.Glob ( "test/{trigger-ingest.py,accession.py}" )).AsConfig | nindent 2 }}
-  {{- ( .Files.Glob ( "test/{verify-inboxes.py,verify-doa.py}" )).AsConfig | nindent 2 }}
+  {{- ( .Files.Glob ( "test/{verify-inboxes.py,trigger-ingest.py,accession.py}" )).AsConfig | nindent 2 }}
   {{- ( .Files.Glob ( "test/release-test.sh" )).AsConfig | nindent 2 }}
-
+{{- if .Values.global.tls }}
+  {{- ( .Files.Glob ( "test/{verify-doa.py}" )).AsConfig | nindent 2 }}
+{{- end }}
 ---
 
 apiVersion: v1
@@ -53,7 +54,7 @@ spec:
       image:  "{{ .Values.releasetest.repository }}:{{ .Values.releasetest.imageTag }}"
       imagePullPolicy: {{ .Values.releasetest.imagePullPolicy | quote }}
       volumeMounts:
-      {{- if not .Values.global.pkiService }}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: certs
           mountPath: {{ template "tlsPath" .  }}
       {{- end }}
@@ -68,6 +69,8 @@ spec:
           mountPath: "/posix_archive"
       {{- end }}
       env:
+        - name: TLS
+          value: {{ .Values.global.tls.enabled | quote}}
       {{- if .Values.global.pkiService }}
         - name: PKI_PATH
           value: {{include "secretsPath" }}
@@ -99,7 +102,7 @@ spec:
         - name: INBOX_REGION
           value: {{ default "us-east-1" .Values.global.inbox.s3Region }}
         - name: INBOX_URL
-          value: {{ required "S3 inbox URL missing" .Values.global.inbox.s3Url }}
+          value: {{ template "S3InboxURL" . }}
         - name: INBOX_ACCESSKEY
           valueFrom:
             secretKeyRef:
@@ -123,7 +126,7 @@ spec:
         - name: ARCHIVE_REGION
           value: {{ default "us-east-1" .Values.global.archive.s3Region }}
         - name: ARCHIVE_URL
-          value: {{ required "S3 inbox URL missing" .Values.global.archive.s3Url }}
+          value: {{ template "S3ArchiveURL" . }}
         - name: ARCHIVE_ACCESSKEY
           valueFrom:
             secretKeyRef:
@@ -153,8 +156,6 @@ spec:
           value: {{ .Values.global.db.port | quote }}
         - name: DB_SSLMODE
           value: {{ template "dbSSLmode" .}}
-        {{- if eq "s3" .Values.global.inbox.storageType }}
-        {{- end }}
         - name: MQ_HOST
           value: {{ required "Broker host must be set" .Values.global.broker.host | quote }}
         - name: MQ_EXCHANGE
@@ -189,11 +190,11 @@ spec:
       args:
         - "/release-test-app/release-test.sh"
   volumes:
-    {{- if not .Values.global.pkiService }}
+    {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
       - name: certs
         secret:
-    {{- end }}
           secretName: {{ .Values.releasetest.tls.secretName }}
+    {{- end }}
     {{- if eq .Values.global.inbox.storageType "posix" }}
       - name: "inbox-release-test"
     {{- if .Values.global.inbox.existingClaim }}
