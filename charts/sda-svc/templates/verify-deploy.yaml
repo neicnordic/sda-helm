@@ -72,6 +72,10 @@ spec:
           value: "s3"
         - name: ARCHIVE_URL
           value: {{ required "S3 archive URL missing" .Values.global.archive.s3Url }}
+      {{- if .Values.global.archive.s3Port }}
+        - name: ARCHIVE_PORT
+          value: {{ .Values.global.archive.s3Port | quote }}
+      {{- end }}
         - name: ARCHIVE_BUCKET
           value: {{ required "S3 archive bucket missing" .Values.global.archive.s3Bucket }}
         - name: ARCHIVE_REGION

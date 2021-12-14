@@ -76,7 +76,7 @@ spec:
           value: {{ include "confFile" .}}
       {{- end }}
         - name: AWS_URL
-          value: {{ .Values.global.inbox.s3Url | quote }}
+          value: {{ template "S3InboxURL" . }}
       {{- if and .Values.global.inbox.s3CaFile .Values.global.tls.enabled }}
         - name: AWS_CACERT
           value: "{{ include "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}"
