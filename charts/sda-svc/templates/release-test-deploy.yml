@@ -77,9 +77,9 @@ spec:
       {{- end }}
         - name: DEPLOYMENT_TOPOLOGY
       {{- if .Values.intercept.deploy }}
-          value: "standalone"
-      {{- else }}
           value: "federated"
+      {{- else }}
+          value: "standalone"
       {{- end }}
         - name: DEPLOYMENT_TYPE
           value: "{{ .Values.global.deploymentType }}"

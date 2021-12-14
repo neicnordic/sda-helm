@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ "${DEPLOYMENT_TOPOLOGY}" = "standalone" ]; then
-  ingest_routing_key="files";
-  accession_routing_key="files";
+if [ "${DEPLOYMENT_TOPOLOGY}" = "federated" ]; then
+  ingest_routing_key="files"
+  accession_routing_key="files"
 else
-  ingest_routing_key="ingest";
-  accession_routing_key="accessionIDs";
+  ingest_routing_key="ingest"
+  accession_routing_key="accessionIDs"
 fi
 
 export MQ_EXCHANGE=''
