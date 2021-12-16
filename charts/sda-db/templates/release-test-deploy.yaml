@@ -29,8 +29,8 @@ spec:
     - name: {{ .Release.Name }}-test
       image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
       imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+      {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
       volumeMounts:
-      {{- if not .Values.externalPkiService.tlsPath }}
         - name: certs
           mountPath: /certs
       {{- end }}
@@ -38,6 +38,12 @@ spec:
         {{- if .Values.externalPkiService.tlsPath }}
         - name: PKI_VOLUME_PATH
           value: {{.Values.externalPkiService.tlsPath }}
+        {{- end }}
+        {{- if .Values.global.tls.enabled }}
+        - name: PGSSLMODE
+          value: {{ .Values.global.tls.verifyPeer }}
+        - name: PGSSL
+          value: ".postgresql"
         {{- end }}
         - name: DB_HOST
           value: "{{ template "dbfullname" . }}"
@@ -49,12 +55,13 @@ spec:
       command: [ "/bin/bash" ]
       args:
         - "-c"
+        {{- if .Values.global.tls.enabled }}
         - 'cd $HOME;
            mkdir -p $PGSSL;
            s=${PKI_VOLUME_PATH:-/certs};
-           cp "$s/tester.key" $PGSSL/postgresql.key;
-           cp "$s/tester.crt" $PGSSL/postgresql.crt;
-           cp "$s/ca.crt" $PGSSL/root.crt;
+           cp "$s/{{ .Values.global.tls.certName }}" $PGSSL/postgresql.crt;
+           cp "$s/{{ .Values.global.tls.keyName }}" $PGSSL/postgresql.key;
+           cp "$s/{{ .Values.global.tls.CAFile }}" $PGSSL/root.crt;
            chmod -R og-rw $PGSSL;
            count=1;
            until (psql -h ${DB_HOST} -U lega_in lega -c "select * from local_ega.dbschema_version" || [ "$count" -ge 10 ]); do 
@@ -62,20 +69,19 @@ spec:
              count=$((count+1));
            done |
            grep -F "Created with version"'
+        {{- else }}
+        - 'count=1;
+           until (psql -h ${DB_HOST} -U lega_in lega -c "select * from local_ega.dbschema_version" || [ "$count" -ge 10 ]); do 
+             sleep 10;
+             count=$((count+1));
+           done |
+           grep -F "Created with version"'
+        {{- end }}
+    {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
   volumes:
-    {{- if not .Values.externalPkiService.tlsPath }}
       - name: certs
-        projected:
-          sources:
-          - secret:
-              name: "{{ .Release.Name }}-test-certs"
-              items:
-              - key: tester.key
-                path: tester.key
-              - key: tester.crt
-                path: tester.crt
-              - key: ca.crt
-                path: ca.crt
+        secret:
+          secretName: {{ .Values.global.tls.secretName }}
     {{- end }}
   restartPolicy: Never
 

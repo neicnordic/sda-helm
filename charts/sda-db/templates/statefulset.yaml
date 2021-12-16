@@ -37,7 +37,7 @@ spec:
       securityContext:
         runAsUser: 70
         fsGroup: 70
-    {{- if or .Values.persistence.volumePermissions }}
+    {{- if or .Values.persistence.volumePermissions (and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath)) }}
       initContainers:
       - name: init-data-chmod
         image: busybox
@@ -50,13 +50,20 @@ spec:
             chmod 700 /psql/data
             find /psql -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs chown -R 70:70
             {{- end }}
+            {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
+            mkdir -p /psql/tls
+            cp /tls/* /psql/tls
+            chmod 600 /psql/tls/*
+            {{- end }}
         securityContext:
           allowPrivilegeEscalation: false
         volumeMounts:
-        {{- if and  .Values.persistence.volumePermissions .Values.persistence.enabled }}
         - name: data
           mountPath: /psql
-        {{- end }}
+      {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
+        - name: certs
+          mountPath: /tls
+      {{- end }}
     {{- end }}
       containers:
       - name: postgresql
@@ -80,20 +87,28 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}
                 key: pgOutPasswd
+      {{- if .Values.postgresAdminPassword }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: {{ template "sda.fullname" . }}
+                key: postgresPassword
+      {{- end }}
+      {{- if .Values.global.tls.enabled }}
         - name: PG_SERVER_CERT
-          value: {{ .Values.persistence.mountPath }}/tls/pg.crt
+          value: {{ template "pgCert" . }}
         - name: PG_SERVER_KEY
-          value: {{ .Values.persistence.mountPath }}/tls/pg.key
-        {{- if .Values.global.verifyPeer }}
+          value: {{ template "pgKey" . }}
+        {{- if ne "verify-none" .Values.global.tls.verifyPeer }}
         - name: PG_CA
-          value: {{ .Values.persistence.mountPath }}/tls/ca.crt
+          value: {{ template "caCert" . }}
         - name: PG_VERIFY_PEER
-          value: {{ ternary 1 0 (.Values.global.verifyPeer) | quote }}
+          value: {{ .Values.global.tls.verifyPeer }}
         {{- end }}
-        {{- if .Values.externalPkiService.tlsPath }}
-        - name: PKI_VOLUME_PATH
-          value: {{.Values.externalPkiService.tlsPath }}
-        {{- end }}
+      {{- else }}
+        - name: NOTLS
+          value: "true"
+      {{- end }}
         ports:
         - containerPort: 5432
           name: postgres
@@ -121,27 +136,11 @@ spec:
         volumeMounts:
         - name: data
           mountPath: {{ .Values.persistence.mountPath }}
-      {{- if not .Values.externalPkiService.tlsPath }}
-        - name: tls-certs
-          mountPath: {{ .Values.persistence.mountPath }}/tls
-      {{- end }}
       volumes:
-    {{- if not .Values.externalPkiService.tlsPath }}
-      - name: tls-certs
-        projected:
-          defaultMode: 0440
-          sources:
-          - secret:
-              name: {{ template "sda.fullname" . }}
-              items:
-              {{- if .Values.global.verifyPeer }}
-              - key: ca.crt
-                path: ca.crt
-              {{- end }}
-              - key: pg.crt
-                path: pg.crt
-              - key: pg.key
-                path: pg.key
+    {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
+      - name: certs
+        secret:
+          secretName: {{ required "TLS secret name is required when TLS in enabled" .Values.global.tls.secretName }}
     {{- end }}
       - name: data
   {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
