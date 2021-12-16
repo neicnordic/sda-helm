@@ -192,6 +192,14 @@ global:
     # a positive integer enables sessions
     # a negative integer disables sessions
     sessionExpiration: 28800
+    # this should translate into JSON array of objects
+    # with 2 keys iss and jku
+    trusted:
+      configPath: ""
+      configFile: "iss.json"
+      iss:
+        - iss: "https://login.elixir-czech.org/oidc/"
+          jku: "https://login.elixir-czech.org/oidc/jwk"
 
   elixir:
     oidcdHost: "https://login.elixir-czech.org/oidc/"

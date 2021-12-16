@@ -88,6 +88,10 @@ spec:
       {{- end }}
         - name: OIDC_CONFIGURATION_URL
           value: "{{ .Values.global.elixir.oidcdHost }}/.well-known/openid-configuration"
+      {{- if .Values.global.download.trusted.iss }}
+        - name: OIDC_TRUSTED_ISS
+          value: {{ include "trustedIssPath" . }}/{{ default "iss.json" .Values.global.download.trusted.configFile }}
+      {{- end }}
         - name: C4GH_FILEPATH
           value: {{ template "c4ghPath" . }}/{{ default "c4gh.sec.pem" .Values.global.c4gh.file }}
       {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
@@ -183,9 +187,11 @@ spec:
         resources:
 {{ toYaml .Values.download.resources | trim | indent 10 }}
         volumeMounts:
-       {{- if not .Values.global.vaultSecrets }}
+        {{- if not .Values.global.vaultSecrets }}
         - name: c4gh
           mountPath: {{ template "c4ghPath" . }}
+        - name: iss
+          mountPath: {{ template "trustedIssPath" . }}
         {{- end }}
         {{- if not .Values.global.pkiService }}
         - name: tls
@@ -216,6 +222,13 @@ spec:
             items:
             - key: {{ .Values.global.c4gh.file }}
               path: {{ .Values.global.c4gh.file }}
+        - name: iss
+          secret:
+            defaultMode: 0440
+            secretName: {{ template "sda.fullname" . }}-download-iss
+            items:
+            - key: {{ .Values.global.download.trusted.configFile }}
+              path: {{ .Values.global.download.trusted.configFile }}
       {{- end }}
       {{- if eq "posix" .Values.global.archive.storageType }}
         - name: archive
