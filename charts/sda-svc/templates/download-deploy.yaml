@@ -112,6 +112,14 @@ spec:
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
+      {{- if .Values.global.download.useTLS }}
+        - name: APP_PORT
+          value: "8443"
+        - name: APP_SERVERCERT
+          value: "{{ template "tlsPath" . }}/download.crt"
+        - name: APP_SERVERKEY
+          value: "{{ template "tlsPath" . }}/download.key"
+      {{- end }}
         - name: SESSION_DOMAIN
           value: {{ .Values.global.ingress.hostName.download | quote }}
         - name: SESSION_EXPIRATION
@@ -150,7 +158,7 @@ spec:
       {{- end }}
         ports:
         - name: download
-          containerPort: 8080
+          containerPort: {{ ternary 8080 8443 ( empty .Values.global.download.useTLS ) }}
           protocol: TCP
         livenessProbe:
           httpGet:
