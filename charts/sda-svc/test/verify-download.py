@@ -9,10 +9,10 @@ import urllib.error
 
 backendhost = os.environ.get('DOWNLOAD_SERVICE_NAME','localhost')
 
-print("Will try connecting to %s:8080" % backendhost)
+print("Will try connecting to %s:443" % backendhost)
 
 try:
-    r = urllib.request.urlopen('http://%s:8080/files' % backendhost, context=ssl._create_unverified_context())
+    r = urllib.request.urlopen('https://%s:443/files' % backendhost, context=ssl._create_unverified_context())
     sys.exit(0)
 except urllib.error.HTTPError as e:
     if e.code == 404:
