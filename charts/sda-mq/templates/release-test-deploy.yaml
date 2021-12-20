@@ -24,10 +24,14 @@ metadata:
 spec:
   containers:
     - name: {{ .Release.Name }}-test
-      image:  "{{ .Values.testimage.repository }}:{{ .Values.testimage.tag }}"
+      {{- if .Values.config.tls.enabled }}
+      image: "{{ .Values.testimage.repository }}:{{ .Values.testimage.tag }}"
+      {{- else }}
+      image: "subfuzion/netcat:latest"
+      {{- end }}
       imagePullPolicy: {{ .Values.testimage.pullPolicy | quote }}
       volumeMounts:
-      {{- if not .Values.externalPkiService.tlsPath }}
+      {{- if and .Values.config.tls.enabled (not .Values.externalPkiService.tlsPath) }}
         - name: certs
           mountPath: /certs
       {{- end }}
@@ -42,9 +46,10 @@ spec:
       args:
         - "-x"
         - "-c"
+        {{- if .Values.config.tls.enabled }}
         - 'P=${PKI_VOLUME_PATH:-/certs}; 
            count=1;
-           until openssl s_client -connect "${MQ_HOST}:5671" -verify 50 -key "$P/tester.key" -cert "$P/tester.crt" -verify_return_error -verifyCAfile "$P/ca.crt" </dev/null; do
+           until openssl s_client -connect "${MQ_HOST}:5671" -verify 50 -key "$P/{{ .Values.testimage.tls.tlsKey }}" -cert "$P/{{ .Values.testimage.tls.tlsCert }}" -verify_return_error -CAfile "$P/{{ .Values.testimage.tls.caCert }}" </dev/null; do
              sleep 5;
              count=$((count+1));
              if [ "$count" -gt 10 ]; then
@@ -52,20 +57,22 @@ spec:
              fi;
            done;
            exit 0'
+        {{- else }}
+        - 'count=1;
+          until nc -zvw10 ${MQ_HOST} 5672 </dev/null; do
+             sleep 5;
+             count=$((count+1));
+             if [ "$count" -gt 10 ]; then
+               exit 1;
+             fi;
+           done;
+           exit 0'
+        {{- end }}
+  {{- if and .Values.config.tls.enabled (not .Values.externalPkiService.tlsPath) }}
   volumes:
-    {{- if not .Values.externalPkiService.tlsPath }}
       - name: certs
-        projected:
-          sources:
-          - secret:
-              name:  "{{ .Release.Name }}-test-certs"
-              items:
-              - key: tester.key
-                path: tester.key
-              - key: tester.crt
-                path: tester.crt
-              - key: ca.crt
-                path: ca.crt
+        secret:
+          secretName: {{ required "TLS secret name is required when TLS in enabled" .Values.testimage.tls.secretName }}
     {{- end }}
   restartPolicy: Never
 

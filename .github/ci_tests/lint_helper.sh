@@ -5,11 +5,6 @@ set -e
 
 pushd charts
 
-if [ $1 = "sda-mq" ]; then
-touch $1/files/ca.crt
-touch $1/files/server.crt
-fi
-
 if [ $1 = "sda-orch" ]; then
 touch $1/files/ca.crt
 touch $1/files/orch.crt

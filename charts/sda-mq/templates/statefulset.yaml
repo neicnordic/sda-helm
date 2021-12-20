@@ -79,16 +79,21 @@ spec:
               name: {{ template "sda.fullname" . }}
               key: shovel_connection
       {{- end }}
-      {{- if .Values.config.verifyPeer }}
-        - name: MQ_CA
-          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/ca.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/ca.crt"{{ end }}
-      {{- end }}
+      {{- if .Values.config.tls.enabled }}
         - name: MQ_SERVER_CERT
-          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.crt" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/server.crt"{{ end }}
+          value: {{ template "mqCert" . }}
         - name: MQ_SERVER_KEY
-          value: {{ if .Values.externalPkiService.tlsPath  }}{{ printf "%s/server.key" .Values.externalPkiService.tlsPath }}{{ else }}"/etc/rabbitmq/tls/server.key"{{ end }}
+          value: {{ template "mqKey" . }}
+        {{- if .Values.config.tls.verifyPeer }}
+        - name: MQ_CA
+          value: {{ template "caCert" . }}
         - name: MQ_VERIFY
           value: {{ include "verifyPeer" . }}
+        {{- end }}
+      {{- else }}
+        - name: NOTLS
+          value: "true"
+      {{- end }}
       {{- if .Values.config.vhost }}
         - name: MQ_VHOST
           value: {{ .Values.config.vhost | quote }}
@@ -97,36 +102,39 @@ spec:
         - containerPort: 15672
           name: management
           protocol: TCP
-        - containerPort: 5671
+        - containerPort: {{ ternary 5671 5672 (.Values.config.tls.enabled )}}
           name: amqp
+        livenessProbe:
+          exec:
+            command:
+              - /bin/bash
+              - -ec
+              - rabbitmq-diagnostics -q ping
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          timeoutSeconds: 5
         readinessProbe:
-          tcpSocket:
-            port: amqp
+          exec:
+            command:
+              - /bin/bash
+              - -ec
+              - rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms
           initialDelaySeconds: 30
-          periodSeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 10
         volumeMounts:
         - name: data
           mountPath: "/var/lib/rabbitmq/"
-        {{- if not .Values.externalPkiService.tlsPath }}
+        {{- if and .Values.config.tls.enabled (not .Values.externalPkiService.tlsPath) }}
         - name: tls-certs
           mountPath: /etc/rabbitmq/tls
         {{- end }}
       volumes:
-      {{- if not .Values.externalPkiService.tlsPath }}
+    {{- if and .Values.config.tls.enabled (not .Values.externalPkiService.tlsPath) }}
       - name: tls-certs
-        projected:
-          defaultMode: 0440
-          sources:
-          - secret:
-              name: {{ template "sda.fullname" . }}
-              items:
-              - key: ca.crt
-                path: ca.crt
-              - key: server.crt
-                path: server.crt
-              - key: server.key
-                path: server.key
-      {{- end }}
+        secret:
+          secretName: {{ required "TLS secret name is required when TLS in enabled" .Values.config.tls.secretName }}
+    {{- end }}
       - name: data
   {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
         persistentVolumeClaim:
