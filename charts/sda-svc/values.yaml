@@ -91,10 +91,24 @@ global:
   extraSecurityContext: {}
 
 # If no dependency services uses TLS, postgreSQL, RabbitMQ, S3
-# TLS can be globally disabled for all serives by setting this to true
-# No to be used in production but handy for testing.
+# TLS can be globally disabled for all serives by setting enabled to false.
+# Not to be used in production but handy for testing.
   tls:
     enabled: true
+    caCert:
+# secretName is the name of the Kubernetes secret that holds the root CA certificate.
+# A Kubernetes secret must be in the same namespace that sda-pipeline is installed into.
+      secretName: ""
+# secretKey is the key within the Kubernetes secret that holds the root CA certificate.
+      secretKey: ""
+# PEM-encoded CA certificates that will be added to the trusted system CAs
+# cert: |
+#   -----BEGIN CERTIFICATE-----
+#   MIIC7jCCApSgAwIBAgIRAIq2zQEVexqxvtxP6J0bXAwwCgYIKoZIzj0EAwIwgbkx
+#   ...
+# @type: string
+      cert:
+
 
 # If an external secrets management service is used set this to true
   vaultSecrets: false
