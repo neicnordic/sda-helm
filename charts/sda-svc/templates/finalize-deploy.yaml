@@ -90,12 +90,12 @@ spec:
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.caCert }}
+          value: {{ include "tlsPath" . }}/ca.crt
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.certFile }}
+          value: {{ include "tlsPath" . }}/tls.crt
         - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.keyFile }}
+          value: {{ include "tlsPath" . }}/tls.key
         {{- end }}
       {{- else }}
         - name: BROKER_SSL
@@ -104,13 +104,13 @@ spec:
       {{- if .Values.global.tls.enabled }}
         {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
-          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.caCert }}
+          value: {{ include "tlsPath" . }}/ca.crt
         {{- end }}
         {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.certFile }}
+          value: {{ include "tlsPath" . }}/tls.crt
         - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.keyFile }}
+          value: {{ include "tlsPath" . }}/tls.key
         {{- end }}
       {{- end }}
         - name: DB_DATABASE
@@ -160,9 +160,22 @@ spec:
           mountPath: {{ template "tlsPath" . }}
       volumes:
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
-          secret:
-            defaultMode: 0440
-            secretName: {{ .Values.finalize.tls.secretName }}
+          projected:
+            sources:
+            {{- if or .Values.global.broker.verifyPeer (eq "verify-full" .Values.global.db.sslMode) }}
+            - secret:
+                name: {{ required "TLS secret name is requrired for verify" .Values.finalize.tls.secretName }}
+            {{- end }}
+            {{- if .Values.global.tls.caCert.secretName }}
+            - secret:
+                name: {{ .Values.global.tls.caCert.secretName }}
+                items:
+                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                  path: ca.crt
+            {{- else }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-cacert
+            {{- end }}
       {{- if .Values.global.pkiPermissions }}
         - name: tls
           emptyDir:
