@@ -84,7 +84,7 @@ spec:
           value: {{ .Values.global.archive.s3ChunkSize | quote }}
         {{- if and .Values.global.archive.s3CaFile .Values.global.tls.enabled }}
         - name: ARCHIVE_CACERT
-          value: {{ template "tlsPath" . }}/{{ .Values.global.archive.s3CaFile }}
+          value: {{ template "tlsPath" . }}/ca.crt
         {{- end }}
       {{- else }}
           value: "posix"
@@ -97,12 +97,12 @@ spec:
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: BROKER_CACERT
-          value: {{ template "tlsPath" . }}/{{.Values.verify.tls.caCert }}
+          value: {{ template "tlsPath" . }}/ca.crt
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ template "tlsPath" . }}/{{.Values.verify.tls.certFile }}
+          value: {{ template "tlsPath" . }}/tls.crt
         - name: BROKER_CLIENTKEY
-          value: {{ template "tlsPath" . }}/{{.Values.verify.tls.keyFile }}
+          value: {{ template "tlsPath" . }}/tls.key
         {{- end }}
       {{- else }}
         - name: BROKER_SSL
@@ -131,15 +131,13 @@ spec:
         - name: C4GH_FILEPATH
           value: {{ template "c4ghPath" . }}/{{ .Values.global.c4gh.keyFile }}
     {{- if .Values.global.tls.enabled }}
-      {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
-          value: {{ template "tlsPath" . }}/{{ .Values.verify.tls.caCert }}
-      {{- end }}
+          value: {{ template "tlsPath" . }}/ca.crt
       {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ template "tlsPath" . }}/{{ .Values.verify.tls.certFile }}
+          value: {{ template "tlsPath" . }}/tls.crt
         - name: DB_CLIENTKEY
-          value: {{ template "tlsPath" . }}/{{ .Values.verify.tls.keyFile }}
+          value: {{ template "tlsPath" . }}/tls.key
       {{- end }}
     {{- end }}
         - name: DB_DATABASE
@@ -214,9 +212,22 @@ spec:
       volumes:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
-          secret:
-            defaultMode: 0440
-            secretName: {{ .Values.verify.tls.secretName }}
+          projected:
+            sources:
+            {{- if or .Values.global.broker.verifyPeer (eq "verify-full" .Values.global.db.sslMode) }}
+            - secret:
+                name: {{ required "TLS secret name is requrired for verify" .Values.verify.tls.secretName }}
+            {{- end }}
+            {{- if .Values.global.tls.caCert.secretName }}
+            - secret:
+                name: {{ .Values.global.tls.caCert.secretName }}
+                items:
+                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                  path: ca.crt
+            {{- else }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-cacert
+            {{- end }}
         {{- if .Values.global.pkiPermissions }}
         - name: tls
           emptyDir:
