@@ -75,6 +75,18 @@ entries:
     version: "0.1"
   sda-mq:
   - apiVersion: v2
+    created: "2021-12-20T19:01:44.925728159Z"
+    description: RabbitMQ component for Sensitive Data Archive (SDA) installation
+    digest: 9cd868122b0ec052340891437a433fa79e02dd236509e61c2c06c4f03d30d5e0
+    home: https://neic-sda.readthedocs.io
+    icon: https://neic.no/assets/images/logo.png
+    name: sda-mq
+    sources:
+    - https://github.com/neicnordic/sda-helm
+    urls:
+    - https://github.com/neicnordic/sda-helm/releases/download/sda-mq-0.4.0/sda-mq-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
     created: "2021-07-27T11:22:44.39520854Z"
     description: RabbitMQ component for Sensitive Data Archive (SDA) installation
     digest: 045ec2588ca391dc63f65e8a6fbb60185ba7cf5d30c2b69659181609e2cbcdf9
@@ -274,4 +286,4 @@ entries:
     urls:
     - https://github.com/neicnordic/sda-helm/releases/download/sda-svc-0.1/sda-svc-0.1.tgz
     version: "0.1"
-generated: "2021-09-15T07:05:37.137493835Z"
+generated: "2021-12-20T19:01:44.92623918Z"
