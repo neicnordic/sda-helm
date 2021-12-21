@@ -42,6 +42,44 @@ spec:
         runAsUser: 65534 
         runAsGroup: 65534
         fsGroup: 65534
+    {{- if not .Values.global.pkiService }}
+      initContainers:
+      - name: init-java-certs
+        image: neicnordic/openssl-alpine:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            keytool -import \
+                    -trustcacerts \
+                    -file /tls-certs/ca.crt \
+                    -alias legaCA -storetype JKS \
+                    -keystore /tls/cacerts \
+                    -storepass "${KEYSTORE_PASSWORD}" \
+                    -noprompt &&
+            openssl pkcs12 -export \
+                           -out /tls/doa.p12 \
+                           -inkey /tls-certs/tls.key \
+                           -in /tls-certs/tls.crt \
+                           -passout pass:"${KEYSTORE_PASSWORD}" &&
+            openssl pkcs8 -topk8 \
+                          -inform pem \
+                          -outform der \
+                          -in /tls-certs/tls.key \
+                          -out /tls/tls.key.der \
+                          -nocrypt &&
+            cp /tls-certs/* /tls/
+        securityContext:
+          allowPrivilegeEscalation: false
+        env:
+        - name: KEYSTORE_PASSWORD
+          value: {{ required "Keystore password is required" .Values.sftpInbox.keystorePass | quote }}
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /tls-certs
+        - name: tmp
+          mountPath: /tls
+    {{- end }}
       containers:
       - name: doa
         image: "{{ .Values.doa.repository }}:{{ .Values.doa.imageTag }}"
@@ -133,15 +171,15 @@ spec:
           value: "{{ include "secretsPath" . }}/{{ .Values.global.elixir.pubKey }}"
       {{- end }}
         - name: KEYSTORE_PATH
-          value: {{ ternary (printf "/etc/ssl/certs/java/%s" .Values.doa.tls.keyStore) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.keystore) (empty .Values.global.pkiService) }}
+          value: {{ ternary (print "/etc/ssl/certs/java/doa.p12") (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.keyStore) (empty .Values.global.pkiService) }}
         - name: KEYSTORE_PASSWORD
           value: {{ .Values.doa.keystorePass | quote }}
         - name: ROOT_CERT_PATH
-          value: {{ ternary (printf "/etc/ssl/certs/java/%s" .Values.doa.tls.caCert) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.caCert ) (empty .Values.global.pkiService) }}
+          value: {{ ternary (print "/etc/ssl/certs/java/ca.crt" ) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.cacert) (empty .Values.global.pkiService) }}
         - name: CERT_PATH
-          value: {{ ternary (printf "/etc/ssl/certs/java/%s" .Values.doa.tls.certFile) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.certFile) (empty .Values.global.pkiService) }}
+          value: {{ ternary (printf "/etc/ssl/certs/java/tls.crt" ) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.certFile) (empty .Values.global.pkiService) }}
         - name: CERT_KEY
-          value: {{ ternary (printf "/etc/ssl/certs/java/%s" .Values.doa.tls.keyFile) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.keyFile) (empty .Values.global.pkiService) }}
+          value: {{ ternary (printf "/etc/ssl/certs/java/tls.key.der" ) (printf "%s/%s" .Values.global.secretsPath .Values.doa.tls.keyFile) (empty .Values.global.pkiService) }}
         - name: CRYPT4GH_PRIVATE_KEY_PATH
           value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.keyFile }}"
         - name: CRYPT4GH_PRIVATE_KEY_PASSWORD_PATH
@@ -168,7 +206,7 @@ spec:
           value: "true"
         {{- if .Values.global.doa.outbox.s3CaFile }}
         - name: S3_OUT_ROOT_CERT_PATH
-          value: "/etc/ssl/certs/java/{{ .Values.doa.tls.caCert }}"
+          value: "/etc/ssl/certs/java/{{ .Values.doa.tls.javaCert }}"
         {{- end }}
         - name: S3_OUT_ACCESS_KEY
           valueFrom:
@@ -209,7 +247,7 @@ spec:
         - name: tmp
           mountPath: "/tmp"
       {{- if not .Values.global.pkiService }}
-        - name: tls-certs
+        - name: tmp
           mountPath: "/etc/ssl/certs/java"
       {{- end }}
       {{- if not .Values.global.vaultSecrets }}
@@ -229,9 +267,20 @@ spec:
           emptyDir: {}
       {{- if not .Values.global.pkiService }}
         - name: tls-certs
-          secret:
-            secretName: {{ .Values.doa.tls.secretName }}
-            defaultMode: 0440
+          projected:
+            sources:
+            - secret:
+                name: {{ required "TLS secret name is requrired for DOA" .Values.doa.tls.secretName }}
+            {{- if .Values.global.tls.caCert.secretName }}
+            - secret:
+                name: {{ .Values.global.tls.caCert.secretName }}
+                items:
+                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                  path: ca.crt
+            {{- else }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-cacert
+            {{- end }}
       {{- end }}
       {{- if not .Values.global.vaultSecrets }}
       {{- if .Values.global.elixir.pubKey }}
