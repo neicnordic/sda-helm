@@ -99,9 +99,9 @@ spec:
         {{- end }}
         {{- if .Values.global.tls.enabled}}
         - name: SERVER_CERT
-          value: {{ template "tlsPath" . }}/{{.Values.auth.tls.certFile }}
+          value: {{ template "tlsPath" . }}/tls.crt
         - name: SERVER_KEY
-          value: {{ template "tlsPath" . }}/{{.Values.auth.tls.keyFile }}
+          value: {{ template "tlsPath" . }}/tls.key
         {{- end }}
         - name: S3INBOX
           value: {{ .Values.global.ingress.hostName.s3Inbox }}
@@ -152,11 +152,22 @@ spec:
                   - key: {{ .Values.global.auth.jwtKey }}
                     path: {{ .Values.global.auth.jwtKey }}
       {{- end }}
-      {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
+      {{- if .Values.global.tls.enabled }}
         - name: tls
-          secret:
-            defaultMode: 0440
-            secretName: {{ .Values.auth.tls.secretName }}
+          projected:
+            sources:
+            - secret:
+                name: {{ required "TLS secret name is requrired for verify" .Values.auth.tls.secretName }}
+            {{- if .Values.global.tls.caCert.secretName }}
+            - secret:
+                name: {{ .Values.global.tls.caCert.secretName }}
+                items:
+                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                  path: ca.crt
+            {{- else }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-caCert
+            {{- end }}
       {{- end }}
 {{- end }}
 {{- end }}
