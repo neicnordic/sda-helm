@@ -139,7 +139,6 @@ global:
     s3ChunkSize: 15 # Chunk size in MB > 5
     s3AccessKey: null
     s3SecretKey: null
-    s3CaFile: null
     s3Port: 443
   # The lines below is only used with POSIX backend
     volumePath: "/backup"
@@ -225,7 +224,6 @@ global:
     s3Bucket: "inbox"
     s3AccessKey: null
     s3SecretKey: null
-    s3CaFile: null
     s3ReadyPath: ""
     s3Region: ""
 
@@ -302,9 +300,6 @@ auth:
   annotations: {}
   tls:
     secretName: ""
-    certFile: ""
-    keyFile: ""
-    caCert: ""
 
 backup:
   name: backup
@@ -326,9 +321,6 @@ backup:
   annotations: {}
   tls:
     secretName: ""
-    certFile: ""
-    keyFile: ""
-    caCert: ""
 
 doa:
   name: doa
@@ -352,11 +344,6 @@ doa:
   annotations: {}
   tls:
     secretName: ""
-    certFile: "doa.crt"
-    keyFile: "doa.key.der"
-    caCert: "ca.crt"
-    javaCert: "cacerts"
-    keyStore: "doa.p12"
 
 finalize:
   name: finalize
@@ -377,9 +364,6 @@ finalize:
   annotations: {}
   tls:
     secretName: ""
-    certFile: ""
-    keyFile: ""
-    caCert: ""
 
 ingest:
   name: ingest
@@ -400,9 +384,6 @@ ingest:
   annotations: {}
   tls:
     secretName: ""
-    certFile: ""
-    keyFile: ""
-    caCert: ""
 
 intercept:
   deploy: true
@@ -424,9 +405,6 @@ intercept:
   annotations: {}
   tls:
     secretName: ""
-    certFile: ""
-    keyFile: ""
-    caCert: ""
 
 mapper:
   replicaCount: 1
@@ -446,9 +424,6 @@ mapper:
   annotations: {}
   tls:
     secretName: ""
-    certFile: ""
-    keyFile: ""
-    caCert: ""
 
 s3Inbox:
   name: s3Inbox
@@ -469,8 +444,6 @@ s3Inbox:
   annotations: {}
   tls:
     secretName: ""
-    keyStore: "inbox.p12"
-    caCert: "cacerts"
 
 
 sftpInbox:
@@ -494,9 +467,7 @@ sftpInbox:
   annotations: {}
   tls:
     secretName: ""
-    certFile: ""
-    keyFile: ""
-    caCert: ""
+
 
 releasetest:
   run: false
@@ -524,6 +495,3 @@ verify:
   annotations: {}
   tls:
     secretName: ""
-    certFile: ""
-    keyFile: ""
-    caCert: ""
