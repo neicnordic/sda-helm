@@ -14,27 +14,11 @@ cp "${basedir}"/certs/cega-mq.key LocalEGA-helm/ega-charts/cega/config/certs/ceg
 
 ## sda-svc certs
 
-for n in backup finalize ingest intercept verify mapper auth 
-  do
-  kubectl create secret generic $n-certs \
-  --from-file="${basedir}"/certs/ca.crt \
-  --from-file="${basedir}"/certs/$n.crt \
-  --from-file="${basedir}"/certs/$n.key
-done
+kubectl create secret generic ca-root --from-file="${basedir}"/certs/ca.crt
 
-for m in doa inbox
+for n in backup doa finalize inbox ingest intercept verify mapper auth tester
   do
-  kubectl create secret generic $m-certs \
-  --from-file="${basedir}"/certs/ca.crt \
-  --from-file="${basedir}"/certs/$m.crt \
-  --from-file="${basedir}"/certs/$m.key \
-  --from-file="${basedir}"/certs/$m.key.der \
-  --from-file="${basedir}"/certs/$m.p12 \
-  --from-file="${basedir}"/certs/cacerts
+  kubectl create secret tls $n-certs \
+  --cert="${basedir}"/certs/$n.crt \
+  --key="${basedir}"/certs/$n.key
 done
-
-# secret for the release testers certificates
-kubectl create secret generic tester-certs \
---from-file="${basedir}"/certs/tester.key \
---from-file="${basedir}"/certs/tester.crt \
---from-file="${basedir}"/certs/ca.crt
