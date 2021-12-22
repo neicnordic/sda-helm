@@ -7,10 +7,6 @@ basedir="sda-deploy-init/config"
 cp "${basedir}"/certs/public.crt public.crt
 cp "${basedir}"/certs/private.key private.key
 
-## sda-orch certs
-cp "${basedir}"/certs/orch.crt charts/sda-orch/files/orch.crt
-cp "${basedir}"/certs/orch.key charts/sda-orch/files/orch.key
-
 ## cega config and certs
 mkdir -p LocalEGA-helm/ega-charts/cega/config/certs
 cp -r dev_tools/cega/* LocalEGA-helm/ega-charts/cega/config/
@@ -33,8 +29,5 @@ for n in backup doa finalize ingest intercept verify mapper inbox auth
   cp "${basedir}"/certs/$n.key charts/sda-svc/files/$n.key
 done
 
-for p in sda-svc sda-orch
-  do 
-  cp "${basedir}"/certs/ca.crt "charts/$p/files/ca.crt"
-  cp "${basedir}"/certs/tester.* "charts/$p/files/"
-done
+cp "${basedir}"/certs/ca.crt "charts/sda-svc/files/ca.crt"
+cp "${basedir}"/certs/tester.* "charts/sda-svc/files/"

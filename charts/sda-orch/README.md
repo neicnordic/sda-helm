@@ -12,17 +12,21 @@ Parameter | Description | Default
 `image.tag` | sda-orch  container image version | `"latest"`
 `image.pullPolicy` | sda-orch container image pull policy | `Always`
 `logLevel` | sda-orch logging level | `info`
-`global.tlsPath` | Default TLS path for certs and key in the pod. | `/tls/certs`
 `revisionHistory` | Number of revisions to keep for the option to rollback a deployment | `3`
 `podAnnotations` | Annotations applied to pods of all services. |`{}`
-`pkiService` | If an external PKI infrastructure is used set this to true. |`false`
-`pkiPermissions` | if permissions needs to be set on the injected certificates set this to true | `true`
+`pkiService.enabled` | If an external PKI infrastructure is used set this to true. |`false`
+`pkiService.tlsPath` | The path where the certifiates are placed. | `""`
+`tls.enabled` | Enable SSL for MQ | `true`
+`tls.secretName` | Name of the secret that holds the certificates | `""`
+`tls.permissions` | if permissions needs to be set on the injected certificates set this to true | `true`
+`tls.cert` | Name of the client certificate file | `""`
+`tls.key` | Name of the client key file | `""`
+`tls.caCert` | name of the CA file| `""`
 `rbacEnabled` | Use role based access control. |`true`
 `networkPolicy.create` | Use network isolation. | `false`
 `podSecurityPolicy.create` | Use pod security policy. | `false`
-`vaultSecrets` | Use If Hasicort Vault is used for secrets management. | `false`
-`sslmode.ssl` | Enable SSL for MQ | `true`
-`sslmode.verifyPeer` | Use Client/Server verification (used by MQ connection). | `true`
+`vaultSecrets` | Use If Hasicorp Vault is used for secrets management. | `false`
+`broker.verifyPeer` | Use Client/Server verification (used by MQ connection). | `true`
 `broker.host` | Domain name or IP address to the message broker. |`""`
 `broker.exchange` | Exchange to publish messages to. |`""`
 `broker.port` | Port for the message broker. |`5671`
@@ -47,8 +51,11 @@ Parameter | Description | Default
 
 ### TLS
 
-Certificates should be placed in the `files` folder and named accordingly.
+Create a secret that contains the certificates
 
-- ca.crt, root ca certificate.
-- orch.crt, serer certificate.
-- orch.key, server key.
+```cmd
+kubectl create secret generic orch-certs \
+--from-file=ca.crt \
+--from-file=orch.crt \
+--from-file=orch.key
+```

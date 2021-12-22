@@ -1,9 +1,3 @@
-global:
-  c4ghPath: c4gh
-  jwtPath: jwt
-  tlsPath: tls
-  podSecurityPolicy:
-    create: false
 broker:
   vhost: "sda"
   host: "broker-sda-mq"
@@ -17,3 +11,8 @@ broker:
     files: files
     stableid: accessionIDs
 logLevel: debug
+tls:
+  secretName: orch-certs
+  cert: orch.crt
+  key: orch.key
+  caCert: ca.crt

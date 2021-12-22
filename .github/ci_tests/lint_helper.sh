@@ -5,12 +5,6 @@ set -e
 
 pushd charts
 
-if [ $1 = "sda-orch" ]; then
-touch $1/files/ca.crt
-touch $1/files/orch.crt
-touch $1/files/orch.key
-fi
-
 if [ $1 = "sda-svc" ]; then
 for n in ca backup doa finalize inbox ingest intercept verify mapper
 do
