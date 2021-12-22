@@ -82,9 +82,9 @@ spec:
           value: {{ .Values.global.broker.vhost | quote }}
         - name: BROKER_SERVERNAME
           value: {{ .Values.global.broker.host | quote }}
-      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_SSL
-          value: "true"
+          value: {{ .Values.global.tls.enabled | quote }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: BROKER_CACERT
@@ -95,9 +95,6 @@ spec:
         - name: BROKER_CLIENTKEY
           value: {{ template "tlsPath" . }}/{{ .Values.mapper.tls.keyFile }}
         {{- end }}
-      {{- else }}
-        - name: BROKER_SSL
-          value: "false"
       {{- end }}
       {{- if .Values.global.tls.enabled }}
       {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}

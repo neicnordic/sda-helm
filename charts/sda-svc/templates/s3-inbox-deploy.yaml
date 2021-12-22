@@ -101,9 +101,9 @@ spec:
           value: {{ .Values.global.broker.exchange | quote }}
         - name: BROKER_ROUTINGKEY
           value: "inbox"
-      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_SSL
-          value: "true"
+          value: {{ .Values.global.tls.enabled | quote }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: BROKER_CACERT
@@ -114,9 +114,6 @@ spec:
         - name: BROKER_CLIENTKEY
           value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.keyFile }}
         {{- end }}
-      {{- else }}
-        - name: BROKER_SSL
-          value: "false"
       {{- end }}
       {{- if .Values.global.tls.enabled }}
         - name: SERVER_CERT
