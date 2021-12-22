@@ -29,7 +29,7 @@ args = parser.parse_args()
 exchange = os.getenv('MQ_EXCHANGE','sda')
 mq_vhost = os.getenv('MQ_VHOST', '/').lstrip("/")
 tls = os.getenv('TLS','true')
-pki_path = os.getenv('PKI_PATH' '/certs')
+pki_path = os.getenv('PKI_PATH', '/certs')
 
 if tls == 'true':
     env_connection = "amqps://%s:%s@%s/%s" % (
@@ -56,8 +56,8 @@ if mq_connection.startswith('amqps'):
     context.check_hostname = False
 
     cacertfile = Path('%s/ca.crt' % pki_path)
-    certfile = Path('%s/tester.crt' % pki_path)
-    keyfile = Path('%s/tester.key' % pki_path)
+    certfile = Path('%s/tls.crt' % pki_path)
+    keyfile = Path('%s/tls.key' % pki_path)
 
     context.verify_mode = ssl.CERT_NONE
     # Require server verification

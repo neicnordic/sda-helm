@@ -137,8 +137,8 @@ if [ "${TLS}" = true ]; then
 
   s=${PKI_PATH:-/certs}
 
-  cp "$s/tester.key" "$PGSSL/postgresql.key"
-  cp "$s/tester.crt" "$PGSSL/postgresql.crt"
+  cp "$s/tls.key" "$PGSSL/postgresql.key"
+  cp "$s/tls.crt" "$PGSSL/postgresql.crt"
   cp "$s/ca.crt" $PGSSL/root.crt
 
   chmod -R og-rw $PGSSL

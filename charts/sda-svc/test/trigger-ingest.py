@@ -23,10 +23,10 @@ parser.add_argument('filepath')
 parser.add_argument('routing_key')
 args = parser.parse_args()
 
-exchange = os.getenv('MQ_EXCHANGE','sda')
+exchange = os.getenv('MQ_EXCHANGE', 'sda')
 mq_vhost = os.getenv('MQ_VHOST', '/').lstrip("/")
-tls = os.getenv('TLS','true')
-pki_path = os.getenv('PKI_PATH' '/certs')
+tls = os.getenv('TLS', 'true')
+pki_path = os.getenv('PKI_PATH', '/certs')
 
 if tls == 'true':
     env_connection = "amqps://%s:%s@%s/%s" % (
@@ -47,13 +47,18 @@ parameters = pika.URLParameters(mq_connection)
 
 if mq_connection.startswith('amqps'):
 
-    context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS)  # Enforcing (highest) TLS version (so... 1.2?)
+    # Enforcing (highest) TLS version (so... 1.2?)
+    context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS)
 
     context.check_hostname = False
 
     cacertfile = Path('%s/ca.crt' % pki_path)
-    certfile = Path('%s/tester.crt' % pki_path)
-    keyfile = Path('%s/tester.key' % pki_path)
+    certfile = Path('%s/tls.crt' % pki_path)
+    keyfile = Path('%s/tls.key' % pki_path)
+
+    print("CAcert: %s" % cacertfile)
+    print("cert: %s" % certfile)
+    print("key: %s" % keyfile)
 
     context.verify_mode = ssl.CERT_NONE
     # Require server verification
@@ -63,11 +68,12 @@ if mq_connection.startswith('amqps'):
 
     # If client verification is required
     if certfile.exists():
-        assert( keyfile.exists() )
+        assert(keyfile.exists())
         context.load_cert_chain(str(certfile), keyfile=str(keyfile))
 
     # Finally, the pika ssl options
-    parameters.ssl_options = pika.SSLOptions(context=context, server_hostname=None)
+    parameters.ssl_options = pika.SSLOptions(
+        context=context, server_hostname=None)
 
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
