@@ -91,9 +91,9 @@ spec:
         - name: ARCHIVE_LOCATION
           value: "{{ .Values.global.archive.volumePath }}"
       {{- end }}
-      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_SSL
-          value: "true"
+          value: {{ .Values.global.tls.enabled | quote }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: BROKER_CACERT
@@ -104,9 +104,6 @@ spec:
         - name: BROKER_CLIENTKEY
           value: {{ template "tlsPath" . }}/tls.key
         {{- end }}
-      {{- else }}
-        - name: BROKER_SSL
-          value: "false"
       {{- end }}
         - name: BROKER_DURABLE
           value: {{ .Values.global.broker.durable | quote }}

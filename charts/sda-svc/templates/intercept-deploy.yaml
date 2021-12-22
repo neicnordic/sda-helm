@@ -68,6 +68,8 @@ spec:
         - name: CONFIGFILE
           value: {{ template "confFile" . }}
       {{- end }}
+        - name: BROKER_SSL
+          value: {{ .Values.global.tls.enabled | quote }}
       {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_CACERT
           value: {{ template "tlsPath" . }}/ca.crt
@@ -77,13 +79,8 @@ spec:
         - name: BROKER_CLIENTKEY
           value: {{ template "tlsPath" . }}/tls.key
         {{- end }}
-        - name: BROKER_SSL
-          value: {{ .Values.global.broker.ssl | quote}}
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
-      {{- else }}
-        - name: BROKER_SSL
-          value: "false"
       {{- end }}
         - name: BROKER_DURABLE
           value: "true"
