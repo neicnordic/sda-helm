@@ -246,3 +246,43 @@ Create chart name and version as used by the chart label.
 {{- ternary .Values.global.broker.password .Values.credentials.verify.mqPassword (empty .Values.credentials.verify.mqPassword) -}}
 {{- end -}}
 {{/**/}}
+
+{{- define "dbSSLmode" -}}
+{{- if .Values.global.tls.enabled }}
+  {{- printf "%s" .Values.global.db.sslMode }}
+{{- else }}
+  {{- print "disable" -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "authRedirect" -}}
+{{- if .Values.global.tls.enabled }}
+  {{- printf "https://%s/elixir/login" .Values.global.ingress.hostName.auth }}
+{{- else }}
+  {{- printf "http://%s/elixir/login" .Values.global.ingress.hostName.auth }}
+{{- end -}}
+{{- end -}}
+
+{{- define "inboxServicePort" -}}
+  {{- if .Values.global.tls.enabled }}
+    {{- printf "%d" (ternary 2222 443 ( empty .Values.global.inbox.s3Url )) }}
+  {{- else }}
+    {{- printf "%d" (ternary 2222 80 ( empty .Values.global.inbox.s3Url )) }}
+  {{- end -}}
+{{- end -}}
+
+{{- define "S3InboxURL" -}}
+  {{- if .Values.global.inbox.s3Port }}
+    {{- printf "%s:%v" .Values.global.inbox.s3Url .Values.global.inbox.s3Port }}
+  {{- else }}
+    {{- printf "%s" .Values.global.inbox.s3Url }}
+  {{- end }}
+{{- end -}}
+
+{{- define "S3ArchiveURL" -}}
+  {{- if .Values.global.inbox.s3Port }}
+    {{- printf "%s:%v" .Values.global.inbox.s3Url .Values.global.inbox.s3Port }}
+  {{- else }}
+    {{- printf "%s" .Values.global.inbox.s3Url }}
+  {{- end }}
+{{- end -}}

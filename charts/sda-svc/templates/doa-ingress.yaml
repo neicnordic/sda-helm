@@ -1,5 +1,5 @@
 {{- if (or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType)) (not .Values.global.deploymentType)) }}
-{{- if .Values.global.ingress.deploy }}
+{{- if and .Values.global.ingress.deploy .Values.global.tls.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

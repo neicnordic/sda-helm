@@ -10,11 +10,10 @@ check_ssl_certificate = False
 encoding = UTF-8
 encrypt = False
 guess_mime_type = True
-host_base = https://localhost:9000
-host_bucket = https://localhost:9000
-use_https = True
+host_base = http://localhost:9000
+host_bucket = http://localhost:9000
+use_https = false
 socket_timeout = 30
-ca_certs_file = sda-svc/files/ca.crt
 EOF
 fi
 

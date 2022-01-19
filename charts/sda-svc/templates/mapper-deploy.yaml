@@ -41,7 +41,7 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
-    {{- if .Values.global.pkiPermissions }}
+    {{- if and .Values.global.pkiPermissions  .Values.global.tls.enabled }}
       initContainers:
       - name: tls-init
         image: busybox
@@ -83,28 +83,30 @@ spec:
         - name: BROKER_SERVERNAME
           value: {{ .Values.global.broker.host | quote }}
         - name: BROKER_SSL
-          value: "true"
+          value: {{ .Values.global.tls.enabled | quote }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
-      {{- if .Values.global.broker.ssl }}
         - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.mapper.tls.caCert }}
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/mapper.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.mapper.tls.certFile }}
         - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/mapper.key
+          value: {{ template "tlsPath" . }}/{{ .Values.mapper.tls.keyFile }}
         {{- end }}
       {{- end }}
+      {{- if .Values.global.tls.enabled }}
       {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.mapper.tls.caCert }}
       {{- end }}
       {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/mapper.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.mapper.tls.certFile }}
         - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/mapper.key
+          value: {{ template "tlsPath" . }}/{{ .Values.mapper.tls.keyFile }}
+      {{- end }}
       {{- end }}
         - name: DB_DATABASE
           value: {{ default "lega" .Values.global.db.name | quote }}
@@ -113,7 +115,7 @@ spec:
         - name: DB_PORT
           value: {{ .Values.global.db.port | quote }}
         - name: DB_SSLMODE
-          value: {{ .Values.global.db.sslMode | quote }}
+          value: {{ template "dbSSLmode" . }}
       {{- if .Values.global.logLevel }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
@@ -141,13 +143,13 @@ spec:
               secretKeyRef:
                 name: {{ template "sda.fullname" . }}-mapper
                 key: dbUser
-      {{ else }}
+      {{- else }}
         - name: CONFIGFILE
           value: {{ include "confFile" . }}
       {{- end }}
         resources:
 {{ toYaml .Values.mapper.resources | trim | indent 10 }}
-  {{- if not .Values.global.pkiService }}
+  {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         volumeMounts:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
@@ -155,7 +157,7 @@ spec:
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-mapper-certs
+            secretName: {{ .Values.mapper.tls.secretName }}
       {{- if .Values.global.pkiPermissions }}
         - name: tls
           emptyDir:

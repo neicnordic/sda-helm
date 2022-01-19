@@ -41,7 +41,7 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
-    {{- if .Values.global.pkiPermissions }}
+    {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
       initContainers:
       - name: tls-init
         image: busybox
@@ -85,28 +85,30 @@ spec:
         - name: BROKER_SERVERNAME
           value: {{ .Values.global.broker.host | quote }}
         - name: BROKER_SSL
-          value: "true"
+          value: {{ .Values.global.tls.enabled | quote }}
+        {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
-      {{- if .Values.global.broker.ssl }}
         - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
+          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.caCert }}
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/finalize.crt
+          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.certFile }}
         - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/finalize.key
+          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.keyFile }}
         {{- end }}
       {{- end }}
-      {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
+      {{- if .Values.global.tls.enabled }}
+        {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
-      {{- end }}
-      {{- if eq "verify-full" .Values.global.db.sslMode }}
+          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.caCert }}
+        {{- end }}
+        {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/finalize.crt
+          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.certFile }}
         - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/finalize.key
+          value: {{ include "tlsPath" . }}/{{ .Values.finalize.tls.keyFile }}
+        {{- end }}
       {{- end }}
         - name: DB_DATABASE
           value: {{ default "lega" .Values.global.db.name | quote }}
@@ -115,7 +117,7 @@ spec:
         - name: DB_PORT
           value: {{ .Values.global.db.port | quote }}
         - name: DB_SSLMODE
-          value: {{ .Values.global.db.sslMode | quote }}
+          value: {{ template "dbSSLmode" . }}
       {{- if .Values.global.logLevel }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
@@ -149,7 +151,7 @@ spec:
       {{- end }}
         resources:
 {{ toYaml .Values.finalize.resources | trim | indent 10 }}
-  {{- if not .Values.global.pkiService }}
+  {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         volumeMounts:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
@@ -157,7 +159,7 @@ spec:
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-finalize-certs
+            secretName: {{ .Values.finalize.tls.secretName }}
       {{- if .Values.global.pkiPermissions }}
         - name: tls
           emptyDir:

@@ -28,7 +28,7 @@ global:
   schemaType: ""
 
   ingress:
-    deploy: false
+    deploy: true
     hostName:
       auth: ""
       doa: ""
@@ -90,6 +90,12 @@ global:
 # the securityContext to apply to the service pods
   extraSecurityContext: {}
 
+# If no dependency services uses TLS, postgreSQL, RabbitMQ, S3
+# TLS can be globally disabled for all serives by setting this to true
+# No to be used in production but handy for testing.
+  tls:
+    enabled: true
+
 # If an external secrets management service is used set this to true
   vaultSecrets: false
 
@@ -127,10 +133,12 @@ global:
     nfsPath: ""
 
   auth:
+    elixirID:
+    elixirSecret:
+    jwtSecret:
     jwtAlg: ES256
-    jwtKey: ""
-    jwtPub: ""
-    useTLS: true
+    jwtKey:
+    jwtPub:
 
   broker:
     durable: true
@@ -151,11 +159,12 @@ global:
     password: ""
 
   c4gh:
-# name of the c4gh key file.
-    file: c4gh.key
-    passphrase: ""
-# name of the public file, required for testing
+    secretName: ""
+  # name of the c4gh key file.
+    keyFile: ""
+  # name of the public file, required for testing
     publicFile: ""
+    passphrase: ""
 
   db:
     host: ""
@@ -263,9 +272,9 @@ credentials:
 auth:
   name: auth
   replicaCount: 1
-  repository: neicnordic/sda-auth
-  imageTag: latest
-  imagePullPolicy: Always
+  repository: ghcr.io/neicnordic/sda-auth
+  imageTag: v0.6.1
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -277,13 +286,18 @@ auth:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 backup:
   name: backup
   deploy: false
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -296,12 +310,17 @@ backup:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 doa:
   name: doa
   repository: neicnordic/sda-doa
   imageTag: latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
     requests:
@@ -317,12 +336,19 @@ doa:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: "doa.crt"
+    keyFile: "doa.key.der"
+    caCert: "ca.crt"
+    javaCert: "cacerts"
+    keyStore: "doa.p12"
 
 finalize:
   name: finalize
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -335,13 +361,18 @@ finalize:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 ingest:
   name: ingest
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
-  imagePullPolicy: Always
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -353,14 +384,19 @@ ingest:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 intercept:
   deploy: true
   name: ingest
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
-  imagePullPolicy: Always
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -372,12 +408,17 @@ intercept:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 mapper:
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
-  imagePullPolicy: Always
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -389,12 +430,17 @@ mapper:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 s3Inbox:
   name: s3Inbox
-  repository: neicnordic/sda-s3proxy
-  imageTag: latest
-  imagePullPolicy: Always
+  repository: ghcr.io/neicnordic/sda-s3proxy
+  imageTag: v0.1.10
+  imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
     requests:
@@ -407,12 +453,17 @@ s3Inbox:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    keyStore: "inbox.p12"
+    caCert: "cacerts"
+
 
 sftpInbox:
   name: sftpInbox
   repository: neicnordic/sda-inbox-sftp
   imageTag: latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
     requests:
@@ -427,17 +478,25 @@ sftpInbox:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""
 
 releasetest:
+  run: false
   repository: neicnordic/sda-helm-tests-support
   imageTag: latest
-  imagePullPolicy: Always
-  
+  imagePullPolicy: IfNotPresent
+  tls:
+    secretName: ""
+
 verify:
   replicaCount: 1
-  repository: neicnordic/sda-pipeline
-  imageTag: latest
-  imagePullPolicy: Always
+  repository: ghcr.io/neicnordic/sda-pipeline
+  imageTag: v0.2.1
+  imagePullPolicy: IfNotPresent
   resources:
     requests:
       memory: "128Mi"
@@ -449,3 +508,8 @@ verify:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
+    certFile: ""
+    keyFile: ""
+    caCert: ""

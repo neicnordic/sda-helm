@@ -25,15 +25,21 @@ args = parser.parse_args()
 
 exchange = os.getenv('MQ_EXCHANGE','sda')
 mq_vhost = os.getenv('MQ_VHOST', '/').lstrip("/")
-
+tls = os.getenv('TLS','true')
 pki_path = os.getenv('PKI_PATH' '/certs')
 
-env_connection = "amqps://%s:%s@%s/%s" % (
-    os.getenv('MQ_USER', 'user'),
-    os.getenv('MQ_PASSWORD', 'password'),
-    os.getenv('MQ_HOST', 'mq'),
-    urllib.parse.quote(mq_vhost, safe=''))
-
+if tls == 'true':
+    env_connection = "amqps://%s:%s@%s/%s" % (
+        os.getenv('MQ_USER', 'user'),
+        os.getenv('MQ_PASSWORD', 'password'),
+        os.getenv('MQ_HOST', 'mq'),
+        urllib.parse.quote(mq_vhost, safe=''))
+else:
+    env_connection = "amqp://%s:%s@%s/%s" % (
+        os.getenv('MQ_USER', 'user'),
+        os.getenv('MQ_PASSWORD', 'password'),
+        os.getenv('MQ_HOST', 'mq'),
+        urllib.parse.quote(mq_vhost, safe=''))
 
 # MQ Connection
 mq_connection = args.connection if args.connection else env_connection

@@ -76,8 +76,8 @@ spec:
           value: {{ include "confFile" .}}
       {{- end }}
         - name: AWS_URL
-          value: {{ .Values.global.inbox.s3Url | quote }}
-      {{- if .Values.global.inbox.s3CaFile }}
+          value: {{ template "S3InboxURL" . }}
+      {{- if and .Values.global.inbox.s3CaFile .Values.global.tls.enabled }}
         - name: AWS_CACERT
           value: "{{ include "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}"
       {{- end }}
@@ -102,26 +102,26 @@ spec:
         - name: BROKER_ROUTINGKEY
           value: "inbox"
         - name: BROKER_SSL
-          value: "true"
-        - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
+          value: {{ .Values.global.tls.enabled | quote }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
-      {{- if .Values.global.broker.ssl }}
         - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
+          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.caCert }}
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/inbox.crt
+          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.certFile }}
         - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/inbox.key
+          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.keyFile }}
         {{- end }}
       {{- end }}
+      {{- if .Values.global.tls.enabled }}
         - name: SERVER_CERT
-          value: {{ include "tlsPath" . }}/inbox.crt
+          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.certFile }}
         - name: SERVER_KEY
-          value: {{ include "tlsPath" . }}/inbox.key
-        {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
+          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.keyFile }}
+      {{- end }}
+        {{- if or .Values.global.auth.jwtPub .Values.global.elixir.pubKey }}
         - name: SERVER_JWTPUBKEYPATH
           value: {{ include "jwtPath" . }}
         {{- end }}
@@ -153,37 +153,26 @@ spec:
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
         volumeMounts:
-      {{- if not .Values.global.pkiService }}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           mountPath: {{ include "tlsPath" . }}
       {{- end }}
-      {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
+      {{- if .Values.global.auth.jwtPub }}
         - name: jwt
           mountPath: {{ include "jwtPath" . }}
       {{- end }}
       volumes:
-      {{- if not .Values.global.pkiService }}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-inbox-certs
+            secretName: {{ .Values.s3Inbox.tls.secretName }}
       {{- end }}
-      {{- if or .Values.global.auth.pubKey .Values.global.elixir.pubKey }}
+      {{- if .Values.global.auth.jwtPub }}
         - name: jwt
-          projected:
+          secret:
             defaultMode: 0440
-            sources:
-            - secret:
-                name: {{ template "sda.fullname" . }}-inbox
-                items:
-                {{- if .Values.global.auth.pubKey }}
-                  - key: {{ .Values.global.auth.pubKey }}
-                    path: {{ .Values.global.auth.pubKey }}
-                {{- end }}
-                {{- if .Values.global.elixir.pubKey }}
-                  - key: {{ .Values.global.elixir.pubKey }}
-                    path: {{ .Values.global.elixir.pubKey }}
-                {{- end }}
+            secretName: {{ .Values.global.auth.jwtSecret }}
       {{- end }}
       restartPolicy: Always
 {{- end }}

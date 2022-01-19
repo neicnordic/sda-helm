@@ -41,6 +41,12 @@ for service in "${services[@]}"; do
                        -inkey "${CONFPATH}/${service}".key \
                        -in "${CONFPATH}/${service}".crt \
                        -passout pass:"${STOREPASS}"
+        openssl pkcs8 -topk8 \
+                -inform pem \
+                -outform der \
+                -in "${CONFPATH}/${service}".key \
+                -out "${CONFPATH}/${service}".key.der \
+                -nocrypt
     fi
 done 
 
@@ -49,3 +55,6 @@ keytool -import -trustcacerts -file "${CONFPATH}"/ca.crt \
         -alias legaCA -storetype JKS \
         -keystore "${CONFPATH}"/cacerts \
         -storepass "${STOREPASS}" -noprompt
+
+# create DER format key
+

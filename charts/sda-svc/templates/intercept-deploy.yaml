@@ -66,18 +66,22 @@ spec:
                 key: mqUser
       {{- else }}
         - name: CONFIGFILE
-          value: {{ include "confFile" . }}
+          value: {{ template "confFile" . }}
       {{- end }}
-        {{- if .Values.global.broker.ssl }}
+        - name: BROKER_SSL
+          value: {{ .Values.global.tls.enabled | quote }}
+      {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.intercept.tls.caCert }}
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/intercept.crt
+          value: {{ template "tlsPath" . }}/{{ .Values.intercept.tls.certFile }}
         - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/intercept.key
+          value: {{ template "tlsPath" . }}/{{ .Values.intercept.tls.keyFile }}
         {{- end }}
-        {{- end }}
+        - name: BROKER_VERIFYPEER
+          value: {{ .Values.global.broker.verifyPeer | quote }}
+      {{- end }}
         - name: BROKER_DURABLE
           value: "true"
         - name: BROKER_EXCHANGE
@@ -90,10 +94,6 @@ spec:
           value: "files"
         - name: BROKER_ROUTINGERROR
           value: {{ .Values.global.broker.routingError | quote }}
-        - name: BROKER_SSL
-          value: {{ .Values.global.broker.ssl | quote}}
-        - name: BROKER_VERIFYPEER
-          value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: BROKER_VHOST
           value: {{ .Values.global.broker.vhost | quote }}
       {{- if .Values.global.logLevel }}
@@ -102,7 +102,7 @@ spec:
       {{- end }}
         resources:
 {{ toYaml .Values.intercept.resources | trim | indent 10 }}
-  {{- if not .Values.global.pkiService }}
+  {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         volumeMounts:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
@@ -110,7 +110,7 @@ spec:
         - name: {{ "tls"  }}
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-intercept-certs
+            secretName: {{ .Values.intercept.tls.secretName }}
     {{- end }}
       restartPolicy: Always
 {{- end }}

@@ -4,7 +4,7 @@ set -e
 helm repo add minio https://helm.min.io/
 helm repo update
 
-kubectl create secret generic minio-certs --from-file=public.crt --from-file=private.key
+kubectl create secret generic minio-certs --from-file=sda-deploy-init/config/certs/public.crt --from-file=sda-deploy-init/config/certs/private.key
 
 MINIO_ACCESS=$(grep s3_access_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
 MINIO_SECRET=$(grep s3_secret_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')

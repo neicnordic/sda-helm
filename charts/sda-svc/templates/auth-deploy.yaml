@@ -82,7 +82,7 @@ spec:
           value: {{ include "confFile" . }}
       {{- end }}
         - name: ELIXIR_REDIRECTURL
-          value: "https://{{ .Values.global.ingress.hostName.auth }}/elixir/login"
+          value: {{ template "authRedirect" .}}
         - name: ELIXIR_ISSUER
           value: "{{ .Values.global.elixir.oidcdHost }}"
         - name: ELIXIR_SCOPE
@@ -97,11 +97,11 @@ spec:
         - name: CEGA_JWTSIGNATUREALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
         {{- end }}
-        {{- if .Values.global.auth.useTLS }}
+        {{- if .Values.global.tls.enabled}}
         - name: SERVER_CERT
-          value: "{{ template "tlsPath" . }}/auth.crt"
+          value: {{ template "tlsPath" . }}/{{.Values.auth.tls.certFile }}
         - name: SERVER_KEY
-          value: "{{ template "tlsPath" . }}/auth.key"
+          value: {{ template "tlsPath" . }}/{{.Values.auth.tls.keyFile }}
         {{- end }}
         - name: S3INBOX
           value: {{ .Values.global.ingress.hostName.s3Inbox }}
@@ -113,7 +113,7 @@ spec:
           httpGet:
             port: auth
             path: /
-            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.auth.useTLS ) }}
+            scheme: {{ ternary "HTTPS" "HTTP" ( .Values.global.tls.enabled ) }}
             httpHeaders:
             - name: Host
               value: {{ .Values.global.ingress.hostName.auth }}
@@ -123,7 +123,7 @@ spec:
           httpGet:
             port: auth
             path: /
-            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.auth.useTLS ) }}
+            scheme: {{ ternary "HTTPS" "HTTP" ( .Values.global.tls.enabled) }}
             httpHeaders:
             - name: Host
               value: {{ .Values.global.ingress.hostName.auth }}
@@ -132,7 +132,7 @@ spec:
         resources:
 {{ toYaml .Values.s3Inbox.resources | trim | indent 10 }}
         volumeMounts:
-      {{- if not .Values.global.pkiService }}
+      {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
         - name: tls
           mountPath: {{ include "tlsPath" . }}
       {{- end }}
@@ -147,16 +147,16 @@ spec:
             defaultMode: 0440
             sources:
             - secret:
-                name: {{ template "sda.fullname" . }}-auth
+                name: {{ .Values.global.auth.jwtSecret }}
                 items:
                   - key: {{ .Values.global.auth.jwtKey }}
                     path: {{ .Values.global.auth.jwtKey }}
       {{- end }}
-      {{- if not .Values.global.pkiService }}
+      {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
         - name: tls
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-auth-certs
+            secretName: {{ .Values.auth.tls.secretName }}
       {{- end }}
 {{- end }}
 {{- end }}
