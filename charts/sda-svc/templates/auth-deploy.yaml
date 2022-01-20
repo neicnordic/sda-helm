@@ -157,7 +157,7 @@ spec:
           projected:
             sources:
             - secret:
-                name: {{ required "TLS secret name is requrired for verify" .Values.auth.tls.secretName }}
+                name: {{ required "TLS secret name is requrired for auth" .Values.auth.tls.secretName }}
             {{- if .Values.global.tls.caCert.secretName }}
             - secret:
                 name: {{ .Values.global.tls.caCert.secretName }}

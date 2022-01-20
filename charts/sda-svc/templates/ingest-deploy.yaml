@@ -263,7 +263,7 @@ spec:
             sources:
             {{- if or .Values.global.broker.verifyPeer (eq "verify-full" .Values.global.db.sslMode) }}
             - secret:
-                name: {{ required "TLS secret name is requrired for verify" .Values.ingest.tls.secretName }}
+                name: {{ required "TLS secret name is requrired for ingest" .Values.ingest.tls.secretName }}
             {{- end }}
             {{- if .Values.global.tls.caCert.secretName }}
             - secret:
