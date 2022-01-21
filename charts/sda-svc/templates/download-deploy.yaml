@@ -41,7 +41,7 @@ spec:
         runAsUser: 65534 
         runAsGroup: 65534
         fsGroup: 65534
-    {{- if .Values.global.pkiPermissions }}
+    {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
       initContainers:
       - name: tls-init
         image: busybox
@@ -93,16 +93,16 @@ spec:
           value: {{ include "trustedIssPath" . }}/{{ default "iss.json" .Values.global.download.trusted.configFile }}
       {{- end }}
         - name: C4GH_FILEPATH
-          value: {{ template "c4ghPath" . }}/{{ default "c4gh.sec.pem" .Values.global.c4gh.file }}
+          value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.keyFile }}"
       {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
       {{- end }}
       {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/download.crt
+          value: {{ include "tlsPath" . }}/tls.crt
         - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/download.key
+          value: {{ include "tlsPath" . }}/tls.key
       {{- end }}
         - name: DB_DATABASE
           value: {{ default "lega" .Values.global.db.name | quote }}
@@ -116,13 +116,13 @@ spec:
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
-      {{- if .Values.global.download.useTLS }}
+      {{- if .Values.global.tls.enabled }}
         - name: APP_PORT
           value: "8443"
         - name: APP_SERVERCERT
-          value: "{{ template "tlsPath" . }}/download.crt"
+          value: "{{ template "tlsPath" . }}/tls.crt"
         - name: APP_SERVERKEY
-          value: "{{ template "tlsPath" . }}/download.key"
+          value: "{{ template "tlsPath" . }}/tls.key"
       {{- end }}
         - name: SESSION_DOMAIN
           value: {{ .Values.global.ingress.hostName.download | quote }}
@@ -162,13 +162,13 @@ spec:
       {{- end }}
         ports:
         - name: download
-          containerPort: {{ ternary 8080 8443 ( empty .Values.global.download.useTLS ) }}
+          containerPort: {{ ternary 8443 8080 .Values.global.tls.enabled }}
           protocol: TCP
         livenessProbe:
           httpGet:
             port: download
             path: /health
-            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.download.useTLS ) }}
+            scheme: {{ ternary "HTTPS" "HTTP" ( .Values.global.tls.enabled) }}
             httpHeaders:
             - name: Host
               value: {{ .Values.global.ingress.hostName.download }}
@@ -178,7 +178,7 @@ spec:
           httpGet:
             port: download
             path: /health
-            scheme: {{ ternary "HTTP" "HTTPS" ( empty .Values.global.download.useTLS ) }}
+            scheme: {{ ternary "HTTPS" "HTTP" ( .Values.global.tls.enabled) }}
             httpHeaders:
             - name: Host
               value: {{ .Values.global.ingress.hostName.download }}
@@ -193,7 +193,7 @@ spec:
         - name: iss
           mountPath: {{ template "trustedIssPath" . }}
         {{- end }}
-        {{- if not .Values.global.pkiService }}
+        {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           mountPath: {{ template "tlsPath" . }}
         {{- end }}
@@ -202,11 +202,24 @@ spec:
           mountPath: {{ .Values.global.archive.volumePath | quote }}
         {{- end }}
       volumes:
-      {{- if not .Values.global.pkiService }}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
-          secret:
-            defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-download-certs
+          projected:
+            sources:
+            {{- if or .Values.global.broker.verifyPeer (eq "verify-full" .Values.global.db.sslMode) }}
+            - secret:
+                name: {{ required "TLS secret name is requrired for download" .Values.download.tls.secretName }}
+            {{- end }}
+            {{- if .Values.global.tls.caCert.secretName }}
+            - secret:
+                name: {{ .Values.global.tls.caCert.secretName }}
+                items:
+                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                  path: ca.crt
+            {{- else }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-cacert
+            {{- end }}
         {{- if .Values.global.pkiPermissions }}
         - name: tls
           emptyDir:
@@ -218,10 +231,10 @@ spec:
         - name: c4gh
           secret:
             defaultMode: 0440
-            secretName: {{ template "sda.fullname" . }}-c4gh
+            secretName: {{ required "A secret for the c4gh key is required" .Values.global.c4gh.secretName }}
             items:
-            - key: {{ .Values.global.c4gh.file }}
-              path: {{ .Values.global.c4gh.file }}
+            - key: {{ .Values.global.c4gh.keyFile }}
+              path: {{ .Values.global.c4gh.keyFile }}
         - name: iss
           secret:
             defaultMode: 0440

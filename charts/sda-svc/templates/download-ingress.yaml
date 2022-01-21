@@ -15,7 +15,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: "/"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/backend-protocol: "{{ ternary "HTTPS" "HTTP" .Values.global.tls.enabled }}"
     {{- if .Values.global.ingress.issuer }}
     cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
@@ -30,7 +30,7 @@ spec:
           service:
             name: {{ template "sda.fullname" . }}-download
             port:
-              number: {{ ternary 8080 443 ( empty .Values.global.download.useTLS ) }}
+              number: {{ ternary 443 8080 .Values.global.tls.enabled }}
   tls:
   - hosts:
     - {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.download }}

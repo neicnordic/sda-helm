@@ -88,16 +88,19 @@ ingest:
     secretName: "ingest-certs"
 intercept:
   tls:
-    secretName: intercept-certs
+    secretName: "intercept-certs"
 mapper:
   tls:
-    secretName: mapper-certs
+    secretName: "mapper-certs"
 s3Inbox:
   tls:
     secretName: "inbox-certs"
 verify:
   tls:
-    secretName: verify-certs
+    secretName: "verify-certs"
+download:
+  tls:
+    secretName: "download-certs"
 releasetest:
   run: true
   tls:

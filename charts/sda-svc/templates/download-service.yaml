@@ -8,7 +8,7 @@ metadata:
 spec:
   ports:
   - name: download
-    port: {{ ternary 8080 443 ( empty .Values.global.download.useTLS ) }}
+    port: {{ ternary 443 8080 .Values.global.tls.enabled }}
     targetPort: download
     protocol: TCP
   selector:
