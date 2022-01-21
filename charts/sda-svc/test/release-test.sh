@@ -30,17 +30,17 @@ if [ "${DEPLOYMENT_TYPE}" = all -o "${DEPLOYMENT_TYPE}" = external ]; then
     fi
 
     echo "DOA seems okay"
-  fi
 
     python3 /release-test-app/verify-download.py
 
     if [ "$?" -ne 0 ]; then
-	echo "Failed download verification, bailing out"
-	exit 1
+      echo "Failed download verification, bailing out"
+      exit 1
     fi
 
     echo "Download seems okay"
 
+  fi
 
 fi
 

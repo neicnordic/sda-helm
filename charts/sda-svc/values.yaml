@@ -208,7 +208,6 @@ global:
     envFile: env
 
   download:
-    useTLS: true
     # session key expiration time in seconds
     # default value = -1 for disabled state
     # a positive integer enables sessions
@@ -370,7 +369,7 @@ download:
   name: download
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-download
-  imageTag: v1.5.0
+  imageTag: v1.6.7
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -383,6 +382,8 @@ download:
 # This should be a multi-line string mapping directly to the a map of
 # the annotations to apply to the service pods
   annotations: {}
+  tls:
+    secretName: ""
 
 finalize:
   name: finalize

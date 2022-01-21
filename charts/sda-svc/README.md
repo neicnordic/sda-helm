@@ -83,7 +83,7 @@ Parameter | Description | Default
 `global.cega.host` | Full URI to the EGA user authentication service. |`""`
 `global.cega.user` | Username for the EGA user authentication service. |`""`
 `global.cega.password` | Password for the EGA user authentication service. |`""`
-`global.c4gh.file` | Private C4GH key. |`c4gh.key`
+`global.c4gh.keyFile` | Private C4GH key. |`c4gh.key`
 `global.c4gh.passphrase` | Passphrase for the private C4GH key. |`""`
 `global.c4gh.publicFile` | Public key corresponding to the private key, neeeded for tests. |`""`
 `global.db.host` | Hostname for the database. |`""`
@@ -184,7 +184,7 @@ Parameter | Description | Default
 `doa.imageTag` | dataedge container image version | `"latest"`
 `doa.imagePullPolicy` | dataedge container image pull policy | `Always`
 `doa.keystorePass` | keystore password | `changeit`
-`doa.annotations` | Specific annotation for the dataedge pod | `{}`
+`doa.annotations` | Specific annotation for the doa pod | `{}`
 `doa.resources.requests.memory` | Memory request for dataedge container. |`128Mi`
 `doa.resources.requests.cpu` | CPU request for dataedge container. |`100m`
 `doa.resources.limits.memory` | Memory limit for dataedge container. |`1024Mi`

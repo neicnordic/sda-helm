@@ -12,5 +12,5 @@ fi
 
 if [ "$1" = "sda" ] || [ "$1" = "all" ];then
     helm uninstall sda
-    kubectl delete secret auth-certs backup-certs doa-certs finalize-certs inbox-certs ingest-certs intercept-certs mapper-certs tester-certs verify-certs ca-root
+    kubectl delete secret auth-certs backup-certs doa-certs finalize-certs inbox-certs ingest-certs intercept-certs mapper-certs tester-certs verify-certs ca-root download-certs
 fi

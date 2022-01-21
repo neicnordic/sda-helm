@@ -50,7 +50,7 @@ openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyo
 openssl x509 -req -in "./${basedir}/doa.csr" -days "${days}" -CA "./${basedir}/ca.crt" -CAkey "./${basedir}/ca.key" -set_serial 01 -out "./${basedir}/doa.crt" -extensions doa_cert -extfile "$(dirname "$0")"/ssl.cnf
 
 # Create certificate for download
-openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyout "./${basedir}/download.key" -out "./${basedir}/download.csr" -extensions download_cert
+openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyout "./${basedir}/download.key" -out "./${basedir}/download.csr" -extensions download_cert -subj "/CN=lega_out/CN=admin/"
 openssl x509 -req -in "./${basedir}/download.csr" -days "${days}" -CA "./${basedir}/ca.crt" -CAkey "./${basedir}/ca.key" -set_serial 01 -out "./${basedir}/download.crt" -extensions download_cert -extfile "$(dirname "$0")"/ssl.cnf
 
 # Create certificate for orch
