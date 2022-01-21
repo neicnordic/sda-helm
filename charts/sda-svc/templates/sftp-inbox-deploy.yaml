@@ -47,6 +47,37 @@ spec:
         runAsUser: 65534 
         runAsGroup: 65534
         fsGroup: 65534
+      {{- if not .Values.global.pkiService }}
+      initContainers:
+      - name: init-java-certs
+        image: neicnordic/openssl-alpine:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            keytool -import \
+                    -trustcacerts \
+                    -file /tls-certs/ca.crt \
+                    -alias legaCA -storetype JKS \
+                    -keystore /tls/cacerts \
+                    -storepass "${KEYSTORE_PASSWORD}" \
+                    -noprompt &&
+            openssl pkcs12 -export \
+                           -out /tls/keystore.p12 \
+                           -inkey /tls-certs/tls.key \
+                           -in /tls-certs/tls.crt \
+                           -passout pass:"${KEYSTORE_PASSWORD}"
+        securityContext:
+          allowPrivilegeEscalation: false
+        env:
+        - name: KEYSTORE_PASSWORD
+          value: {{ required "Keystore password is required" .Values.sftpInbox.keystorePass | quote }}
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /tls-certs
+        - name: tmp
+          mountPath: /tls
+      {{- end }}
       containers:
       - name: inbox
         image: "{{ .Values.sftpInbox.repository }}:{{ .Values.sftpInbox.imageTag }}"
@@ -87,7 +118,7 @@ spec:
               name: {{ template "sda.fullname" . }}-inbox
               key: cegaCredentials
         - name: KEYSTORE_PATH
-          value: "/etc/ssl/certs/java/{{ .Values.sftpInbox.tls.keyStore}}"
+          value: {{ ternary "/etc/ssl/certs/java/keystore.p12" (printf "%s/%s" .Values.global.secretsPath .Values.sftpInbox.tls.keyStoreFile ) (empty .Values.global.pkiService)}}
         - name: KEYSTORE_PASSWORD
           value: {{ .Values.sftpInbox.keystorePass | quote }}
         - name: KEYSTORE_TYPE
@@ -117,7 +148,7 @@ spec:
         volumeMounts:
         - name: inbox
           mountPath: "/ega/inbox"
-        - name: tls
+        - name: tmp
           mountPath: "/etc/ssl/certs/java"
         - name: tmp
           mountPath: /tmp/
@@ -133,9 +164,20 @@ spec:
             server: {{ required "An inbox NFS server is required" .Values.global.inbox.nfsServer | quote }}
             path: {{ if .Values.global.inbox.nfsPath }}{{ .Values.global.inbox.nfsPath | quote}}{{ else }}{{ "/" }}{{ end }}
       {{- end }}
-        - name: tls
-          secret:
-            secretName: {{ .Values.sftpInbox.tls.secretName }}
-            defaultMode: 0440
+        - name: tls-certs
+          projected:
+            sources:
+            - secret:
+                name: {{ required "TLS secret name is requrired for sftpInbox" .Values.sftpInbox.tls.secretName }}
+            {{- if .Values.global.tls.caCert.secretName }}
+            - secret:
+                name: {{ .Values.global.tls.caCert.secretName }}
+                items:
+                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                  path: ca.crt
+            {{- else }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-cacert
+            {{- end }}
 {{- end }}
 {{- end }}

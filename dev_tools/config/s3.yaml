@@ -39,6 +39,7 @@ global:
     password: 3iSGc5loLN7hu2EwT2Z2CzCT26iUrk3t
   db:
     host: "postgres-sda-db"
+    sslMode: "verify-full"
   c4gh:
     secretName: c4gh
     keyFile: c4gh.key
@@ -60,12 +61,14 @@ global:
     hostName:
       auth: sda-sda-svc-auth
   logLevel: debug
+  tls:
+    enabled: true
+    caCert:
+      secretName: "ca-root"
+      secretKey: "ca.crt"
 auth:
   tls:
     secretName: "auth-certs"
-    certFile: "auth.crt"
-    keyFile: "auth.key"
-    caCert: "ca.crt"
 backup:
   deploy: true
   tls:
@@ -76,46 +79,24 @@ backup:
 doa:
   tls:
     secretName: "doa-certs"
-    certFile: "doa.crt"
-    keyFile: "doa.key.der"
-    caCert: "ca.crt"
-    javaCert: "cacerts"
 finalize:
   tls:
     secretName: "finalize-certs"
-    certFile: "finalize.crt"
-    keyFile: "finalize.key"
-    caCert: "ca.crt"
 ingest:
   tls:
     secretName: "ingest-certs"
-    certFile: "ingest.crt"
-    keyFile: "ingest.key"
-    caCert: "ca.crt"
 intercept:
   tls:
     secretName: intercept-certs
-    certFile: intercept.crt
-    keyFile: intercept.key
-    caCert: ca.crt
 mapper:
   tls:
     secretName: mapper-certs
-    certFile: mapper.crt
-    keyFile: mapper.key
-    caCert: ca.crt
 s3Inbox:
   tls:
     secretName: "inbox-certs"
-    certFile: "inbox.crt"
-    keyFile: "inbox.key"
-    caCert: "ca.crt"
 verify:
   tls:
     secretName: verify-certs
-    certFile: verify.crt
-    keyFile: verify.key
-    caCert: ca.crt
 releasetest:
   run: true
   tls:

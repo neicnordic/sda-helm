@@ -23,8 +23,6 @@ jobs:
       run: bash ./dev_tools/scripts/install-sda-deps.sh
     - name: Create certificates
       run: bash ./dev_tools/scripts/make-certs.sh
-    - name: Create java certificates
-      run: bash ./dev_tools/scripts/java-certs.sh
     - name: Create secrets
       run: bash ./dev_tools/scripts/create-secrets.sh
     - name: Set up services configuration

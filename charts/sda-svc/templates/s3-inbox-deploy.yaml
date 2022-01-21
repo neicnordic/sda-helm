@@ -79,7 +79,7 @@ spec:
           value: {{ template "S3InboxURL" . }}
       {{- if and .Values.global.inbox.s3CaFile .Values.global.tls.enabled }}
         - name: AWS_CACERT
-          value: "{{ include "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}"
+          value: "{{ include "tlsPath" . }}/ca.crt"
       {{- end }}
       {{- if .Values.global.inbox.s3Region }}
         - name: AWS_REGION
@@ -107,19 +107,19 @@ spec:
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
         - name: BROKER_CACERT
-          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.caCert }}
+          value: {{ include "tlsPath" . }}/ca.crt
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.certFile }}
+          value: {{ include "tlsPath" . }}/tls.crt
         - name: BROKER_CLIENTKEY
-          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.keyFile }}
+          value: {{ include "tlsPath" . }}/tls.key
         {{- end }}
       {{- end }}
       {{- if .Values.global.tls.enabled }}
         - name: SERVER_CERT
-          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.certFile }}
+          value: {{ include "tlsPath" . }}/tls.crt
         - name: SERVER_KEY
-          value: {{ include "tlsPath" . }}/{{.Values.s3Inbox.tls.keyFile }}
+          value: {{ include "tlsPath" . }}/tls.key
       {{- end }}
         {{- if or .Values.global.auth.jwtPub .Values.global.elixir.pubKey }}
         - name: SERVER_JWTPUBKEYPATH
@@ -164,9 +164,20 @@ spec:
       volumes:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
-          secret:
-            defaultMode: 0440
-            secretName: {{ .Values.s3Inbox.tls.secretName }}
+          projected:
+            sources:
+            - secret:
+                name: {{ required "TLS secret name is requrired for S3Inbox"  .Values.s3Inbox.tls.secretName }}
+            {{- if .Values.global.tls.caCert.secretName }}
+            - secret:
+                name: {{ .Values.global.tls.caCert.secretName }}
+                items:
+                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                  path: ca.crt
+            {{- else }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-cacert
+            {{- end }}
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt

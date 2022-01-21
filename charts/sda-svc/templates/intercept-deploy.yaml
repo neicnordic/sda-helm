@@ -72,12 +72,12 @@ spec:
           value: {{ .Values.global.tls.enabled | quote }}
       {{- if and .Values.global.broker.ssl .Values.global.tls.enabled }}
         - name: BROKER_CACERT
-          value: {{ template "tlsPath" . }}/{{ .Values.intercept.tls.caCert }}
+          value: {{ template "tlsPath" . }}/ca.crt
         {{- if .Values.global.broker.verifyPeer }}
         - name: BROKER_CLIENTCERT
-          value: {{ template "tlsPath" . }}/{{ .Values.intercept.tls.certFile }}
+          value: {{ template "tlsPath" . }}/tls.crt
         - name: BROKER_CLIENTKEY
-          value: {{ template "tlsPath" . }}/{{ .Values.intercept.tls.keyFile }}
+          value: {{ template "tlsPath" . }}/tls.key
         {{- end }}
         - name: BROKER_VERIFYPEER
           value: {{ .Values.global.broker.verifyPeer | quote }}
@@ -108,9 +108,22 @@ spec:
           mountPath: {{ template "tlsPath" . }}
       volumes:
         - name: {{ "tls"  }}
-          secret:
-            defaultMode: 0440
-            secretName: {{ .Values.intercept.tls.secretName }}
+          projected:
+            sources:
+            {{- if .Values.intercept.tls.secretName }}
+            - secret:
+                name: {{ .Values.intercept.tls.secretName }}
+            {{- end }}
+            {{- if .Values.global.tls.caCert.secretName }}
+            - secret:
+                name: {{ .Values.global.tls.caCert.secretName }}
+                items:
+                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                  path: ca.crt
+            {{- else }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-cacert
+            {{- end }}
     {{- end }}
       restartPolicy: Always
 {{- end }}

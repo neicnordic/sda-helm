@@ -144,9 +144,9 @@ spec:
       {{- end }}
       {{- if eq "verify-full" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/tester.crt
+          value: {{ include "tlsPath" . }}/tls.crt
         - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/tester.key
+          value: {{ include "tlsPath" . }}/tls.key
       {{- end }}
         - name: DB_DATABASE
           value: {{ default "lega" .Values.global.db.name | quote }}
@@ -192,8 +192,20 @@ spec:
   volumes:
     {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
       - name: certs
-        secret:
-          secretName: {{ .Values.releasetest.tls.secretName }}
+        projected:
+          sources:
+          - secret:
+              name: {{ .Values.releasetest.tls.secretName }}
+          {{- if .Values.global.tls.caCert.secretName }}
+          - secret:
+              name: {{ .Values.global.tls.caCert.secretName }}
+              items:
+              - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
+                path: ca.crt
+          {{- else }}
+          - secret:
+              name: {{ template "sda.fullname" . }}-caCert
+          {{- end }}
     {{- end }}
     {{- if eq .Values.global.inbox.storageType "posix" }}
       - name: "inbox-release-test"
