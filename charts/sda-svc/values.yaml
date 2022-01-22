@@ -344,7 +344,7 @@ backup:
 
 doa:
   name: doa
-  repository: neicnordic/sda-doa
+  repository: ghcr.io/neicnordic/sda-doa
   imageTag: v1.6.3
   imagePullPolicy: IfNotPresent
   replicaCount: 1
@@ -488,7 +488,7 @@ s3Inbox:
 
 sftpInbox:
   name: sftpInbox
-  repository: neicnordic/sda-inbox-sftp
+  repository: ghcr.io/neicnordic/sda-inbox-sftp
   imageTag: v1.7.6
   imagePullPolicy: IfNotPresent
   replicaCount: 1
