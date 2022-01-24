@@ -326,7 +326,7 @@ backup:
   deploy: false
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.10
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -345,7 +345,7 @@ backup:
 doa:
   name: doa
   repository: ghcr.io/neicnordic/sda-doa
-  imageTag: v1.6.3
+  imageTag: v1.6.4
   imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
@@ -389,7 +389,7 @@ finalize:
   name: finalize
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.10
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -409,7 +409,7 @@ ingest:
   name: ingest
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.10
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -430,7 +430,7 @@ intercept:
   name: ingest
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.10
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -449,7 +449,7 @@ intercept:
 mapper:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.10
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -489,7 +489,7 @@ s3Inbox:
 sftpInbox:
   name: sftpInbox
   repository: ghcr.io/neicnordic/sda-inbox-sftp
-  imageTag: v1.7.6
+  imageTag: v1.7.8
   imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
@@ -520,7 +520,7 @@ releasetest:
 verify:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.10
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
