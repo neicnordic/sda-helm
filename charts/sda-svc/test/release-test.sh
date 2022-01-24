@@ -10,11 +10,10 @@ fi
 
 export MQ_EXCHANGE=''
 
-if [ "${DEPLOYMENT_TYPE}" = all -o "${DEPLOYMENT_TYPE}" = external ]; then
+if [ "${DEPLOYMENT_TYPE}" = all ] || [ "${DEPLOYMENT_TYPE}" = external ]; then
 
-  python3 /release-test-app/verify-inboxes.py
 
-  if [ "$?" -ne 0 ]; then
+  if ! python3 /release-test-app/verify-inboxes.py ; then
     echo "Failed inbox verification, bailing out"
     exit 1
   fi
@@ -22,18 +21,15 @@ if [ "${DEPLOYMENT_TYPE}" = all -o "${DEPLOYMENT_TYPE}" = external ]; then
   echo "Inbox seems okay"
 
   if [ "${TLS}" = true ]; then
-    python3 /release-test-app/verify-doa.py
 
-    if [ "$?" -ne 0 ]; then
+    if ! python3 /release-test-app/verify-doa.py ; then
       echo "Failed doa verification, bailing out"
       exit 1
     fi
 
     echo "DOA seems okay"
 
-    python3 /release-test-app/verify-download.py
-
-    if [ "$?" -ne 0 ]; then
+    if ! python3 /release-test-app/verify-download.py ; then
       echo "Failed download verification, bailing out"
       exit 1
     fi
