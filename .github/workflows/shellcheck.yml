@@ -12,3 +12,13 @@ jobs:
       uses: ludeeus/action-shellcheck@master
       with:
         scandir: './dev_tools/scripts'
+  python-scripts:
+    name: Python scripts linting
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - name: Install Black
+      run: pip install black
+    - name: Run black --check .
+      run: black --check . -l 160
