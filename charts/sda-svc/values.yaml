@@ -305,7 +305,7 @@ auth:
   name: auth
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-auth
-  imageTag: v0.6.1
+  imageTag: v0.6.3
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -326,7 +326,7 @@ backup:
   deploy: false
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.1
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -344,8 +344,8 @@ backup:
 
 doa:
   name: doa
-  repository: neicnordic/sda-doa
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-doa
+  imageTag: v1.6.4
   imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
@@ -389,7 +389,7 @@ finalize:
   name: finalize
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.1
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -409,7 +409,7 @@ ingest:
   name: ingest
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.1
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -430,7 +430,7 @@ intercept:
   name: ingest
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.1
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -449,7 +449,7 @@ intercept:
 mapper:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.1
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -468,7 +468,7 @@ mapper:
 s3Inbox:
   name: s3Inbox
   repository: ghcr.io/neicnordic/sda-s3proxy
-  imageTag: v0.1.10
+  imageTag: v0.1.16
   imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
@@ -488,8 +488,8 @@ s3Inbox:
 
 sftpInbox:
   name: sftpInbox
-  repository: neicnordic/sda-inbox-sftp
-  imageTag: latest
+  repository: ghcr.io/neicnordic/sda-inbox-sftp
+  imageTag: v1.7.8
   imagePullPolicy: IfNotPresent
   replicaCount: 1
   resources:
@@ -520,7 +520,7 @@ releasetest:
 verify:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.1
+  imageTag: v0.2.11
   imagePullPolicy: IfNotPresent
   resources:
     requests:
