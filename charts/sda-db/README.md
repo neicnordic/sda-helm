@@ -4,7 +4,7 @@ Source repository: [https://github.com/neicnordic/sda-db](https://github.com/nei
 
 ## Installing the Chart
 
-Edit the values.yaml file and specify the relevant parts of the `default` section.
+Edit the values.yaml file and specify the relevant parts of the `global` section.
 
 Parameter | Description | Default
 --------- | ----------- | -------
