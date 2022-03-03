@@ -31,7 +31,7 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "verifyPeer" -}}
-  {{ if .Values.config.tls.verifyPeer }}
+  {{ if .Values.global.tls.verifyPeer }}
     {{-  print "verify_peer" -}}
   {{ else }}
     {{-  print "verify_none" -}}
@@ -40,24 +40,24 @@ Create chart name and version as used by the chart label.
 
 {{- define "mqCert" -}}
     {{- if .Values.externalPkiService.tlsPath }}
-        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a TLS certificate is required" .Values.config.tls.serverCert)) "/")}}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a TLS certificate is required" .Values.global.tls.serverCert)) "/")}}
     {{- else }}
-        {{- printf "/etc/rabbitmq/tls/%s" (required "a TLS certificate is required" .Values.config.tls.serverCert) }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "a TLS certificate is required" .Values.global.tls.serverCert) }}
     {{- end -}}
 {{- end -}}
 
 {{- define "mqKey" -}}
     {{- if .Values.externalPkiService.tlsPath }}
-        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a TLS key is required" .Values.config.tls.serverKey)) "/")}}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a TLS key is required" .Values.global.tls.serverKey)) "/")}}
     {{- else }}
-        {{- printf "/etc/rabbitmq/tls/%s" (required "a TLS key is required" .Values.config.tls.serverKey) }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "a TLS key is required" .Values.global.tls.serverKey) }}
     {{- end -}}
 {{- end -}}
 
 {{- define "caCert" -}}
     {{- if .Values.externalPkiService.tlsPath }}
-        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a CA certificate is required" .Values.config.tls.caCert)) "/")}}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a CA certificate is required" .Values.global.tls.caCert)) "/")}}
     {{- else }}
-        {{- printf "/etc/rabbitmq/tls/%s" (required "a CA certificate is required" .Values.config.tls.caCert) }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "a CA certificate is required" .Values.global.tls.caCert) }}
     {{- end -}}
 {{- end -}}

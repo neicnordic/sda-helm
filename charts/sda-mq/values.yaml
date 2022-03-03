@@ -1,4 +1,4 @@
-config:
+global:
   adminUser:
   adminPasswordHash:
   tls:
@@ -12,6 +12,7 @@ config:
   vhost: ""
 
 # Upstream shovel recipient
+# only used in a federated setup
   shovel:
     host: ""
     pass: ""

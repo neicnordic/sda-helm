@@ -11,20 +11,20 @@ Parameter | Description | Default
 `image.repository` | sda-mq container image repository | `ghcr.io/neicnordic/sda-mq`
 `image.tag` | sda-mq  container image version | `v1.3.0`
 `image.pullPolicy` | sda-mq container image pull policy | `Always`
-`config.adminUser` | Username of admin user |`""`
-`config.adminPasswordHash` | Passwordhash for admin user. |`""`
-`config.tls.enabled` | Use TLS for all connections. |`true`
-`config.tls.secretName` | Name of the secret that holds the certificates. |`""`
-`config.tls.serverKey` | Name of the certificate private key file. |`""`
-`config.tls.serverCert` | Name of the certificate file. |`""`
-`config.tls.caCert` | Name of the CA file. |`""`
-`config.tls.verifyPeer` | Require client certificates. |`true`
-`config.vhost` | default vhost is '/' unless specifically named |`""`
-`config.shovel.host` | Hostname of federated server |`""`
-`config.shovel.pass` | Password to federated server |`""`
-`config.shovel.port` | Port that federated server listens on |`5671`
-`config.shovel.user` | Username to federated server |`""`
-`config.shovel.vhost` | Vhost on federated sever to connect to |`""`
+`global.adminUser` | Username of admin user |`""`
+`global.adminPasswordHash` | Passwordhash for admin user. |`""`
+`global.tls.enabled` | Use TLS for all connections. |`true`
+`global.tls.secretName` | Name of the secret that holds the certificates. |`""`
+`global.tls.serverKey` | Name of the certificate private key file. |`""`
+`global.tls.serverCert` | Name of the certificate file. |`""`
+`global.tls.caCert` | Name of the CA file. |`""`
+`global.tls.verifyPeer` | Require client certificates. |`true`
+`global.vhost` | default vhost is '/' unless specifically named |`""`
+`global.shovel.host` | Hostname of federated server |`""`
+`global.shovel.pass` | Password to federated server |`""`
+`global.shovel.port` | Port that federated server listens on |`5671`
+`global.shovel.user` | Username to federated server |`""`
+`global.shovel.vhost` | Vhost on federated sever to connect to |`""`
 `externalPkiService.tlsPath` | If an external PKI service is used, this is the path where the certifiates are placed | `""`
 `rbacEnabled` | Use role based access control. |`true`
 `revisionHistory` | Number of revisions to keep for the option to rollback a deployment | `3`

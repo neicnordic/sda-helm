@@ -66,25 +66,25 @@ spec:
 {{ toYaml .Values.resources | trim | indent 10 }}
         env:
         - name: MQ_USER
-          value: {{ required "The admin username is required" .Values.config.adminUser | quote }}
+          value: {{ required "The admin username is required" .Values.global.adminUser | quote }}
         - name: MQ_PASSWORD_HASH
           valueFrom:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}
               key: password_hash
-      {{- if and .Values.config.shovel.host (and .Values.config.shovel.user .Values.config.shovel.pass) }}
+      {{- if and .Values.global.shovel.host (and .Values.global.shovel.user .Values.global.shovel.pass) }}
         - name: CEGA_CONNECTION
           valueFrom:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}
               key: shovel_connection
       {{- end }}
-      {{- if .Values.config.tls.enabled }}
+      {{- if .Values.global.tls.enabled }}
         - name: MQ_SERVER_CERT
           value: {{ template "mqCert" . }}
         - name: MQ_SERVER_KEY
           value: {{ template "mqKey" . }}
-        {{- if .Values.config.tls.verifyPeer }}
+        {{- if .Values.global.tls.verifyPeer }}
         - name: MQ_CA
           value: {{ template "caCert" . }}
         - name: MQ_VERIFY
@@ -94,15 +94,15 @@ spec:
         - name: NOTLS
           value: "true"
       {{- end }}
-      {{- if .Values.config.vhost }}
+      {{- if .Values.global.vhost }}
         - name: MQ_VHOST
-          value: {{ .Values.config.vhost | quote }}
+          value: {{ .Values.global.vhost | quote }}
       {{- end }}
         ports:
         - containerPort: 15672
           name: management
           protocol: TCP
-        - containerPort: {{ ternary 5671 5672 (.Values.config.tls.enabled )}}
+        - containerPort: {{ ternary 5671 5672 (.Values.global.tls.enabled )}}
           name: amqp
         livenessProbe:
           exec:
@@ -125,15 +125,15 @@ spec:
         volumeMounts:
         - name: data
           mountPath: "/var/lib/rabbitmq/"
-        {{- if and .Values.config.tls.enabled (not .Values.externalPkiService.tlsPath) }}
+        {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
         - name: tls-certs
           mountPath: /etc/rabbitmq/tls
         {{- end }}
       volumes:
-    {{- if and .Values.config.tls.enabled (not .Values.externalPkiService.tlsPath) }}
+    {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
       - name: tls-certs
         secret:
-          secretName: {{ required "TLS secret name is required when TLS in enabled" .Values.config.tls.secretName }}
+          secretName: {{ required "TLS secret name is required when TLS in enabled" .Values.global.tls.secretName }}
     {{- end }}
       - name: data
   {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
