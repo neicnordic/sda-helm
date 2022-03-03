@@ -1,5 +1,6 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 {{- if .Values.global.tls.enabled }}
+{{- if .Values.global.doa.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -310,5 +311,6 @@ spec:
             path: {{ if .Values.global.archive.nfsPath }}{{ .Values.global.archive.nfsPath | quote }}{{ else }}{{ "/" }}{{ end }}
         {{- end }}
       {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

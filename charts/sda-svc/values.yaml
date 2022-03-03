@@ -189,6 +189,7 @@ global:
     sslMode: "verify-full"
 
   doa:
+    enabled: false
     outbox:
       enabled: false
       # MQ queue name for files/datasets export requests
