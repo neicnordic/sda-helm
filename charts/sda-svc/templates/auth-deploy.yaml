@@ -87,6 +87,10 @@ spec:
           value: "{{ .Values.global.elixir.oidcdHost }}"
         - name: ELIXIR_SCOPE
           value: "ga4gh_passport_v1"
+        - name: ELIXIR_JWTPRIVATEKEY
+          value: "{{ template "jwtPath" . }}/{{ .Values.global.auth.jwtKey }}"
+        - name: ELIXIR_JWTSIGNATUREALG
+          value: {{ .Values.global.auth.jwtAlg }}
         {{- if or ( eq "federated" .Values.global.schemaType) ( eq "" .Values.global.schemaType) }}
         - name: ELIXIR_JWTPRIVATEKEY
           value: "{{ template "jwtPath" . }}/{{ .Values.global.auth.jwtKey }}"
@@ -138,15 +142,15 @@ spec:
         volumeMounts:
       {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
         - name: tls
-          mountPath: {{ include "tlsPath" . }}
+          mountPath: {{ template "tlsPath" . }}
       {{- end }}
       {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
         - name: jwt
-          mountPath: {{ include "jwtPath" . }}
+          mountPath: {{ template "jwtPath" . }}
       {{- end }}
       volumes:
       {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
-        - name: jwt
+        - name: {{ .Values.global.jwtPath }}
           projected:
             defaultMode: 0440
             sources:
