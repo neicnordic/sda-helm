@@ -17,9 +17,9 @@ The following table lists the configurable parameters of the `sda-svc` chart and
 Parameter | Description | Default
 --------- | ----------- | -------
 `global.secretsPath` | Path where the sensitive files can be found | `/.secrets`
-`global.c4ghPath` | This path will be a subpath to the secretsPath | `""`
-`global.tlsPath` | This path will be a subpath to the secretsPath | `""`
-`global.jwtPath` | This path will be a subpath to the secretsPath | `""`
+`global.c4ghPath` | This path will be a subpath to the secretsPath | `c4gh`
+`global.tlsPath` | This path will be a subpath to the secretsPath | `tls`
+`global.jwtPath` | This path will be a subpath to the secretsPath | `jwt`
 `global.confFile` | Name of config file, used when secrets are handled by hasicorp vault | `config.yaml`
 `global.confFilePath` | This path will be a subpath to the secretsPath | `""`
 `global.deploymentType` | Deployment can be split into `external` and `internal` components, available options are `all`, `external` and `internal`. | `all`

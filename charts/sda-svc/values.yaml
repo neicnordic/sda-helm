@@ -7,9 +7,9 @@ global:
 # TLS certificates or C4GH key locations can be set using global.tlsPath or global.c4ghPath respectively,
 # this path will be a subpath to the secretsPath.
   secretsPath: /.secrets
-  c4ghPath: ""
-  tlsPath: ""
-  jwtPath: ""
+  c4ghPath: "c4gh"
+  tlsPath: "tls"
+  jwtPath: "jwt"
 
 # Name of an injected config file, located in the secretsPath
 # If the file is located in a subpath it can be set using the confFilePath
@@ -216,7 +216,7 @@ global:
     # this should translate into JSON array of objects
     # with 2 keys iss and jku
     trusted:
-      configPath: ""
+      configPath: "iss"
       configFile: "iss.json"
       iss:
         - iss: "https://login.elixir-czech.org/oidc/"
