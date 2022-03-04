@@ -1,12 +1,14 @@
 global:
-  pg_in_password:
-  pg_out_password:
+  pg_in_password: ""
+  pg_out_password: ""
   tls:
     enabled: true
-    secretName: 
-    certName: postgresql.crt
-    keyName: postgresql.key
-    CAFile: root.crt
+    issuer: ""
+    clusterIssuer: ""
+    secretName: ""
+    certName: tls.crt
+    keyName: tls.key
+    CAFile: ca.crt
 # If client verification is to be used set verifyPeer to verify-full or verify-ca
 # To disable certificate validation set to verify-none
     verifyPeer: verify-ca
@@ -90,3 +92,10 @@ service:
   port: 5432
 
 updateStrategyType: RollingUpdate
+
+
+# secret containing the TLS certificagtes for the release tester
+# if no certificate issuer is used
+testimage:
+  tls:
+    secretName: ""
