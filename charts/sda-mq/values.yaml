@@ -3,10 +3,12 @@ global:
   adminPasswordHash:
   tls:
     enabled: true
-    secretName:
-    serverKey:
-    serverCert:
-    caCert:
+    issuer: ""
+    clusterIssuer: ""
+    secretName: ""
+    certName: tls.crt
+    keyName: tls.key
+    caCert: ca.crt
     verifyPeer: true
 # if a different vhost than the default `/` is to be used
   vhost: ""
@@ -54,7 +56,7 @@ networkPolicy:
 ## If undefined (the default) or set to null, no storageClassName spec is
 ##   set, choosing the default provisioner.
 persistence: 
-  enabled: true
+  enabled: false
   storageSize: 8Gi
   storageClass: null
   existingClaim: null
@@ -97,6 +99,6 @@ testimage:
   pullPollicy: Always
   tls:
     secretName: 
-    tlsKey: 
-    tlsCert: 
-    caCert: 
+    tlsKey: tls.key
+    tlsCert: tls.crt
+    caCert: ca.crt
