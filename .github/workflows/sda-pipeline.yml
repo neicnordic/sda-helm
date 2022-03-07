@@ -20,7 +20,7 @@ jobs:
         else
           echo "SVCS=auth backup doa finalize inbox ingest mapper verify download" >> "$GITHUB_ENV";
         fi
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install kube dependencies
       run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Initialise k3d
