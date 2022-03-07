@@ -1,7 +1,7 @@
 
 image:
-  repository: neicnordic/sda-orch
-  tag: latest
+  repository: ghcr.io/neicnordic/sda-orch
+  tag: v0.9.11
   pullPolicy: Always
 logLevel: "info"
 
