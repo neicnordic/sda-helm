@@ -7,7 +7,7 @@ jobs:
     name: Lint sda-db
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install helm3
       run: |
         wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz -O - | tar -xz
@@ -19,7 +19,7 @@ jobs:
     name: Lint sda-mq
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install helm3
       run: |
         wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz -O - | tar -xz
@@ -31,7 +31,7 @@ jobs:
     name: Lint sda-svc
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install helm3
       run: |
         wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz -O - | tar -xz
@@ -43,7 +43,7 @@ jobs:
     name: Lint sda-orch
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install helm3
       run: |
         wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz -O - | tar -xz

@@ -12,7 +12,7 @@ jobs:
         test: [sda-standalone]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install kube dependencies
       run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Initialise k3d
