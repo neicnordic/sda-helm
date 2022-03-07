@@ -36,11 +36,13 @@ networkPolicy:
 
 tls:
   enabled: true
-  secretName:
+  issuer: ""
+  clusterIssuer: ""
+  secretName: 
   permissions: false
-  cert:
-  key:
-  caCert:
+  cert: tls.crt
+  key: tls.key
+  caCert: ca.crt
 
 ## RevisionHistory
 ##  If defined, set the revisionHistoryLimit of the deployment, defaults to 3
@@ -55,11 +57,11 @@ envFile: "env"
 
 # used by Message Broker
 broker:
-  exchange: ""
-  host: ""
-  password: ""
+  exchange: "foo"
+  host: "foo"
+  password: "bar"
   port: 5671
-  username: ""
+  username: "baz"
   vhost: "/"
   queue:
     inbox: "inbox"
