@@ -1,4 +1,5 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
+{{- if .Values.global.download.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -255,4 +256,5 @@ spec:
         {{- end }}
       {{- end }}
       restartPolicy: Always
+{{- end }}
 {{- end }}
