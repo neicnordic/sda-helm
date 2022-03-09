@@ -97,7 +97,11 @@ spec:
         - name: ELIXIR_JWTSIGNATUREALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
         - name: CEGA_JWTISSUER
+        {{- if .Values.global.tls.enabled }}
           value: "https://{{ .Values.global.ingress.hostName.auth }}"
+        {{- else }}
+          value: "http://{{ .Values.global.ingress.hostName.auth }}"
+        {{- end }}
         - name: CEGA_AUTHURL
           value: {{ .Values.global.cega.host | quote }}
         - name: CEGA_JWTPRIVATEKEY
