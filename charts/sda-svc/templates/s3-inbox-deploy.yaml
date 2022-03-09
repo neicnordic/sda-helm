@@ -168,17 +168,11 @@ spec:
           projected:
             sources:
             - secret:
-                name: {{ required "TLS secret name is requrired for S3Inbox"  .Values.s3Inbox.tls.secretName }}
-            {{- if .Values.global.tls.caCert.secretName }}
-            - secret:
-                name: {{ .Values.global.tls.caCert.secretName }}
-                items:
-                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                  path: ca.crt
-            {{- else }}
-            - secret:
-                name: {{ template "sda.fullname" . }}-cacert
-            {{- end }}
+          {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
+                name: {{ template "sda.fullname" . }}-inbox-certs
+          {{- else }}
+                name: {{ required "An certificate issuer or a TLS secret name is requrired for S3Inbox" .Values.s3Inbox.tls.secretName }}
+          {{- end }}
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt

@@ -89,8 +89,8 @@ global:
 # Not to be used in production but handy for testing.
   tls:
     enabled: true
-    caCert:
-# secretName is the name of the Kubernetes secret that holds the root CA certificate.
+    issuer: ""
+    clusterIssuer: ""
 # A Kubernetes secret must be in the same namespace that sda-pipeline is installed into.
       secretName: ""
 # secretKey is the key within the Kubernetes secret that holds the root CA certificate.

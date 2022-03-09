@@ -207,19 +207,12 @@ spec:
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           projected:
             sources:
-            {{- if or .Values.global.broker.verifyPeer (eq "verify-full" .Values.global.db.sslMode) }}
+            {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
             - secret:
-                name: {{ required "TLS secret name is requrired for download" .Values.download.tls.secretName }}
-            {{- end }}
-            {{- if .Values.global.tls.caCert.secretName }}
-            - secret:
-                name: {{ .Values.global.tls.caCert.secretName }}
-                items:
-                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                  path: ca.crt
+                name: {{ template "sda.fullname" . }}-download-certs
             {{- else }}
-            - secret:
-                name: {{ template "sda.fullname" . }}-cacert
+              - secret:
+                  name: {{ required "An certificate issuer or a TLS secret name is requrired for download" .Values.download.tls.secretName }}
             {{- end }}
         {{- if .Values.global.pkiPermissions }}
         - name: tls

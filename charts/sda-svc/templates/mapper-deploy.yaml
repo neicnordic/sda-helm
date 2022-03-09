@@ -157,20 +157,13 @@ spec:
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           projected:
             sources:
-            {{- if or .Values.global.broker.verifyPeer (eq "verify-full" .Values.global.db.sslMode) }}
+          {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
             - secret:
-                name: {{ required "TLS secret name is requrired for mapper" .Values.mapper.tls.secretName }}
-            {{- end }}
-            {{- if .Values.global.tls.caCert.secretName }}
+                name: {{ template "sda.fullname" . }}-mapper-certs
+          {{- else if .Values.mapper.tls.secretName }}
             - secret:
-                name: {{ .Values.global.tls.caCert.secretName }}
-                items:
-                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                  path: ca.crt
-            {{- else }}
-            - secret:
-                name: {{ template "sda.fullname" . }}-cacert
-            {{- end }}
+                name: {{ required "An certificate issuer or a TLS secret name is requrired for mapper" .Values.mapper.tls.secretName }}
+          {{- end }}
       {{- if .Values.global.pkiPermissions }}
         - name: tls
           emptyDir:

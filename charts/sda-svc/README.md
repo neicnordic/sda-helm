@@ -132,6 +132,9 @@ Parameter | Description | Default
 `global.inbox.s3SecretKey` | Secret key to S3 inbox. |`null`
 `global.inbox.s3CaFile` | CA certificate to use if the S3 inbox is internal. |`null`
 `global.inbox.s3ReadyPath` | Endpoint to verify that the inbox is respondig. |`""`
+`global.tls.enabled` | Use TLS for all connections. |`true`
+`global.tls.issuer` | Issuer for TLS certificate creation. |`""`
+`global.tls.clusterIssuer` | ClusterIssuer for TLS certificate creation. |`""`
 
 ### Credentials
 

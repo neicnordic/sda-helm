@@ -160,22 +160,17 @@ spec:
                   - key: {{ .Values.global.auth.jwtKey }}
                     path: {{ .Values.global.auth.jwtKey }}
       {{- end }}
-      {{- if .Values.global.tls.enabled }}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           projected:
             sources:
+          {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
             - secret:
-                name: {{ required "TLS secret name is requrired for auth" .Values.auth.tls.secretName }}
-            {{- if .Values.global.tls.caCert.secretName }}
+                name: {{ template "sda.fullname" . }}-auth-certs
+          {{- else }}
             - secret:
-                name: {{ .Values.global.tls.caCert.secretName }}
-                items:
-                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                  path: ca.crt
-            {{- else }}
-            - secret:
-                name: {{ template "sda.fullname" . }}-caCert
-            {{- end }}
+                name: {{ required "An certificate issuer or a TLS secret name is requrired for auth" .Values.auth.tls.secretName }}
+          {{- end }}
       {{- end }}
 {{- end }}
 {{- end }}
