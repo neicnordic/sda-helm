@@ -148,20 +148,20 @@ spec:
         - name: tls
           mountPath: {{ template "tlsPath" . }}
       {{- end }}
-      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: jwt
           mountPath: {{ template "jwtPath" . }}
       {{- end }}
       volumes:
-      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
-        - name: {{ .Values.global.jwtPath }}
+      {{- if not .Values.global.vaultSecrets }}
+        - name: jwt
           projected:
             defaultMode: 0440
             sources:
             - secret:
-                name: {{ .Values.global.auth.jwtSecret }}
+                name: {{ required "A secret for the JWT signing key is needed" .Values.global.auth.jwtSecret }}
                 items:
-                  - key: {{ .Values.global.auth.jwtKey }}
+                  - key: {{ required "The name of the JWT signing key is needed" .Values.global.auth.jwtKey }}
                     path: {{ .Values.global.auth.jwtKey }}
       {{- end }}
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
