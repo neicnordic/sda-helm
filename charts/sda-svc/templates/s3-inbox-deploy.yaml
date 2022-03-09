@@ -121,13 +121,11 @@ spec:
         - name: SERVER_KEY
           value: {{ include "tlsPath" . }}/tls.key
       {{- end }}
-        {{- if or .Values.global.auth.jwtPub .Values.global.elixir.pubKey }}
+        {{- if.Values.global.auth.jwtPub }}
         - name: SERVER_JWTPUBKEYPATH
           value: {{ include "jwtPath" . }}
-        {{- end }}
-        {{- if and .Values.global.elixir.oidcdHost .Values.global.elixir.jwkPath }}
-        - name: SERVER_JWTPUBKEYURL
-          value: "{{ .Values.global.elixir.oidcdHost }}{{ .Values.global.elixir.jwkPath }}"
+        {{- else }}
+          {{ fail "The global.auth.jwtPub is requrired for s3Inbox" }}
         {{- end }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel }}
