@@ -44,6 +44,10 @@ global:
 # issuer requires a configured cert-manager
     issuer: ""
     clusterIssuer: ""
+    # extra annotations for the ingress
+    annotations: {}
+    # |
+    # kubernetes.io/tls-acme: "true"
 
   logLevel: "info"
 
