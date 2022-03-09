@@ -117,6 +117,10 @@ Create chart name and version as used by the chart label.
 {{- ternary .Values.global.secretsPath (printf "%s/%s" .Values.global.secretsPath .Values.global.jwtPath) (empty .Values.global.jwtPath) -}}
 {{- end -}}
 
+{{- define "jwtPathElixir" -}}
+{{- ternary .Values.global.secretsPath (printf "%s/%s" .Values.global.secretsPath .Values.global.jwtPathElixir) (empty .Values.global.jwtPathElixir) -}}
+{{- end -}}
+
 {{- define "confFile" -}}
   {{- if .Values.global.confFilePath -}}
     {{- printf "%s/%s/%s" .Values.global.secretsPath .Values.global.confFilePath .Values.global.confFile }}

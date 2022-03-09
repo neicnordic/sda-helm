@@ -10,6 +10,7 @@ global:
   c4ghPath: ""
   tlsPath: ""
   jwtPath: ""
+  jwtPathElixir: ""
 
 # Name of an injected config file, located in the secretsPath
 # If the file is located in a subpath it can be set using the confFilePath
@@ -149,6 +150,9 @@ global:
   auth:
     elixirID:
     elixirSecret:
+    jwtSecretElixir:
+    jwtAlgElixir: ES256
+    jwtKeyElixir:
     jwtSecret:
     jwtAlg: ES256
     jwtKey:
