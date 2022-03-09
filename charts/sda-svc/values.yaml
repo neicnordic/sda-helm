@@ -134,11 +134,17 @@ global:
     nfsPath: ""
 
   auth:
+    # @param elixirID, client ID to the Elixir OIDC for the service endpoint 
     elixirID:
+    # @param elixirSecret, client secret to the Elixir OIDC for the service endpoint 
     elixirSecret:
+    # @param jwtSecret, name of the secret holding the jwt signing key
     jwtSecret:
+    # @param jwtAlg, cipher type of the signing key
     jwtAlg: ES256
+    # @param jwtKey, name of the signing key
     jwtKey:
+    # @param jwtPub, name of the public signing key
     jwtPub:
 
   broker:
@@ -155,8 +161,11 @@ global:
     vhost: "/"
 
   cega:
+    ## @param host, URI to CEGA NSS server users endpoint 
     host: ""
+    ## @param user, usernamen for accessing the CEGA NSS host
     user: ""
+    ## @param password, password for accessing the CEGA NSS host
     password: ""
 
   c4gh:
