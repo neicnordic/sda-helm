@@ -58,15 +58,6 @@ global:
     externalNamespace: ""
     internalNamespace: ""
 
-
-  persistence: 
-    enabled: true
-## Persistent Volume Storage Class
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.
-
 ## RevisionHistory
 ##  If defined, set the revisionHistoryLimit of the deployment, defaults to 3
 ##  RevisionHistoryLimit is number of old ReplicaSets to retain to allow rollback.

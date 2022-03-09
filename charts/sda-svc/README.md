@@ -40,7 +40,6 @@ Parameter | Description | Default
 `global.networkPolicy.databaseNamespace` | Namespace where the database is deployed. | `""`
 `global.networkPolicy.externalNamespace` | Namespace where the external components are deployed. | `""`
 `global.networkPolicy.internalNamespace` | Namespace where the internal components are deployed. | `""`
-`global.persistence.enabled` | Enable persistent datastorage | `true`
 `global.revisionHistory` | Number of revisions to keep for the option to rollback a deployment | `3`
 `global.podAnnotations` | Annotations applied to pods of all services. |`{}`
 `global.pkiService` | If an external PKI infrastructure is used set this to true. |`false`
