@@ -32,6 +32,7 @@ Parameter | Description | Default
 `global.ingress.secretNames.auth` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
 `global.ingress.secretNames.doa` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
 `global.ingress.secretNames.s3Inbox` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
+`global.ingress.clusterIssuer` | If cert-manager is set up to request certificates to the ingress endpoints, the configured clusterIssuer can be specified to automate certificate configuration for the ingress endpoint. | `""`
 `global.ingress.issuer` | If cert-manager is set up to request certificates to the ingress endpoints, the configured issuer can be specified to automate certificate configuration for the ingress endpoint. | `""`
 `global.logLevel` | Log level for all services. | `info`
 `global.networkPolicy.create` | Use network isolation. | `false`

@@ -16,8 +16,10 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: "/"
     nginx.ingress.kubernetes.io/backend-protocol: "{{ ternary "HTTPS" "HTTP" .Values.global.tls.enabled }}"
-    {{- if .Values.global.ingress.issuer }}
-    cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
+    {{- if .Values.global.ingress.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.global.ingress.clusterIssuer | quote }}
+    {{- else if .Values.global.ingress.issuer }}
+    cert-manager.io/issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
 {{- if .Values.global.ingress.annotations }}                                    
 {{ toYaml .Values.global.ingress.annotations | indent 4 }}                      

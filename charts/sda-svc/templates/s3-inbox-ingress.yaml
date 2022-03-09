@@ -18,8 +18,10 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: "{{ ternary "HTTPS" "HTTP" .Values.global.tls.enabled }}"
     nginx.ingress.kubernetes.io/proxy-body-size: 2000m
     nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
-    {{- if .Values.global.ingress.issuer }}
-    cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
+    {{- if .Values.global.ingress.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.global.ingress.clusterIssuer | quote }}
+    {{- else if .Values.global.ingress.issuer }}
+    cert-manager.io/issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
 {{- if .Values.global.ingress.annotations }}                                    
 {{ toYaml .Values.global.ingress.annotations | indent 4 }}                      

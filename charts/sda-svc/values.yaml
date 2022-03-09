@@ -42,6 +42,7 @@ global:
       s3Inbox: ""
 # issuer requires a configured cert-manager
     issuer: ""
+    clusterIssuer: ""
 
   logLevel: "info"
 
