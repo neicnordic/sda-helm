@@ -39,6 +39,7 @@ global:
     secretNames:
       auth: ""
       doa: ""
+      download: ""
       s3Inbox: ""
 # issuer requires a configured cert-manager
     issuer: ""
