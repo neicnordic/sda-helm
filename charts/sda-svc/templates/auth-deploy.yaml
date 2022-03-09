@@ -88,12 +88,16 @@ spec:
         - name: ELIXIR_SCOPE
           value: "ga4gh_passport_v1"
         {{- if or ( eq "federated" .Values.global.schemaType) ( eq "" .Values.global.schemaType) }}
+        - name: ELIXIR_JWTPRIVATEKEY
+          value: "{{ template "jwtPathElixir" . }}/{{ .Values.global.auth.jwtKeyElixir }}"
+        - name: ELIXIR_JWTSIGNATUREALG
+          value: {{ .Values.global.auth.jwtAlgElixir | quote }}
         - name: CEGA_JWTISSUER
           value: "https://{{ .Values.global.ingress.hostName.auth }}"
         - name: CEGA_AUTHURL
           value: {{ .Values.global.cega.host | quote }}
         - name: CEGA_JWTPRIVATEKEY
-          value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtKey }}"
+          value: "{{ template "jwtPath" . }}/{{ .Values.global.auth.jwtKey }}"
         - name: CEGA_JWTSIGNATUREALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
         {{- end }}
@@ -136,7 +140,11 @@ spec:
         - name: tls
           mountPath: {{ include "tlsPath" . }}
       {{- end }}
-      {{- if and .Values.global.auth.jwtkey .Values.global.jwtPath }}
+      {{- if and .Values.global.auth.jwtKeyElixir .Values.global.jwtPathElixir }}
+        - name: jwt-elixir
+          mountPath: {{ include "jwtPathElixir" . }}
+      {{- end }}
+      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
         - name: jwt
           mountPath: {{ include "jwtPath" . }}
       {{- end }}
@@ -151,6 +159,17 @@ spec:
                 items:
                   - key: {{ .Values.global.auth.jwtKey }}
                     path: {{ .Values.global.auth.jwtKey }}
+      {{- end }}
+      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
+        - name: jwt-elixir                                                      
+          projected:                                                            
+            defaultMode: 0440                                                   
+            sources:                                                            
+            - secret:                                                           
+                name: {{ .Values.global.auth.jwtSecretElixir }}                 
+                items:                                                          
+                  - key: {{ .Values.global.auth.jwtKeyElixir }}                 
+                    path: {{ .Values.global.auth.jwtKeyElixir }}
       {{- end }}
       {{- if .Values.global.tls.enabled }}
         - name: tls
