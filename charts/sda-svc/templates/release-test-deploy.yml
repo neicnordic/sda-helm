@@ -196,17 +196,12 @@ spec:
       - name: certs
         projected:
           sources:
-          - secret:
-              name: {{ .Values.releasetest.tls.secretName }}
-          {{- if .Values.global.tls.caCert.secretName }}
-          - secret:
-              name: {{ .Values.global.tls.caCert.secretName }}
-              items:
-              - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                path: ca.crt
+          {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
+            - secret:
+                name: {{ template "sda.fullname" . }}-tester-certs
           {{- else }}
-          - secret:
-              name: {{ template "sda.fullname" . }}-caCert
+            - secret:
+                name: {{ required "An certificate issuer or a TLS secret name is requrired for releasetest" .Values.releasetest.tls.secretName }}
           {{- end }}
     {{- end }}
     {{- if eq .Values.global.inbox.storageType "posix" }}
@@ -255,6 +250,39 @@ spec:
                   - key: {{ .Values.global.c4gh.publicFile }}
                     path: c4gh.pub
   restartPolicy: Never
-
-{{- /* end for only run if given publicFile */ -}}
+---
+{{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ template "sda.fullname" . }}-tester-certs
+spec:
+  # Secret names are always required.
+  secretName: {{ template "sda.fullname" . }}-tester-certs
+  duration: 1h
+  # The use of the common name field has been deprecated since 2000 and is
+  # discouraged from being used.
+  commonName: {{ template "sda.fullname" . }}-tester
+  isCA: false
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  usages:
+    - client auth
+  # At least one of a DNS Name, URI, or IP address is required.
+  dnsNames:
+    - {{ template "sda.fullname" . }}-tester
+    - {{ template "sda.fullname" . }}-tester.{{ .Release.Namespace }}.svc
+  ipAddresses:
+    - 127.0.0.1
+  # Issuer references are always required.
+  issuerRef:
+    name: {{ template "TLSissuer" . }}
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: {{ ternary "Issuer" "ClusterIssuer" (empty .Values.global.tls.clusterIssuer )}}
+    # This is optional since cert-manager will default to this value however
+    # if you are using an external issuer, change this to that issuer group.
+    group: cert-manager.io
+{{- end -}}
 {{- end -}}
