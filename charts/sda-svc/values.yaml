@@ -196,6 +196,7 @@ global:
     envFile: env
 
   download:
+    enabled: true
     # session key expiration time in seconds
     # default value = -1 for disabled state
     # a positive integer enables sessions
