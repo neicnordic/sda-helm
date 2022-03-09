@@ -106,7 +106,16 @@ Parameter | Description | Default
 `global.doa.outbox.s3CaFile` | Outbox S3 CA certificate to use | `null`
 `global.doa.outbox.s3AccessKey` | Outbox S3 Access Key | `null`
 `global.doa.outbox.s3SecretKey` | Outbox S3 Secret key | `null`
-`global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org/oidc/"`
+`global.download.enabled` | Deploy the download service | `true`
+`global.download.sessionExpiration` | Session key expiration time in seconds | `28800`
+`global.download.trusted.configPath` | Path to the ISS config file | `$secrets/iss`
+`global.download.trusted.configFile` | Name of ISS config file | `iss.json`
+`global.download.trusted.iss` | Array of trusted OIDC endpoints | ``
+`global.download.trusted.iss[iss]` | URI to the OIDC service | `https://login.elixir-czech.org/oidc/`
+`global.download.trusted.iss[jku]` | The URI to the OIDCs jwk endpoint | `https://login.elixir-czech.org/oidc/jwk`
+
+`global.elixir.oidcdHost` | URL to the OIDc service. | `"https://login.elixir-czech.org/oidc/"`
+`global.elixir.jwkPath` | Public key path on the OIDC host. | `jwk`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
 `global.inbox.storageType` | Storage type for the inbox, available options are `s3` and `posix`. |`posix`
 `global.inbox.path` | Path to the mounted `posix` volume. |`/inbox`
