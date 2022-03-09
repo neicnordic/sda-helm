@@ -29,6 +29,7 @@ global:
 
   ingress:
     deploy: true
+    ingressClassName: "nginx"
     hostName:
       auth: ""
       doa: ""
@@ -47,6 +48,7 @@ global:
     # extra annotations for the ingress
     annotations: {}
     # |
+    # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
 
   logLevel: "info"

@@ -13,7 +13,6 @@ metadata:
 {{ toYaml .Values.global.ingress.labels | indent 4 }}
 {{- end }}
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: "/"
     nginx.ingress.kubernetes.io/backend-protocol: "{{ ternary "HTTPS" "HTTP" .Values.global.tls.enabled }}"
     nginx.ingress.kubernetes.io/proxy-body-size: 2000m
@@ -27,6 +26,9 @@ metadata:
 {{ toYaml .Values.global.ingress.annotations | indent 4 }}                      
 {{- end }}
 spec:
+{{- if .Values.global.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.global.ingress.ingressClassName }}
+{{- end }}
   rules:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.s3Inbox }}
     http:
