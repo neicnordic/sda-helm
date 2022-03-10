@@ -27,4 +27,6 @@ crypt4gh generate -n "${basedir}/c4gh" -p "$G4GH"
 kubectl create secret generic c4gh --from-file="${basedir}/c4gh.sec.pem" --from-file="${basedir}/c4gh.pub.pem" --from-literal=passphrase="${G4GH}"
 
 # secret for the OIDC keypair
-kubectl create secret generic oidc --from-file="${basedir}/certs/token.key" --from-file="${basedir}/certs/token.pub"
+openssl ecparam -name prime256v1 -genkey -noout -out "${basedir}/jwt.key"
+openssl ec -in "${basedir}/jwt.key" -pubout -out "${basedir}/jwt.pub"
+kubectl create secret generic oidc --from-file="${basedir}/jwt.key" --from-file="${basedir}/jwt.pub"

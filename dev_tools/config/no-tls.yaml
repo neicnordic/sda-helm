@@ -15,8 +15,8 @@ global:
     elixirSecret: DfCieZLuBU
     jwtSecret: oidc
     jwtAlg: ES256
-    jwtKey: token.key
-    jwtPub: token.pub
+    jwtKey: jwt.key
+    jwtPub: jwt.pub
   backupArchive:
     storageType: s3
     s3Url: "http://minio"
