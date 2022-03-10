@@ -14,11 +14,10 @@ cp "${basedir}"/certs/cega-mq.key LocalEGA-helm/ega-charts/cega/config/certs/ceg
 
 ## sda-svc certs
 
-kubectl create secret generic ca-root --from-file="${basedir}"/certs/ca.crt
-
 for n in backup doa finalize inbox ingest intercept verify mapper auth tester download
   do
-  kubectl create secret tls $n-certs \
-  --cert="${basedir}"/certs/$n.crt \
-  --key="${basedir}"/certs/$n.key
+  kubectl create secret generic $n-certs \
+  --from-file="${basedir}"/certs/ca.crt \
+  --from-file=tls.crt="${basedir}"/certs/$n.crt \
+  --from-file=tls.key="${basedir}"/certs/$n.key
 done

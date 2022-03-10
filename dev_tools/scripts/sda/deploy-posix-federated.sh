@@ -7,9 +7,4 @@ DB_OUT_PASS=$(grep pg_out_password sda-deploy-init/config/trace.yml | awk '{prin
 C4GH_PASSPHRASE=$(grep c4gh_passphrase sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
 
 helm install sda charts/sda-svc -f dev_tools/config/posix.yaml \
---set global.broker.vhost=/sda,\
-global.c4gh.passphrase="$C4GH_PASSPHRASE",\
-global.cega.password="$CEGA_USERS_PASS",\
-global.db.passIngest="$DB_IN_PASS",\
-global.db.passOutgest="$DB_OUT_PASS",\
-intercept.deploy=false
+    --set global.broker.vhost=/sda,global.c4gh.passphrase="$C4GH_PASSPHRASE",global.cega.password="$CEGA_USERS_PASS",global.db.passIngest="$DB_IN_PASS",global.db.passOutgest="$DB_OUT_PASS",intercept.deploy=false

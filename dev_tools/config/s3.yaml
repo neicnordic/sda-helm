@@ -16,8 +16,8 @@ global:
     elixirSecret: DfCieZLuBU
     jwtSecret: oidc
     jwtAlg: ES256
-    jwtKey: token.key
-    jwtPub: token.pub
+    jwtKey: jwt.key
+    jwtPub: jwt.pub
   backupArchive:
     storageType: s3
     s3Url: "https://minio"
@@ -39,11 +39,11 @@ global:
     password: 3iSGc5loLN7hu2EwT2Z2CzCT26iUrk3t
   db:
     host: "postgres-sda-db"
-    sslMode: "verify-full"
+    sslMode: "verify-ca"
   c4gh:
     secretName: c4gh
-    keyFile: c4gh.key
-    publicFile: c4gh.pub
+    keyFile: c4gh.sec.pem
+    publicFile: c4gh.sec.pub
   elixir:
     oidcdHost: "http://oidc-server:8080"
     jwkPath: ""
@@ -51,7 +51,7 @@ global:
     storageType: s3
     # existingClaim: test
     s3Url: "https://minio"
-    s3Bucket: "archive"
+    s3Bucket: "inbox"
     s3AccessKey: idDQBxLpXoM8l88l
     s3SecretKey: ABd6XCIvNWj7JULbrqBf8tB7q9BoHJSc
     s3CaFile: ca.crt
@@ -64,9 +64,6 @@ global:
   logLevel: debug
   tls:
     enabled: true
-    caCert:
-      secretName: "ca-root"
-      secretKey: "ca.crt"
 auth:
   tls:
     secretName: "auth-certs"
@@ -74,9 +71,6 @@ backup:
   deploy: true
   tls:
     secretName: "backup-certs"
-    certFile: "backup.crt"
-    keyFile: "backup.key"
-    caCert: "ca.crt"
 doa:
   tls:
     secretName: "doa-certs"

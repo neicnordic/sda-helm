@@ -12,4 +12,4 @@ MINIO_SECRET=$(grep s3_secret_key sda-deploy-init/config/trace.yml | awk '{print
 helm install minio minio/minio \
 --set accessKey="$MINIO_ACCESS",secretKey="$MINIO_SECRET",\
 tls.enabled=true,tls.certSecret=minio-certs,\
-persistence.enabled=false,service.port=443 --version 8.0.8
+persistence.enabled=true,persistence.size=2Gi,service.port=443 --version 8.0.8

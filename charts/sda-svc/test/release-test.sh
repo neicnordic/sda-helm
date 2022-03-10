@@ -8,6 +8,7 @@ if [ "$INBOX_STORAGE_TYPE" == "s3" ]; then
 		access_key = dummy
 		access_token = $INBOX_ACCESS_TOKEN
 		use_https = True
+		ca_certs_file = /tls/ca.crt
 		EOF
 	else
 		cat >> "/tmp/s3cfg" <<-EOF
@@ -40,7 +41,7 @@ if [ "${DEPLOYMENT_TYPE}" = all ] || [ "${DEPLOYMENT_TYPE}" = external ]; then
 			fi
 
 			echo "Will try connecting to http://$AUTH_SERVICE_NAME/"
-			responsecode=$(curl -s -o /dev/null -w "%{http_code}" "https://$AUTH_SERVICE_NAME")
+			responsecode=$(curl --cacert /tls/ca.crt -s -o /dev/null -w "%{http_code}" "https://$AUTH_SERVICE_NAME")
 			if ! [ "$responsecode" -eq 200 ]; then
 				echo "expected 200 got: $responsecode"
 				echo "Failed auth verification, bailing out"

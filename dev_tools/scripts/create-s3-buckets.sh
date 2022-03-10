@@ -2,7 +2,7 @@
 set -e
 
 if [ ! -f s3cmd.conf ]; then
-  cat >> "s3cmd.conf" <<EOF
+  cat >>"s3cmd.conf" <<EOF
 [default]
 access_key=$(grep s3_access_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
 secret_key=$(grep s3_secret_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
