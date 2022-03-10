@@ -95,15 +95,20 @@ spec:
       {{- end }}
         - name: C4GH_FILEPATH
           value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.keyFile }}"
-      {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
+      {{- if .Values.global.tls.enabled }}
         - name: DB_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
-      {{- end }}
-      {{- if eq "verify-full" .Values.global.db.sslMode }}
+        {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CLIENTCERT
           value: {{ include "tlsPath" . }}/tls.crt
         - name: DB_CLIENTKEY
           value: {{ include "tlsPath" . }}/tls.key
+        {{- end }}
+        - name: DB_SSLMODE
+          value: {{ .Values.global.db.sslMode | quote }}
+      {{- else }}
+        - name: DB_SSLMODE
+          value: "disable"
       {{- end }}
         - name: DB_DATABASE
           value: {{ default "lega" .Values.global.db.name | quote }}
@@ -111,8 +116,6 @@ spec:
           value: {{ required "A valid DB host is required" .Values.global.db.host | quote }}
         - name: DB_PORT
           value: {{ .Values.global.db.port | quote }}
-        - name: DB_SSLMODE
-          value: {{ .Values.global.db.sslMode | quote }}
       {{- if .Values.global.logLevel }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
