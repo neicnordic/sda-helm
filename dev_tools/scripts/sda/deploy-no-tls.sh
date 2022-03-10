@@ -90,5 +90,7 @@ if [ "$1" = "pipeline" ]; then
     S3_ACCESS_KEY=$(grep s3_access_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
     S3_SECRET_KEY=$(grep s3_secret_key sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
     C4GH_PASSPHRASE=$(grep c4gh_passphrase sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
-    helm install sda charts/sda-svc -f dev_tools/config/no-tls.yaml --set global.archive.s3AccessKey="$S3_ACCESS_KEY",global.archive.s3SecretKey="$S3_SECRET_KEY",global.backupArchive.s3AccessKey="$S3_ACCESS_KEY",global.backupArchive.s3SecretKey="$S3_SECRET_KEY",global.broker.vhost=sda,global.c4gh.passphrase="$C4GH_PASSPHRASE",global.db.passIngest="$DB_IN_PASS",global.db.passOutgest="$DB_OUT_PASS",global.inbox.s3AccessKey="$S3_ACCESS_KEY",global.inbox.s3SecretKey="$S3_SECRET_KEY"
+    token="$(bash dev_tools/scripts/sign_jwt.sh ES256 sda-deploy-init/config/jwt.key)"
+    helm install sda charts/sda-svc -f dev_tools/config/no-tls.yaml \
+        --set global.archive.s3AccessKey="$S3_ACCESS_KEY",global.archive.s3SecretKey="$S3_SECRET_KEY",global.backupArchive.s3AccessKey="$S3_ACCESS_KEY",global.backupArchive.s3SecretKey="$S3_SECRET_KEY",global.broker.vhost=sda,global.c4gh.passphrase="$C4GH_PASSPHRASE",global.db.passIngest="$DB_IN_PASS",global.db.passOutgest="$DB_OUT_PASS",global.inbox.s3AccessKey="$S3_ACCESS_KEY",global.inbox.s3SecretKey="$S3_SECRET_KEY",releasetest.secrets.accessToken="$token"
 fi

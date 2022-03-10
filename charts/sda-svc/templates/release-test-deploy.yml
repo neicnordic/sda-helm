@@ -1,5 +1,5 @@
----
-{{- if and .Values.releasetest.run .Values.global.c4gh.publicFile -}}
+{{- if .Values.releasetest.run }}
+{{- if eq "s3" .Values.global.inbox.storageType }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -9,13 +9,9 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
 type: Opaque
 data:
-  mqPassword: {{ include "mqPassReleaseTest" . | b64enc }}
-  mqUser: {{ include "mqUserReleaseTest" . | b64enc }}
-  dbPassword: {{ include "dbPassReleaseTest" . | b64enc }}
-  dbUser: {{ include "dbUserReleaseTest" . | b64enc }}
-
+  accessToken: {{ required "Access token is required for testing the S3 inbox" .Values.releasetest.secrets.accessToken | b64enc }}
 ---
-
+{{- end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -24,13 +20,8 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
 data:
-  {{- ( .Files.Glob ( "test/{verify-inboxes.py,trigger-ingest.py,accession.py}" )).AsConfig | nindent 2 }}
   {{- ( .Files.Glob ( "test/release-test.sh" )).AsConfig | nindent 2 }}
-{{- if .Values.global.tls }}
-  {{- ( .Files.Glob ( "test/{verify-doa.py,verify-download.py}" )).AsConfig | nindent 2 }}
-{{- end }}
 ---
-
 apiVersion: v1
 kind: Pod
 metadata:
@@ -56,18 +47,10 @@ spec:
       volumeMounts:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: certs
-          mountPath: {{ template "tlsPath" .  }}
+          mountPath: /tls
       {{- end }}
         - name: release-test-app
           mountPath: "/release-test-app"
-      {{- if eq "posix" .Values.global.inbox.storageType }}
-        - name: "inbox-release-test"
-          mountPath: "/posix_inbox"
-      {{- end }}
-      {{- if eq "posix" .Values.global.archive.storageType }}
-        - name: "archive-release-test"
-          mountPath: "/posix_archive"
-      {{- end }}
       env:
         - name: TLS
           value: {{ .Values.global.tls.enabled | quote}}
@@ -76,118 +59,33 @@ spec:
           value: {{include "secretsPath" }}
       {{- else }}
         - name: PKI_PATH
-          value: {{ template "tlsPath" . }}
-      {{- end }}
-        - name: DEPLOYMENT_TOPOLOGY
-      {{- if .Values.intercept.deploy }}
-          value: "federated"
-      {{- else }}
-          value: "standalone"
+          value: /tls
       {{- end }}
         - name: DEPLOYMENT_TYPE
           value: "{{ .Values.global.deploymentType }}"
         - name: INBOX_SERVICE_NAME
           value: "{{ template "sda.fullname" . }}-inbox"
+      {{- if eq "s3" .Values.global.inbox.storageType }}
+        - name: AUTH_SERVICE_NAME
+          value: "{{ template "sda.fullname" . }}-auth"
+        - name: INBOX_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-release-test-passwords
+              key: accessToken
+      {{- end }}
+      {{- if and .Values.global.tls.enabled .Values.global.doa.enabled }}
         - name: DOA_SERVICE_NAME
-          value: "{{ template "sda.fullname" . }}-doa" 
+          value: "{{ template "sda.fullname" . }}-doa"
+        {{- end }}
+      {{- if .Values.global.download.enabled }}
         - name: DOWNLOAD_SERVICE_NAME
           value: "{{ template "sda.fullname" . }}-download"
+        {{- end }}
         - name: INBOX_STORAGE_TYPE
           value: {{ required "Missing storage type for inbox" .Values.global.inbox.storageType | quote }}
-      {{- if eq "s3" .Values.global.inbox.storageType }}
-        - name: INBOX_BUCKET
-          value: {{ required "S3 inbox bucket missing" .Values.global.inbox.s3Bucket }}
-      {{- if .Values.global.inbox.s3CaFile }}
-        - name: INBOX_CACERT
-          value: {{ template "tlsPath" . }}/{{ .Values.global.inbox.s3CaFile }}
-      {{- end }}
-        - name: INBOX_REGION
-          value: {{ default "us-east-1" .Values.global.inbox.s3Region }}
-        - name: INBOX_URL
-          value: {{ template "S3InboxURL" . }}
-        - name: INBOX_ACCESSKEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-s3inbox-keys
-              key: s3InboxAccessKey
-        - name: INBOX_SECRETKEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-s3inbox-keys
-              key: s3InboxSecretKey
-      {{- end }}
         - name: ARCHIVE_STORAGE_TYPE
           value: {{ required "Missing storage type for archive" .Values.global.archive.storageType | quote }}
-      {{- if eq "s3" .Values.global.archive.storageType }}
-        - name: ARCHIVE_BUCKET
-          value: {{ required "S3 archive bucket missing" .Values.global.archive.s3Bucket }}
-      {{- if .Values.global.archive.s3CaFile }}
-        - name: ARCHIVE_CACERT
-          value: {{ template "tlsPath" . }}/{{ .Values.global.archive.s3CaFile }}
-      {{- end }}
-        - name: ARCHIVE_REGION
-          value: {{ default "us-east-1" .Values.global.archive.s3Region }}
-        - name: ARCHIVE_URL
-          value: {{ template "S3ArchiveURL" . }}
-        - name: ARCHIVE_ACCESSKEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-s3archive-keys
-              key: s3ArchiveAccessKey
-        - name: ARCHIVE_SECRETKEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "sda.fullname" . }}-s3archive-keys
-              key: s3ArchiveSecretKey
-      {{- end }}
-      {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
-        - name: DB_CACERT
-          value: {{ include "tlsPath" . }}/ca.crt
-      {{- end }}
-      {{- if eq "verify-full" .Values.global.db.sslMode }}
-        - name: DB_CLIENTCERT
-          value: {{ include "tlsPath" . }}/tls.crt
-        - name: DB_CLIENTKEY
-          value: {{ include "tlsPath" . }}/tls.key
-      {{- end }}
-        - name: DB_DATABASE
-          value: {{ default "lega" .Values.global.db.name | quote }}
-        - name: DB_HOST
-          value: {{ required "A valid DB host is required" .Values.global.db.host | quote }}
-        - name: DB_PORT
-          value: {{ .Values.global.db.port | quote }}
-        - name: DB_SSLMODE
-          value: {{ template "dbSSLmode" .}}
-        - name: MQ_HOST
-          value: {{ required "Broker host must be set" .Values.global.broker.host | quote }}
-        - name: MQ_EXCHANGE
-          value: {{ default "lega" .Values.global.broker.exchange | quote }}
-      {{- if not .Values.global.vaultSecrets }}
-        - name: MQ_PASSWORD
-          valueFrom:
-              secretKeyRef:
-                name: "{{ .Release.Name }}-release-test-passwords"
-                key: mqPassword
-        - name: MQ_USER
-          valueFrom:
-              secretKeyRef:
-                name: "{{ .Release.Name }}-release-test-passwords"
-                key: mqUser
-        - name: DB_PASSWORD
-          valueFrom:
-              secretKeyRef:
-                name: "{{ .Release.Name }}-release-test-passwords"
-                key: dbPassword
-        - name: DB_USER
-          valueFrom:
-              secretKeyRef:
-                name: "{{ .Release.Name }}-release-test-passwords"
-                key: dbUser
-      {{- end }}
-      {{- if .Values.global.broker.vhost }}
-        - name: MQ_VHOST
-          value: {{ .Values.global.broker.vhost | quote }}
-      {{- end }}
       command: [ "/bin/bash" ]
       args:
         - "/release-test-app/release-test.sh"
@@ -204,51 +102,14 @@ spec:
                 name: {{ required "An certificate issuer or a TLS secret name is requrired for releasetest" .Values.releasetest.tls.secretName }}
           {{- end }}
     {{- end }}
-    {{- if eq .Values.global.inbox.storageType "posix" }}
-      - name: "inbox-release-test"
-    {{- if .Values.global.inbox.existingClaim }}
-        persistentVolumeClaim:
-          claimName: {{ .Values.global.inbox.existingClaim }}
-    {{- else }}
-        nfs:
-          server: {{ required "An inbox NFS server is required" .Values.global.inbox.nfsServer | quote }}
-          path: {{ if .Values.global.inbox.nfsPath }}{{ .Values.global.inbox.nfsPath | quote}}{{ else }}{{ "/" }}{{ end }}
-    {{- end }}
-    {{- end }}
-    {{- if eq .Values.global.archive.storageType "posix" }}
-      - name: "archive-release-test"
-    {{- if .Values.global.archive.existingClaim }}
-        persistentVolumeClaim:
-          claimName: {{ .Values.global.archive.existingClaim }}
-    {{- else }}
-        nfs:
-          server: {{ required "An archive NFS server is required" .Values.global.archive.nfsServer | quote }}
-          path: {{ if .Values.global.archive.nfsPath }}{{ .Values.global.archive.nfsPath | quote}}{{ else }}{{ "/" }}{{ end }}
-    {{- end }}
-    {{- end }}
       - name: release-test-app
         projected:
           sources:
             - configMap:
                 name: "{{ .Release.Name }}-release-test-app"
                 items:
-                  - key: trigger-ingest.py
-                    path: trigger-ingest.py
-                  - key: accession.py
-                    path: accession.py
-                  - key: verify-inboxes.py
-                    path: verify-inboxes.py
-                  - key: verify-doa.py
-                    path: verify-doa.py
-                  - key: verify-download.py
-                    path: verify-download.py
                   - key: release-test.sh
                     path: release-test.sh
-            - secret:
-                name: {{ .Values.global.c4gh.secretName}}
-                items:
-                  - key: {{ .Values.global.c4gh.publicFile }}
-                    path: c4gh.pub
   restartPolicy: Never
 ---
 {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
