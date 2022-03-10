@@ -157,8 +157,7 @@ spec:
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt
-          mountPath: {{ include "jwtPath" . }}/{{ .Values.global.ingress.hostName.auth }}.pub
-          subPath: {{ .Values.global.auth.jwtPub }}
+          mountPath: {{ include "jwtPath" . }}
       {{- end }}
       volumes:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
@@ -174,9 +173,13 @@ spec:
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt
-          secret:
-            defaultMode: 0440
-            secretName: {{ .Values.global.auth.jwtSecret }}
+          projected:
+            sources:
+            - secret:
+                name: {{ .Values.global.auth.jwtSecret }}
+                items:
+                  - key: {{ required "The name of the JWT signing key is needed" .Values.global.auth.jwtPub }}
+                    path: "{{ .Values.global.ingress.hostName.auth }}.pub"
       {{- end }}
       restartPolicy: Always
 {{- end }}
