@@ -3,6 +3,11 @@ set -e
 
 basedir="sda-deploy-init/config"
 
+if ! [ -d "$basedir" ]; then
+  mkdir -p "${basedir}"
+fi
+
+
 DB_IN=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 DB_OUT=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
