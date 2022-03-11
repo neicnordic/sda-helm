@@ -17,5 +17,11 @@ CEGA_USERS_PASS="OfEoDPVadIfd4CZUWkisrrVQbJ2yQPIH"
 
 token="$(bash dev_tools/scripts/sign_jwt.sh ES256 sda-deploy-init/config/jwt.key)"
 
-helm install sda charts/sda-svc -f dev_tools/config/s3.yaml \
-    --set global.broker.vhost=sda,global.archive.s3AccessKey="$S3_ACCESS_KEY",global.archive.s3SecretKey="$S3_SECRET_KEY",global.backupArchive.s3AccessKey="$S3_ACCESS_KEY",global.backupArchive.s3SecretKey="$S3_SECRET_KEY",global.c4gh.passphrase="$C4GH_PASSPHRASE",global.cega.password="$CEGA_USERS_PASS",global.db.passIngest="$DB_IN_PASS",global.db.passOutgest="$DB_OUT_PASS",global.doa.enabled=true,global.inbox.s3AccessKey="$S3_ACCESS_KEY",global.inbox.s3SecretKey="$S3_SECRET_KEY",global.schemaType="$SCHEMA",intercept.deploy="$INTERCEPT",releasetest.secrets.accessToken="$token"
+if [ "$2" = "issuer" ]; then
+    helm install sda charts/sda-svc -f dev_tools/config/s3.yaml \
+        --set global.broker.vhost=sda,global.archive.s3AccessKey="$S3_ACCESS_KEY",global.archive.s3SecretKey="$S3_SECRET_KEY",global.backupArchive.s3AccessKey="$S3_ACCESS_KEY",global.backupArchive.s3SecretKey="$S3_SECRET_KEY",global.c4gh.passphrase="$C4GH_PASSPHRASE",global.cega.password="$CEGA_USERS_PASS",global.db.passIngest="$DB_IN_PASS",global.db.passOutgest="$DB_OUT_PASS",global.doa.enabled=true,global.inbox.s3AccessKey="$S3_ACCESS_KEY",global.inbox.s3SecretKey="$S3_SECRET_KEY",global.schemaType="$SCHEMA",intercept.deploy="$INTERCEPT",releasetest.secrets.accessToken="$token",global.tls.issuer=ca-issuer
+
+else
+    helm install sda charts/sda-svc -f dev_tools/config/s3.yaml \
+        --set global.broker.vhost=sda,global.archive.s3AccessKey="$S3_ACCESS_KEY",global.archive.s3SecretKey="$S3_SECRET_KEY",global.backupArchive.s3AccessKey="$S3_ACCESS_KEY",global.backupArchive.s3SecretKey="$S3_SECRET_KEY",global.c4gh.passphrase="$C4GH_PASSPHRASE",global.cega.password="$CEGA_USERS_PASS",global.db.passIngest="$DB_IN_PASS",global.db.passOutgest="$DB_OUT_PASS",global.doa.enabled=true,global.inbox.s3AccessKey="$S3_ACCESS_KEY",global.inbox.s3SecretKey="$S3_SECRET_KEY",global.schemaType="$SCHEMA",intercept.deploy="$INTERCEPT",releasetest.secrets.accessToken="$token"
+fi
