@@ -120,7 +120,7 @@ metadata:
 spec:
   # Secret names are always required.
   secretName: {{ template "sda.fullname" . }}-tester-certs
-  duration: 1h
+  duration: 2160h
   # The use of the common name field has been deprecated since 2000 and is
   # discouraged from being used.
   commonName: {{ template "sda.fullname" . }}-tester
