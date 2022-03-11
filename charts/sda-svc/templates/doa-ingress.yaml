@@ -19,6 +19,9 @@ metadata:
     {{- if .Values.global.ingress.issuer }}
     cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
+{{- if .Values.global.ingress.annotations }}                                    
+{{ toYaml .Values.global.ingress.annotations | indent 4 }}                      
+{{- end }}
 spec:
   rules:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.doa }}

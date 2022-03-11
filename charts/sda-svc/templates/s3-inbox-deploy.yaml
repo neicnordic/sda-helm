@@ -159,7 +159,8 @@ spec:
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt
-          mountPath: {{ include "jwtPath" . }}
+          mountPath: {{ include "jwtPath" . }}/{{ .Values.global.ingress.hostName.auth }}.pub
+          subPath: {{ .Values.global.auth.jwtPub }}
       {{- end }}
       volumes:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}

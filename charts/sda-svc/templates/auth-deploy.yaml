@@ -88,12 +88,16 @@ spec:
         - name: ELIXIR_SCOPE
           value: "ga4gh_passport_v1"
         {{- if or ( eq "federated" .Values.global.schemaType) ( eq "" .Values.global.schemaType) }}
+        - name: ELIXIR_JWTPRIVATEKEY
+          value: "{{ template "jwtPath" . }}/{{ .Values.global.auth.jwtKey }}"
+        - name: ELIXIR_JWTSIGNATUREALG
+          value: {{ .Values.global.auth.jwtAlg | quote }}
         - name: CEGA_JWTISSUER
           value: "https://{{ .Values.global.ingress.hostName.auth }}"
         - name: CEGA_AUTHURL
           value: {{ .Values.global.cega.host | quote }}
         - name: CEGA_JWTPRIVATEKEY
-          value: "{{ template "secretsPath" . }}/{{ .Values.global.auth.jwtKey }}"
+          value: "{{ template "jwtPath" . }}/{{ .Values.global.auth.jwtKey }}"
         - name: CEGA_JWTSIGNATUREALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
         {{- end }}
@@ -136,7 +140,7 @@ spec:
         - name: tls
           mountPath: {{ include "tlsPath" . }}
       {{- end }}
-      {{- if and .Values.global.auth.jwtkey .Values.global.jwtPath }}
+      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
         - name: jwt
           mountPath: {{ include "jwtPath" . }}
       {{- end }}
