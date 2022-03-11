@@ -182,7 +182,7 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:inbox,DNS:inbox.default.svc.cluster.local,DNS:inbox.default
+subjectAltName = DNS:sda-sda-svc-inbox,DNS:inbox.default.svc.cluster.local,DNS:inbox.default
 
 [ doa_cert ]
 # Extensions for server certificates (`man x509v3_config`).
@@ -191,7 +191,7 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:doa,DNS:doa.default.svc.cluster.local,DNS:doa.default
+subjectAltName = DNS:sda-sda-svc-doa,DNS:doa.default.svc.cluster.local,DNS:doa.default
 
 [ download_cert ]
 # Extensions for server certificates (`man x509v3_config`).
@@ -200,7 +200,7 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:download,DNS:download.default.svc.cluster.local,DNS:download.default
+subjectAltName = DNS:sda-sda-svc-download,DNS:download.default.svc.cluster.local,DNS:download.default
 
 [ auth_cert ]
 # Extensions for server certificates (`man x509v3_config`).
