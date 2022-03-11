@@ -2,7 +2,7 @@
 set -e
 
 if [ "$1" = "federated" ]; then
-    CEGA_MQ_PASS=$(grep cega_mq_pass sda-deploy-init/config/trace.yml | awk '{print $2}' | sed -e 's/\"//g')
+    CEGA_MQ_PASS=lega
 fi
 
 HASH="DI0kJIvQHptGSBH2coZ25dsjjN9Z4uxp8hAyqtd9H7rb/SBO"
