@@ -97,11 +97,9 @@ spec:
         {{- end }}
       {{- end }}
       {{- if .Values.global.tls.enabled }}
-      {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
           value: {{ template "tlsPath" . }}/ca.crt
-      {{- end }}
-      {{- if eq "verify-full" .Values.global.db.sslMode }}
+      {{- if ne "verify-none" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
           value: {{ template "tlsPath" . }}/tls.crt
         - name: DB_CLIENTKEY
