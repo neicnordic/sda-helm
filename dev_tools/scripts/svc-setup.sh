@@ -6,11 +6,9 @@ basedir="sda-deploy-init/config"
 ## cega config and certs
 mkdir -p LocalEGA-helm/ega-charts/cega/config/certs
 cp -r dev_tools/cega/* LocalEGA-helm/ega-charts/cega/config/
-cp "${basedir}"/certs/ca.crt LocalEGA-helm/ega-charts/cega/config/certs/root.ca.crt
-cp "${basedir}"/certs/cega-users.crt LocalEGA-helm/ega-charts/cega/config/certs/cega-users.ca.crt
-cp "${basedir}"/certs/cega-users.key LocalEGA-helm/ega-charts/cega/config/certs/cega-users.ca.key
-cp "${basedir}"/certs/cega-mq.crt LocalEGA-helm/ega-charts/cega/config/certs/cega-mq.crt
-cp "${basedir}"/certs/cega-mq.key LocalEGA-helm/ega-charts/cega/config/certs/cega-mq.key
+cp "${basedir}"/certs/ca.crt LocalEGA-helm/ega-charts/cega/config/certs/ca.crt
+cp "${basedir}"/certs/cega.crt LocalEGA-helm/ega-charts/cega/config/certs/tls.crt
+cp "${basedir}"/certs/cega.key LocalEGA-helm/ega-charts/cega/config/certs/tls.key
 
 ## sda-svc certs
 

@@ -3,4 +3,4 @@ secrets:
   cega_mq_pass: "xFOumcdbIftsXxZqOW5sE8BB2BrXoMVC"
 config:
   cega_users_user: "legatest"
-  tls_ca_root_file: root.ca.crt
+  tls_ca_root_file: ca.crt

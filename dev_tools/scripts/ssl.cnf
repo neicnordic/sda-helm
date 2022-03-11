@@ -222,23 +222,14 @@ subjectAltName = DNS:tester,DNS:tester.default.svc.cluster.local,DNS:tester.defa
 
 # CEGA certificates
 
-[ cega_users_cert ]
+[ cega ]
 # Extensions for server certificates (`man x509v3_config`).
 basicConstraints = critical,CA:FALSE
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:cega-users,DNS:cega-users.default.svc.cluster.local,DNS:cega-users.default
-
-[ cega_mq_cert ]
-# Extensions for server certificates (`man x509v3_config`).
-basicConstraints = critical,CA:FALSE
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer:always
-keyUsage = critical, digitalSignature, keyEncipherment
-extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:cega-mq,DNS:cega-mq.default.svc.cluster.local,DNS:cega-mq.default
+subjectAltName = DNS:cega-mq,DNS:cega-users
 
 [ crl_ext ]
 # Extension for CRLs (`man x509v3_config`).
