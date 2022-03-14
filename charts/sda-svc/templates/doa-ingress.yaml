@@ -14,8 +14,10 @@ metadata:
 {{ toYaml .Values.global.ingress.labels | indent 4 }}
 {{- end }}
   annotations:
+    {{- if eq "nginx" .Values.global.ingress.ingressClassName }}
     nginx.ingress.kubernetes.io/rewrite-target: "/"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    {{- end }}
     {{- if .Values.global.ingress.clusterIssuer }}
     cert-manager.io/cluster-issuer: {{ .Values.global.ingress.clusterIssuer | quote }}
     {{- else if .Values.global.ingress.issuer }}

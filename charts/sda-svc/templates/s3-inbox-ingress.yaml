@@ -13,10 +13,12 @@ metadata:
 {{ toYaml .Values.global.ingress.labels | indent 4 }}
 {{- end }}
   annotations:
+    {{- if eq "nginx" .Values.global.ingress.ingressClassName }}
     nginx.ingress.kubernetes.io/rewrite-target: "/"
     nginx.ingress.kubernetes.io/backend-protocol: "{{ ternary "HTTPS" "HTTP" .Values.global.tls.enabled }}"
     nginx.ingress.kubernetes.io/proxy-body-size: 2000m
     nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    {{- end }}
     {{- if .Values.global.ingress.clusterIssuer }}
     cert-manager.io/cluster-issuer: {{ .Values.global.ingress.clusterIssuer | quote }}
     {{- else if .Values.global.ingress.issuer }}
