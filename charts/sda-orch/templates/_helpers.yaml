@@ -35,7 +35,7 @@ Create chart name and version as used by the chart label.
         {{- printf "%s" (regexReplaceAll "/$"  (required "pkiService.tlsPath is required if pkiservice is enabled" .Values.pkiService.tlsPath) "" ) -}}
     {{- else }}
         {{- printf "/tls/certs" }}
-    {{- end -}}    
+    {{- end -}}
 {{- end -}}
 
 {{/**/}}

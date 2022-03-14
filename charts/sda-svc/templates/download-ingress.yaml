@@ -20,8 +20,8 @@ metadata:
     {{- else if .Values.global.ingress.issuer }}
     cert-manager.io/issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
-{{- if .Values.global.ingress.annotations }}                                    
-{{ toYaml .Values.global.ingress.annotations | indent 4 }}                      
+{{- if .Values.global.ingress.annotations }}
+{{ toYaml .Values.global.ingress.annotations | indent 4 }}
 {{- end }}
 spec:
 {{- if .Values.global.ingress.ingressClassName }}
