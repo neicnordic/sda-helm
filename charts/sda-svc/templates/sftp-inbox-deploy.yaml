@@ -172,7 +172,7 @@ spec:
                 name: {{ template "sda.fullname" . }}-inbox-certs
             {{- else}}
             - secret:
-                name: {{ required "An certificate issuer or a TLS secret name is requrired for sftpInbobx" .Values.sftpInbox.tls.secretName }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for sftpInbobx" .Values.sftpInbox.tls.secretName }}
             {{- end }}
 {{- end }}
 {{- end }}

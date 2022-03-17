@@ -125,7 +125,7 @@ spec:
         - name: SERVER_JWTPUBKEYPATH
           value: {{ include "jwtPath" . }}
         {{- else }}
-          {{ fail "The global.auth.jwtPub is requrired for s3Inbox" }}
+          {{ fail "The global.auth.jwtPub is required for s3Inbox" }}
         {{- end }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel }}
@@ -168,7 +168,7 @@ spec:
           {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
                 name: {{ template "sda.fullname" . }}-inbox-certs
           {{- else }}
-                name: {{ required "An certificate issuer or a TLS secret name is requrired for S3Inbox" .Values.s3Inbox.tls.secretName }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for S3Inbox" .Values.s3Inbox.tls.secretName }}
           {{- end }}
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}

@@ -216,7 +216,7 @@ spec:
                 name: {{ template "sda.fullname" . }}-verify-certs
             {{- else if .Values.verify.tls.secretName }}
             - secret:
-                name: {{ required "An certificate issuer or a TLS secret name is requrired for verify" .Values.verify.tls.secretName }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for verify" .Values.verify.tls.secretName }}
             {{- end }}
         {{- if .Values.global.pkiPermissions }}
         - name: tls

@@ -160,7 +160,7 @@ spec:
                 name: {{ template "sda.fullname" . }}-mapper-certs
           {{- else if .Values.mapper.tls.secretName }}
             - secret:
-                name: {{ required "An certificate issuer or a TLS secret name is requrired for mapper" .Values.mapper.tls.secretName }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for mapper" .Values.mapper.tls.secretName }}
           {{- end }}
       {{- if .Values.global.pkiPermissions }}
         - name: tls

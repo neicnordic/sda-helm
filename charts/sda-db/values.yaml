@@ -94,7 +94,7 @@ service:
 updateStrategyType: RollingUpdate
 
 
-# secret containing the TLS certificagtes for the release tester
+# secret containing the TLS certificates for the release tester
 # if no certificate issuer is used
 testimage:
   tls:

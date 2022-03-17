@@ -275,7 +275,7 @@ spec:
                 name: {{ template "sda.fullname" . }}-doa-certs
           {{- else }}
             - secret:
-                name: {{ required "An certificate issuer or a TLS secret name is requrired for doa" .Values.doa.tls.secretName }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for doa" .Values.doa.tls.secretName }}
           {{- end }}
       {{- end }}
       {{- if not .Values.global.vaultSecrets }}

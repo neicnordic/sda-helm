@@ -245,7 +245,7 @@ spec:
                 name: {{ template "sda.fullname" . }}-backup-certs
             {{- else }}
               - secret:
-                  name: {{ required "An certificate issuer or a TLS secret name is requrired for backup" .Values.backup.tls.secretName }}
+                  name: {{ required "An certificate issuer or a TLS secret name is required for backup" .Values.backup.tls.secretName }}
             {{- end }}
     {{- if .Values.global.pkiPermissions }}
         - name: tls

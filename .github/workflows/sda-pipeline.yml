@@ -30,7 +30,7 @@ jobs:
         if: matrix.cert == 'manual'
         run: bash ./dev_tools/scripts/make-certs.sh
 
-      - name: Create certificate isuer
+      - name: Create certificate issuer
         if: matrix.cert == 'issuer'
         run: bash ./dev_tools/scripts/deploy-cert-manager.sh
 

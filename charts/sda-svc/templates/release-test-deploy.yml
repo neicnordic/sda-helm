@@ -99,7 +99,7 @@ spec:
                 name: {{ template "sda.fullname" . }}-tester-certs
           {{- else }}
             - secret:
-                name: {{ required "An certificate issuer or a TLS secret name is requrired for releasetest" .Values.releasetest.tls.secretName }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for releasetest" .Values.releasetest.tls.secretName }}
           {{- end }}
     {{- end }}
       - name: release-test-app

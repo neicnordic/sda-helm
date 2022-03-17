@@ -304,7 +304,7 @@ Create chart name and version as used by the chart label.
         {{- fail "Only one of global.tls.issuer or global.tls.clusterIssuer should be set" }}
     {{- end -}}
 
-    {{- if and .Values.global.tls.issuer }}
+    {{- if .Values.global.tls.issuer }}
         {{- printf "%s" .Values.global.tls.issuer }}
     {{- else if and .Values.global.tls.clusterIssuer }}
         {{- printf "%s" .Values.global.tls.clusterIssuer }}
