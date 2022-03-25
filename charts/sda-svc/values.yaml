@@ -44,6 +44,7 @@ global:
     issuer: ""
 
   logLevel: "info"
+  logFormat: "json"
 
 # utilize network isolation
 # Make sure you’ve configured a network provider with network policy support.
@@ -57,7 +58,7 @@ global:
     internalNamespace: ""
 
 
-  persistence: 
+  persistence:
     enabled: true
 ## Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
@@ -255,7 +256,7 @@ credentials:
   doa:
     dbUser: ""
     dbPassword: ""
-  
+
   download:
     dbUser: ""
     dbPassword: ""
