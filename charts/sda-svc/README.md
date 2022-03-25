@@ -33,6 +33,7 @@ Parameter | Description | Default
 `global.ingress.secretNames.s3Inbox` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
 `global.ingress.issuer` | If cert-manager is set up to request certificates to the ingress endpoints, the configured issuer can be specified to automate certificate configuration for the ingress endpoint. | `""`
 `global.logLevel` | Log level for all services. | `info`
+`global.logFormat` | Log format for all services. | `json`
 `global.networkPolicy.create` | Use network isolation. | `false`
 `global.networkPolicy.brokerNamespace` | Namespace where the broker is deployed. | `""`
 `global.networkPolicy.databaseNamespace` | Namespace where the database is deployed. | `""`
