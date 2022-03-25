@@ -54,6 +54,8 @@ spec:
         env:
         - name: LOG_LEVEL
           value: {{ upper .Values.global.logLevel }}
+        - name: LOG_FORMAT
+          value: {{ upper .Values.global.logFormat }}
       {{- if not .Values.global.vaultSecrets }}
         - name: ELIXIR_ID
           valueFrom:

@@ -171,6 +171,10 @@ spec:
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
+      {{- if .Values.global.logFormat }}
+        - name: LOG_FORMAT
+          value: {{ .Values.global.logFormat | quote }}
+      {{- end }}
       {{- if not .Values.global.vaultSecrets }}
       {{- if eq "s3" .Values.global.archive.storageType }}
         - name: ARCHIVE_ACCESSKEY

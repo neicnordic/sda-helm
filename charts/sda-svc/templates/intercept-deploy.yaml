@@ -100,6 +100,10 @@ spec:
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel | quote }}
       {{- end }}
+      {{- if .Values.global.logFormat }}
+        - name: LOG_FORMAT
+          value: {{ .Values.global.logFormat | quote }}
+      {{- end }}
         resources:
 {{ toYaml .Values.intercept.resources | trim | indent 10 }}
   {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
