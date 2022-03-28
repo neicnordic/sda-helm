@@ -1,5 +1,6 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
 {{- if .Values.global.tls.enabled }}
+{{- if .Values.global.doa.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -269,18 +270,13 @@ spec:
         - name: tls-certs
           projected:
             sources:
+          {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
             - secret:
-                name: {{ required "TLS secret name is requrired for DOA" .Values.doa.tls.secretName }}
-            {{- if .Values.global.tls.caCert.secretName }}
+                name: {{ template "sda.fullname" . }}-doa-certs
+          {{- else }}
             - secret:
-                name: {{ .Values.global.tls.caCert.secretName }}
-                items:
-                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                  path: ca.crt
-            {{- else }}
-            - secret:
-                name: {{ template "sda.fullname" . }}-cacert
-            {{- end }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for doa" .Values.doa.tls.secretName }}
+          {{- end }}
       {{- end }}
       {{- if not .Values.global.vaultSecrets }}
       {{- if .Values.global.elixir.pubKey }}
@@ -310,5 +306,6 @@ spec:
             path: {{ if .Values.global.archive.nfsPath }}{{ .Values.global.archive.nfsPath | quote }}{{ else }}{{ "/" }}{{ end }}
         {{- end }}
       {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

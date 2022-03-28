@@ -87,13 +87,21 @@ spec:
           value: "{{ .Values.global.elixir.oidcdHost }}"
         - name: ELIXIR_SCOPE
           value: "ga4gh_passport_v1"
+        - name: ELIXIR_JWTPRIVATEKEY
+          value: "{{ template "jwtPath" . }}/{{ .Values.global.auth.jwtKey }}"
+        - name: ELIXIR_JWTSIGNATUREALG
+          value: {{ .Values.global.auth.jwtAlg }}
         {{- if or ( eq "federated" .Values.global.schemaType) ( eq "" .Values.global.schemaType) }}
         - name: ELIXIR_JWTPRIVATEKEY
           value: "{{ template "jwtPath" . }}/{{ .Values.global.auth.jwtKey }}"
         - name: ELIXIR_JWTSIGNATUREALG
           value: {{ .Values.global.auth.jwtAlg | quote }}
         - name: CEGA_JWTISSUER
+        {{- if .Values.global.tls.enabled }}
           value: "https://{{ .Values.global.ingress.hostName.auth }}"
+        {{- else }}
+          value: "http://{{ .Values.global.ingress.hostName.auth }}"
+        {{- end }}
         - name: CEGA_AUTHURL
           value: {{ .Values.global.cega.host | quote }}
         - name: CEGA_JWTPRIVATEKEY
@@ -138,40 +146,35 @@ spec:
         volumeMounts:
       {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
         - name: tls
-          mountPath: {{ include "tlsPath" . }}
+          mountPath: {{ template "tlsPath" . }}
       {{- end }}
-      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: jwt
-          mountPath: {{ include "jwtPath" . }}
+          mountPath: {{ template "jwtPath" . }}
       {{- end }}
       volumes:
-      {{- if and .Values.global.auth.jwtKey .Values.global.jwtPath }}
+      {{- if not .Values.global.vaultSecrets }}
         - name: jwt
           projected:
             defaultMode: 0440
             sources:
             - secret:
-                name: {{ .Values.global.auth.jwtSecret }}
+                name: {{ required "A secret for the JWT signing key is needed" .Values.global.auth.jwtSecret }}
                 items:
-                  - key: {{ .Values.global.auth.jwtKey }}
+                  - key: {{ required "The name of the JWT signing key is needed" .Values.global.auth.jwtKey }}
                     path: {{ .Values.global.auth.jwtKey }}
       {{- end }}
-      {{- if .Values.global.tls.enabled }}
+      {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           projected:
             sources:
+          {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
             - secret:
-                name: {{ required "TLS secret name is requrired for auth" .Values.auth.tls.secretName }}
-            {{- if .Values.global.tls.caCert.secretName }}
+                name: {{ template "sda.fullname" . }}-auth-certs
+          {{- else }}
             - secret:
-                name: {{ .Values.global.tls.caCert.secretName }}
-                items:
-                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                  path: ca.crt
-            {{- else }}
-            - secret:
-                name: {{ template "sda.fullname" . }}-caCert
-            {{- end }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for auth" .Values.auth.tls.secretName }}
+          {{- end }}
       {{- end }}
 {{- end }}
 {{- end }}

@@ -13,16 +13,22 @@ metadata:
 {{ toYaml .Values.global.ingress.labels | indent 4 }}
 {{- end }}
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    {{- if eq "nginx" .Values.global.ingress.ingressClassName }}
     nginx.ingress.kubernetes.io/rewrite-target: "/"
     nginx.ingress.kubernetes.io/backend-protocol: "{{ ternary "HTTPS" "HTTP" .Values.global.tls.enabled }}"
-    {{- if .Values.global.ingress.issuer }}
-    cert-manager.io/cluster-issuer: {{ .Values.global.ingress.issuer | quote }}
     {{- end }}
-{{- if .Values.global.ingress.annotations }}                                    
-{{ toYaml .Values.global.ingress.annotations | indent 4 }}                      
+    {{- if .Values.global.ingress.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.global.ingress.clusterIssuer | quote }}
+    {{- else if .Values.global.ingress.issuer }}
+    cert-manager.io/issuer: {{ .Values.global.ingress.issuer | quote }}
+    {{- end }}
+{{- if .Values.global.ingress.annotations }}
+{{ toYaml .Values.global.ingress.annotations | indent 4 }}
 {{- end }}
 spec:
+{{- if .Values.global.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.global.ingress.ingressClassName }}
+{{- end }}
   rules:
   - host: {{ required "An ingress hostname is required!" .Values.global.ingress.hostName.auth }}
     http:

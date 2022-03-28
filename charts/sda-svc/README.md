@@ -1,9 +1,10 @@
 # SDA services
 
 Source repositories:
-- https://github.com/neicnordic/sda-pipeline
-- https://github.com/neicnordic/sda-doa
-- https://github.com/neicnordic/sda-download
+
+- [https://github.com/neicnordic/sda-pipeline](https://github.com/neicnordic/sda-pipeline)
+- [https://github.com/neicnordic/sda-doa](https://github.com/neicnordic/sda-doa)
+- [https://github.com/neicnordic/sda-download](https://github.com/neicnordic/sda-download)
 
 ## Installing the Chart
 
@@ -17,9 +18,9 @@ The following table lists the configurable parameters of the `sda-svc` chart and
 Parameter | Description | Default
 --------- | ----------- | -------
 `global.secretsPath` | Path where the sensitive files can be found | `/.secrets`
-`global.c4ghPath` | This path will be a subpath to the secretsPath | `""`
-`global.tlsPath` | This path will be a subpath to the secretsPath | `""`
-`global.jwtPath` | This path will be a subpath to the secretsPath | `""`
+`global.c4ghPath` | This path will be a subpath to the secretsPath | `c4gh`
+`global.tlsPath` | This path will be a subpath to the secretsPath | `tls`
+`global.jwtPath` | This path will be a subpath to the secretsPath | `jwt`
 `global.confFile` | Name of config file, used when secrets are handled by hasicorp vault | `config.yaml`
 `global.confFilePath` | This path will be a subpath to the secretsPath | `""`
 `global.deploymentType` | Deployment can be split into `external` and `internal` components, available options are `all`, `external` and `internal`. | `all`
@@ -31,14 +32,16 @@ Parameter | Description | Default
 `global.ingress.secretNames.auth` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
 `global.ingress.secretNames.doa` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
 `global.ingress.secretNames.s3Inbox` | The name of a manually created secret holding the certificates for the ingrewss enpoint. | `""`
+`global.ingress.clusterIssuer` | If cert-manager is set up to request certificates to the ingress endpoints, the configured clusterIssuer can be specified to automate certificate configuration for the ingress endpoint. | `""`
 `global.ingress.issuer` | If cert-manager is set up to request certificates to the ingress endpoints, the configured issuer can be specified to automate certificate configuration for the ingress endpoint. | `""`
+`global.ingress.annotations` | extra annotations for the ingress objects | `""`
+`global.ingress.ingressClassName` | Class of ingress controller to use | `nginx`
 `global.logLevel` | Log level for all services. | `info`
 `global.networkPolicy.create` | Use network isolation. | `false`
 `global.networkPolicy.brokerNamespace` | Namespace where the broker is deployed. | `""`
 `global.networkPolicy.databaseNamespace` | Namespace where the database is deployed. | `""`
 `global.networkPolicy.externalNamespace` | Namespace where the external components are deployed. | `""`
 `global.networkPolicy.internalNamespace` | Namespace where the internal components are deployed. | `""`
-`global.persistence.enabled` | Enable persistent datastorage | `true`
 `global.revisionHistory` | Number of revisions to keep for the option to rollback a deployment | `3`
 `global.podAnnotations` | Annotations applied to pods of all services. |`{}`
 `global.pkiService` | If an external PKI infrastructure is used set this to true. |`false`
@@ -92,6 +95,7 @@ Parameter | Description | Default
 `global.db.passOutgest` | Password used for `data out` services. |`""`
 `global.db.port` | Port that the database is listening on. |`5432`
 `global.db.sslMode` | SSL mode for the database connection, options are `verify-ca` or `verify-full`. |`verify-full`
+`global.doa.enabled` | Deploy the DOA service | `false`
 `global.doa.envFile` | File to source when credentials are managed by Hasicorp vault | `env`
 `global.doa.serviceport` | Port that the DOA service is accessible on | `443`
 `global.doa.outbox.enabled` | Enable Outbox functionality of Data Out API | `false`
@@ -105,7 +109,16 @@ Parameter | Description | Default
 `global.doa.outbox.s3CaFile` | Outbox S3 CA certificate to use | `null`
 `global.doa.outbox.s3AccessKey` | Outbox S3 Access Key | `null`
 `global.doa.outbox.s3SecretKey` | Outbox S3 Secret key | `null`
-`global.elixir.oidcdHost` | URL to get the public key used to verify Elixir JWT. | `"https://login.elixir-czech.org/oidc/"`
+`global.download.enabled` | Deploy the download service | `true`
+`global.download.sessionExpiration` | Session key expiration time in seconds | `28800`
+`global.download.trusted.configPath` | Path to the ISS config file | `$secrets/iss`
+`global.download.trusted.configFile` | Name of ISS config file | `iss.json`
+`global.download.trusted.iss` | Array of trusted OIDC endpoints | ``
+`global.download.trusted.iss[iss]` | URI to the OIDC service | `https://login.elixir-czech.org/oidc/`
+`global.download.trusted.iss[jku]` | The URI to the OIDCs jwk endpoint | `https://login.elixir-czech.org/oidc/jwk`
+
+`global.elixir.oidcdHost` | URL to the OIDc service. | `"https://login.elixir-czech.org/oidc/"`
+`global.elixir.jwkPath` | Public key path on the OIDC host. | `jwk`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
 `global.inbox.storageType` | Storage type for the inbox, available options are `s3` and `posix`. |`posix`
 `global.inbox.path` | Path to the mounted `posix` volume. |`/inbox`
@@ -121,6 +134,9 @@ Parameter | Description | Default
 `global.inbox.s3SecretKey` | Secret key to S3 inbox. |`null`
 `global.inbox.s3CaFile` | CA certificate to use if the S3 inbox is internal. |`null`
 `global.inbox.s3ReadyPath` | Endpoint to verify that the inbox is respondig. |`""`
+`global.tls.enabled` | Use TLS for all connections. |`true`
+`global.tls.issuer` | Issuer for TLS certificate creation. |`""`
+`global.tls.clusterIssuer` | ClusterIssuer for TLS certificate creation. |`""`
 
 ### Credentials
 

@@ -15,8 +15,8 @@ global:
     elixirSecret: DfCieZLuBU
     jwtSecret: oidc
     jwtAlg: ES256
-    jwtKey: token.key
-    jwtPub: token.pub
+    jwtKey: jwt.key
+    jwtPub: jwt.pub
   backupArchive:
     storageType: s3
     s3Url: "http://minio"
@@ -34,8 +34,8 @@ global:
     host: "postgres-sda-db"
   c4gh:
     secretName: c4gh
-    keyFile: c4gh.key
-    publicFile: c4gh.pub
+    keyFile: c4gh.sec.pem
+    publicFile: c4gh.pub.pem
   elixir:
     oidcdHost: "http://oidc-server:8080"
     jwkPath: ""

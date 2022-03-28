@@ -121,13 +121,11 @@ spec:
         - name: SERVER_KEY
           value: {{ include "tlsPath" . }}/tls.key
       {{- end }}
-        {{- if or .Values.global.auth.jwtPub .Values.global.elixir.pubKey }}
+        {{- if.Values.global.auth.jwtPub }}
         - name: SERVER_JWTPUBKEYPATH
           value: {{ include "jwtPath" . }}
-        {{- end }}
-        {{- if and .Values.global.elixir.oidcdHost .Values.global.elixir.jwkPath }}
-        - name: SERVER_JWTPUBKEYURL
-          value: "{{ .Values.global.elixir.oidcdHost }}{{ .Values.global.elixir.jwkPath }}"
+        {{- else }}
+          {{ fail "The global.auth.jwtPub is required for s3Inbox" }}
         {{- end }}
         - name: LOG_LEVEL
           value: {{ .Values.global.logLevel }}
@@ -159,8 +157,7 @@ spec:
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt
-          mountPath: {{ include "jwtPath" . }}/{{ .Values.global.ingress.hostName.auth }}.pub
-          subPath: {{ .Values.global.auth.jwtPub }}
+          mountPath: {{ include "jwtPath" . }}
       {{- end }}
       volumes:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
@@ -168,23 +165,21 @@ spec:
           projected:
             sources:
             - secret:
-                name: {{ required "TLS secret name is requrired for S3Inbox"  .Values.s3Inbox.tls.secretName }}
-            {{- if .Values.global.tls.caCert.secretName }}
-            - secret:
-                name: {{ .Values.global.tls.caCert.secretName }}
-                items:
-                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                  path: ca.crt
-            {{- else }}
-            - secret:
-                name: {{ template "sda.fullname" . }}-cacert
-            {{- end }}
+          {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
+                name: {{ template "sda.fullname" . }}-inbox-certs
+          {{- else }}
+                name: {{ required "An certificate issuer or a TLS secret name is required for S3Inbox" .Values.s3Inbox.tls.secretName }}
+          {{- end }}
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt
-          secret:
-            defaultMode: 0440
-            secretName: {{ .Values.global.auth.jwtSecret }}
+          projected:
+            sources:
+            - secret:
+                name: {{ .Values.global.auth.jwtSecret }}
+                items:
+                  - key: {{ required "The name of the JWT signing key is needed" .Values.global.auth.jwtPub }}
+                    path: "{{ .Values.global.ingress.hostName.auth }}.pub"
       {{- end }}
       restartPolicy: Always
 {{- end }}

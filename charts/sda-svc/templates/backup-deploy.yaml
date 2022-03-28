@@ -148,11 +148,9 @@ spec:
     {{- end }}
   {{- end }}
   {{- if .Values.global.tls.enabled }}
-    {{- if or (eq "verify-ca" .Values.global.db.sslMode) (eq "verify-full" .Values.global.db.sslMode) }}
         - name: DB_CACERT
           value: {{ include "tlsPath" . }}/ca.crt
-    {{- end }}
-    {{- if eq "verify-full" .Values.global.db.sslMode }}
+    {{- if ne "verify-none" .Values.global.db.sslMode }}
         - name: DB_CLIENTCERT
           value: {{ include "tlsPath" . }}/tls.crt
         - name: DB_CLIENTKEY
@@ -242,19 +240,12 @@ spec:
         - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           projected:
             sources:
-            {{- if or .Values.global.broker.verifyPeer (eq "verify-full" .Values.global.db.sslMode) }}
+            {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
             - secret:
-                name: {{ required "TLS secret name is requrired for backup" .Values.backup.tls.secretName }}
-            {{- end }}
-            {{- if .Values.global.tls.caCert.secretName }}
-            - secret:
-                name: {{ .Values.global.tls.caCert.secretName }}
-                items:
-                - key: {{ required "A name for the CA cert is required" .Values.global.tls.caCert.secretKey }}
-                  path: ca.crt
+                name: {{ template "sda.fullname" . }}-backup-certs
             {{- else }}
-            - secret:
-                name: {{ template "sda.fullname" . }}-caCert
+              - secret:
+                  name: {{ required "An certificate issuer or a TLS secret name is required for backup" .Values.backup.tls.secretName }}
             {{- end }}
     {{- if .Values.global.pkiPermissions }}
         - name: tls

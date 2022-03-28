@@ -1,5 +1,6 @@
 {{- if or (or (eq "all" .Values.global.deploymentType) (eq "external" .Values.global.deploymentType) ) (not .Values.global.deploymentType) }}
-{{- if .Values.global.tls.enabled }}
+{{- if and .Values.global.tls.enabled .Values.global.doa.enabled }}
+{{- if .Values.global.doa.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -14,5 +15,6 @@ spec:
     protocol: TCP
   selector:
     app: {{ template "sda.fullname" . }}-doa
+{{- end }}
 {{- end }}
 {{- end }}

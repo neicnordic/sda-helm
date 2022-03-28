@@ -31,7 +31,7 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "verifyPeer" -}}
-  {{ if .Values.config.tls.verifyPeer }}
+  {{ if and .Values.global.tls.enabled .Values.global.tls.verifyPeer }}
     {{-  print "verify_peer" -}}
   {{ else }}
     {{-  print "verify_none" -}}
@@ -40,24 +40,62 @@ Create chart name and version as used by the chart label.
 
 {{- define "mqCert" -}}
     {{- if .Values.externalPkiService.tlsPath }}
-        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a TLS certificate is required" .Values.config.tls.serverCert)) "/")}}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath .Values.global.tls.certName) "/")}}
+    {{- else if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
+        {{- print "/etc/rabbitmq/tls/tls.crt" -}}
     {{- else }}
-        {{- printf "/etc/rabbitmq/tls/%s" (required "a TLS certificate is required" .Values.config.tls.serverCert) }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "name of tls certificate is required" .Values.global.tls.certName) }}
     {{- end -}}
 {{- end -}}
 
 {{- define "mqKey" -}}
     {{- if .Values.externalPkiService.tlsPath }}
-        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a TLS key is required" .Values.config.tls.serverKey)) "/")}}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath .Values.global.tls.keyName) "/")}}
+    {{- else if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
+        {{- printf "/etc/rabbitmq/tls/tls.key" -}}
     {{- else }}
-        {{- printf "/etc/rabbitmq/tls/%s" (required "a TLS key is required" .Values.config.tls.serverKey) }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "name of tls key is required" .Values.global.tls.keyName) }}
     {{- end -}}
 {{- end -}}
 
 {{- define "caCert" -}}
     {{- if .Values.externalPkiService.tlsPath }}
-        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath (required "a CA certificate is required" .Values.config.tls.caCert)) "/")}}
+        {{- printf "%s" (regexReplaceAll "^/*|/+" (printf "%s/%s" .Values.externalPkiService.tlsPath .Values.global.tls.caCert) "/")}}
+    {{- else if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
+        {{- printf "/etc/rabbitmq/tls/ca.crt" -}}
     {{- else }}
-        {{- printf "/etc/rabbitmq/tls/%s" (required "a CA certificate is required" .Values.config.tls.caCert) }}
+        {{- printf "/etc/rabbitmq/tls/%s" (required "name of ca file is required" .Values.global.tls.caCert) }}
+    {{- end -}}
+{{- end -}}
+
+{{- define "TLSissuer" -}}
+    {{- if and .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
+        {{- fail "Only one of global.tls.issuer or global.tls.clusterIssuer should be set" }}
+    {{- end -}}
+
+    {{- if and .Values.global.tls.issuer }}
+        {{- printf "%s" .Values.global.tls.issuer }}
+    {{- else if and .Values.global.tls.clusterIssuer }}
+        {{- printf "%s" .Values.global.tls.clusterIssuer }}
+    {{- end -}}
+{{- end -}}
+
+{{- define "TLSsecret" -}}
+    {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
+        {{- if and (not .Values.global.tls.issuer) (not .Values.global.tls.clusterIssuer) }}
+            {{ printf "%s" (required "TLS secret name is required when TLS in enabled without issuer or PKI service" .Values.global.tls.secretName) }}
+        {{- else }}
+            {{- printf "%s-certs" (include "sda.fullname" .) }}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- define "testTLSsecret" -}}
+    {{- if and .Values.global.tls.enabled (not .Values.externalPkiService.tlsPath) }}
+        {{- if and (not .Values.global.tls.issuer) (not .Values.global.tls.clusterIssuer) }}
+            {{ printf "%s" (required "TLS secret name is required when TLS in enabled without issuer or PKI service" .Values.testimage.tls.secretName) }}
+        {{- else }}
+            {{- printf "%s-test-certs" (include "sda.fullname" .) }}
+        {{- end -}}
     {{- end -}}
 {{- end -}}

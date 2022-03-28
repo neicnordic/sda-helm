@@ -182,7 +182,7 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:inbox,DNS:inbox.default.svc.cluster.local,DNS:inbox.default
+subjectAltName = DNS:sda-sda-svc-inbox,DNS:inbox.default.svc.cluster.local,DNS:inbox.default,DNS:localhost
 
 [ doa_cert ]
 # Extensions for server certificates (`man x509v3_config`).
@@ -191,7 +191,7 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:doa,DNS:doa.default.svc.cluster.local,DNS:doa.default
+subjectAltName = DNS:sda-sda-svc-doa,DNS:doa.default.svc.cluster.local,DNS:doa.default,DNS:localhost
 
 [ download_cert ]
 # Extensions for server certificates (`man x509v3_config`).
@@ -200,7 +200,7 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:download,DNS:download.default.svc.cluster.local,DNS:download.default
+subjectAltName = DNS:sda-sda-svc-download,DNS:download.default.svc.cluster.local,DNS:download.default,DNS:localhost
 
 [ auth_cert ]
 # Extensions for server certificates (`man x509v3_config`).
@@ -209,7 +209,7 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:auth,DNS:auth.default.svc.cluster.local,DNS:auth.default
+subjectAltName = DNS:sda-sda-svc-auth,DNS:auth.default.svc.cluster.local,DNS:auth.default,DNS:localhost
 
 [ tester_cert ]
 # Extensions for server certificates (`man x509v3_config`).
@@ -222,23 +222,14 @@ subjectAltName = DNS:tester,DNS:tester.default.svc.cluster.local,DNS:tester.defa
 
 # CEGA certificates
 
-[ cega_users_cert ]
+[ cega ]
 # Extensions for server certificates (`man x509v3_config`).
 basicConstraints = critical,CA:FALSE
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:cega-users,DNS:cega-users.default.svc.cluster.local,DNS:cega-users.default
-
-[ cega_mq_cert ]
-# Extensions for server certificates (`man x509v3_config`).
-basicConstraints = critical,CA:FALSE
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer:always
-keyUsage = critical, digitalSignature, keyEncipherment
-extendedKeyUsage = clientAuth, serverAuth
-subjectAltName = DNS:cega-mq,DNS:cega-mq.default.svc.cluster.local,DNS:cega-mq.default
+subjectAltName = DNS:cega-mq,DNS:cega-users
 
 [ crl_ext ]
 # Extension for CRLs (`man x509v3_config`).

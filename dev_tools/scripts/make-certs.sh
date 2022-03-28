@@ -73,13 +73,9 @@ openssl x509 -req -in "./${basedir}/auth.csr" -days "${days}" -CA "./${basedir}/
 openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyout "./${basedir}/tester.key" -out "./${basedir}/tester.csr" -extensions tester_cert -subj "/CN=lega_in/CN=admin/" 
 openssl x509 -req -in "./${basedir}/tester.csr" -days "${days}" -CA "./${basedir}/ca.crt" -CAkey "./${basedir}/ca.key" -set_serial 01 -out "./${basedir}/tester.crt" -extensions tester_cert -extfile "$(dirname "$0")"/ssl.cnf
 
-# Create certificate for cega-users
-openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyout "./${basedir}/cega-users.key" -out "./${basedir}/cega-users.csr" -extensions cega_users_cert
-openssl x509 -req -in "./${basedir}/cega-users.csr" -days "${days}" -CA "./${basedir}/ca.crt" -CAkey "./${basedir}/ca.key" -set_serial 01 -out "./${basedir}/cega-users.crt" -extensions cega_users_cert -extfile "$(dirname "$0")"/ssl.cnf
-
-# Create certificate for cega-mq
-openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyout "./${basedir}/cega-mq.key" -out "./${basedir}/cega-mq.csr" -extensions cega_mq_cert
-openssl x509 -req -in "./${basedir}/cega-mq.csr" -days "${days}" -CA "./${basedir}/ca.crt" -CAkey "./${basedir}/ca.key" -set_serial 01 -out "./${basedir}/cega-mq.crt" -extensions cega_mq_cert -extfile "$(dirname "$0")"/ssl.cnf
+# Create certificate for cega
+openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyout "./${basedir}/cega.key" -out "./${basedir}/cega.csr" -extensions cega
+openssl x509 -req -in "./${basedir}/cega.csr" -days "${days}" -CA "./${basedir}/ca.crt" -CAkey "./${basedir}/ca.key" -set_serial 01 -out "./${basedir}/cega.crt" -extensions cega -extfile "$(dirname "$0")"/ssl.cnf
 
 # Create token
 openssl req  -nodes -new -x509  -keyout "./${basedir}/token.key" -out "./${basedir}/token.pub" -config "$(dirname "$0")"/ssl.cnf
