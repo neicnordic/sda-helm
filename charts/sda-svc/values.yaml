@@ -324,7 +324,7 @@ backup:
   deploy: false
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.25
+  imageTag: v0.3.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -387,7 +387,7 @@ finalize:
   name: finalize
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.25
+  imageTag: v0.3.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -407,7 +407,7 @@ ingest:
   name: ingest
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.25
+  imageTag: v0.3.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -428,7 +428,7 @@ intercept:
   name: ingest
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.25
+  imageTag: v0.3.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -447,7 +447,7 @@ intercept:
 mapper:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.25
+  imageTag: v0.3.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -520,7 +520,7 @@ releasetest:
 verify:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.2.25
+  imageTag: v0.3.1
   imagePullPolicy: IfNotPresent
   resources:
     requests:
