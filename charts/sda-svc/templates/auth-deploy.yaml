@@ -52,8 +52,14 @@ spec:
 {{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
 {{- end }}
         env:
+      {{- if .Values.global.log.format }}
+        - name: LOG_FORMAT
+          value: {{ .Values.global.log.format | quote }}
+      {{- end }}
+      {{- if .Values.global.log.level }}
         - name: LOG_LEVEL
-          value: {{ upper .Values.global.logLevel }}
+          value: {{ .Values.global.log.level | quote }}
+      {{- end }}
       {{- if not .Values.global.vaultSecrets }}
         - name: ELIXIR_ID
           valueFrom:
