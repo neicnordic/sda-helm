@@ -301,7 +301,7 @@ credentials:
 
 auth:
   name: auth
-  replicaCount: 1
+  replicaCount: 2
   repository: ghcr.io/neicnordic/sda-auth
   imageTag: v0.6.15
   imagePullPolicy: IfNotPresent
@@ -345,7 +345,7 @@ doa:
   repository: ghcr.io/neicnordic/sda-doa
   imageTag: v1.6.14
   imagePullPolicy: IfNotPresent
-  replicaCount: 1
+  replicaCount: 2
   resources:
     requests:
       memory: "256Mi"
@@ -365,7 +365,7 @@ doa:
 
 download:
   name: download
-  replicaCount: 1
+  replicaCount: 2
   repository: ghcr.io/neicnordic/sda-download
   imageTag: v1.6.35
   imagePullPolicy: IfNotPresent
@@ -468,7 +468,7 @@ s3Inbox:
   repository: ghcr.io/neicnordic/sda-s3proxy
   imageTag: v0.1.44
   imagePullPolicy: IfNotPresent
-  replicaCount: 1
+  replicaCount: 2
   resources:
     requests:
       memory: "128Mi"
@@ -489,7 +489,7 @@ sftpInbox:
   repository: ghcr.io/neicnordic/sda-inbox-sftp
   imageTag: v1.7.25
   imagePullPolicy: IfNotPresent
-  replicaCount: 1
+  replicaCount: 2
   resources:
     requests:
       memory: "128Mi"
