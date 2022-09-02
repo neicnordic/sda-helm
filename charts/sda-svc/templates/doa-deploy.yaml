@@ -36,6 +36,20 @@ spec:
 {{- toYaml .Values.doa.annotations | nindent 8 -}}
 {{- end }}
     spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        whenUnsatisfiable: DoNotSchedule
+        topologyKey: kubernetes.io/hostname
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ template "sda.fullname" . }}-doa
+            topologyKey: kubernetes.io/hostname
     {{- if .Values.global.rbacEnabled}}
       serviceAccountName: {{ .Release.Name }}
     {{- end }}
