@@ -134,9 +134,13 @@ spec:
           value: {{ required "A valid DB host is required" .Values.global.db.host | quote }}
         - name: DB_PORT
           value: {{ .Values.global.db.port | quote }}
-      {{- if .Values.global.logLevel }}
+      {{- if .Values.global.log.format }}
+        - name: LOG_FORMAT
+          value: {{ .Values.global.log.format | quote }}
+      {{- end }}
+      {{- if .Values.global.log.level }}
         - name: LOG_LEVEL
-          value: {{ .Values.global.logLevel | quote }}
+          value: {{ .Values.global.log.level | quote }}
       {{- end }}
       {{- if .Values.global.tls.enabled }}
         - name: APP_PORT

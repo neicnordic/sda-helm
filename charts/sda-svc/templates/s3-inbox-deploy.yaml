@@ -141,8 +141,14 @@ spec:
         {{- else }}
           {{ fail "The global.auth.jwtPub is required for s3Inbox" }}
         {{- end }}
+      {{- if .Values.global.log.format }}
+        - name: LOG_FORMAT
+          value: {{ .Values.global.log.format | quote }}
+      {{- end }}
+      {{- if .Values.global.log.level }}
         - name: LOG_LEVEL
-          value: {{ .Values.global.logLevel }}
+          value: {{ .Values.global.log.level | quote }}
+      {{- end }}
         ports:
         - name: inbox
           containerPort: 8000

@@ -51,7 +51,9 @@ global:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
 
-  logLevel: "info"
+  log:
+    level: "info"
+    format: "json"
 
 # utilize network isolation
 # Make sure you’ve configured a network provider with network policy support.

@@ -36,7 +36,8 @@ Parameter | Description | Default
 `global.ingress.issuer` | If cert-manager is set up to request certificates to the ingress endpoints, the configured issuer can be specified to automate certificate configuration for the ingress endpoint. | `""`
 `global.ingress.annotations` | extra annotations for the ingress objects | `""`
 `global.ingress.ingressClassName` | Class of ingress controller to use | `nginx`
-`global.logLevel` | Log level for all services. | `info`
+`global.log.format` | Log format for all services, JSON or TEXT. | `json`
+`global.log.level` | Log level for all services. | `info`
 `global.networkPolicy.create` | Use network isolation. | `false`
 `global.networkPolicy.brokerNamespace` | Namespace where the broker is deployed. | `""`
 `global.networkPolicy.databaseNamespace` | Namespace where the database is deployed. | `""`
