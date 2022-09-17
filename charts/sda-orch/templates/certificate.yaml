@@ -17,7 +17,7 @@ spec:
     algorithm: ECDSA
     size: 256
   usages:
-    - server auth
+    - client auth
   # At least one of a DNS Name, URI, or IP address is required.
   dnsNames:
     - {{ template "sda.fullname" . }}
