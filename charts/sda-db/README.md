@@ -13,7 +13,7 @@ Parameter | Description | Default
 `global.tls.enabled` | Enable TLS for all connections. |`true`
 `global.tls.issuer` | Issuer for TLS certificate creation. |`""`
 `global.tls.clusterIssuer` | ClusterIssuer for TLS certificate creation. |`""`
-`global.tls.secretName` | Name of the secret holding the certificates. |``
+`global.tls.secretName` | Name of the secret holding the certificates. |`""`
 `global.tls.certName` | Server certificate. |`tls.crt`
 `global.tls.keyName` | Server private key. |`tls.key`
 `global.tls.CAFile` | CA root certificate. |`ca.crt`
