@@ -25,7 +25,7 @@ Parameter | Description | Default
 `networkPolicy.create` | Use network isolation. | `false`
 `networkPolicy.matchLabels` | App labels that are allowed to connect to the database. | `app: sda-svc`
 `persistence.enabled` | Enable persistence. | `true`
-`persistence.mountPath` | Mountpoint for persistent volume. | `/var/lib/postgresql`
+`persistence.mountPath` | Custom mountpoint for persistent volume. | `"/var/lib/postgresql/data/"`
 `persistence.storageSize` | Volume size. | `8Gi`
 `persistence.storageClass` | Use specific storage class, by default dynamic provisioning enabled. | `null`
 `persistence.existingClaim` | Use existing claim. | `null`

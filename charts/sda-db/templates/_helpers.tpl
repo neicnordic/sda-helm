@@ -99,3 +99,11 @@ Create chart name and version as used by the chart label.
         {{- end -}}
     {{- end -}}
 {{- end -}}
+
+{{- define "pgData" -}}
+    {{- if .Values.persistence.mountPath }}
+        {{ printf "%s/pgdata" .Values.persistence.mountPath }}
+    {{- else }}
+            {{- "/var/lib/postgresql/data/pgdata/" }}
+    {{- end -}}
+{{- end -}}
