@@ -63,7 +63,7 @@ spec:
       - name: backup
         image: "{{ .Values.backup.repository }}:{{ .Values.backup.imageTag }}"
         imagePullPolicy: {{ .Values.backup.imagePullPolicy | quote }}
-        command: ["sda-sync"]
+        command: ["sda-backup"]
         securityContext:
           allowPrivilegeEscalation: false
         env:
