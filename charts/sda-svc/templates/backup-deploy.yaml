@@ -115,6 +115,14 @@ spec:
         - name: BACKUP_LOCATION
           value: "{{ .Values.global.backupArchive.volumePath }}"
   {{- end }}
+        - name: BACKUP_COPYHEADER
+          value: "{{ .Values.global.backupArchive.copyHeader }}"
+    {{- if .Values.global.backupArchive.copyHeader}}
+        - name: C4GH_FILEPATH
+          value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.keyFile }}"
+        - name: C4GH_BACKUPPUBKEY
+          value: "{{ template "c4ghPath" . }}/{{ .Values.global.c4gh.backupPubKey }}"
+    {{- end }}
         - name: BROKER_DURABLE
           value: {{ .Values.global.broker.durable | quote }}
         - name: BROKER_EXCHANGE
@@ -231,6 +239,10 @@ spec:
         - name: archive
           mountPath: {{ .Values.global.archive.volumePath | quote }}
   {{- end }}
+  {{- if .Values.global.backupArchive.copyHeader}}
+        - name: c4gh
+          mountPath: {{ template "c4ghPath" . }}
+  {{- end }}
   {{- if eq "posix" .Values.global.backupArchive.storageType }}
         - name: backup
           mountPath: {{ .Values.global.backupArchive.volumePath | quote }}
@@ -256,6 +268,17 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 10Mi
+    {{- end }}
+    {{- if and (not .Values.global.vaultSecrets) .Values.global.backupArchive.copyHeader }}
+        - name: c4gh
+          secret:
+            defaultMode: 0440
+            secretName: {{ required "A secret for the c4gh key is required" .Values.global.c4gh.secretName }}
+            items:
+            - key: {{ .Values.global.c4gh.keyFile }}
+              path: {{ .Values.global.c4gh.keyFile }}
+            - key: {{ .Values.global.c4gh.backupPubKey }}
+              path: {{ .Values.global.c4gh.backupPubKey }}
     {{- end }}
   {{- end }}
   {{- if eq "posix" .Values.global.archive.storageType }}

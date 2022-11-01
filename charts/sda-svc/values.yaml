@@ -134,6 +134,7 @@ global:
     volumePath: "/backup"
     nfsServer: ""
     nfsPath: ""
+    copyHeader: false
 
   auth:
     # @param elixirID, client ID to the Elixir OIDC for the service endpoint 
@@ -177,6 +178,7 @@ global:
   # name of the public file, required for testing
     publicFile: ""
     passphrase: ""
+    backupPubKey: ""
 
   db:
     host: ""
