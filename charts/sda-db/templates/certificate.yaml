@@ -6,8 +6,8 @@ metadata:
 spec:
   # Secret names are always required.
   secretName: {{ template "sda.fullname" . }}-certs
-
-  duration: 2160h # 90d
+  # postgres can not hot reload a new certificate, hence the 1y timelimit
+  duration: 8760h
 
   # The use of the common name field has been deprecated since 2000 and is
   # discouraged from being used.

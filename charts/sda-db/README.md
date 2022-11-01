@@ -13,7 +13,7 @@ Parameter | Description | Default
 `global.tls.enabled` | Enable TLS for all connections. |`true`
 `global.tls.issuer` | Issuer for TLS certificate creation. |`""`
 `global.tls.clusterIssuer` | ClusterIssuer for TLS certificate creation. |`""`
-`global.tls.secretName` | Name of the secret holding the certificates. |``
+`global.tls.secretName` | Name of the secret holding the certificates. |`""`
 `global.tls.certName` | Server certificate. |`tls.crt`
 `global.tls.keyName` | Server private key. |`tls.key`
 `global.tls.CAFile` | CA root certificate. |`ca.crt`
@@ -25,7 +25,7 @@ Parameter | Description | Default
 `networkPolicy.create` | Use network isolation. | `false`
 `networkPolicy.matchLabels` | App labels that are allowed to connect to the database. | `app: sda-svc`
 `persistence.enabled` | Enable persistence. | `true`
-`persistence.mountPath` | Mountpoint for persistent volume. | `/var/lib/postgresql`
+`persistence.mountPath` | Custom mountpoint for persistent volume. | `"/var/lib/postgresql/data/"`
 `persistence.storageSize` | Volume size. | `8Gi`
 `persistence.storageClass` | Use specific storage class, by default dynamic provisioning enabled. | `null`
 `persistence.existingClaim` | Use existing claim. | `null`
