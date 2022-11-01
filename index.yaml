@@ -220,6 +220,19 @@ entries:
     version: "0.1"
   sda-orch:
   - apiVersion: v2
+    created: "2022-11-01T14:28:24.876529449Z"
+    description: Orchestrate component for Sensitive Data Archive (SDA) standalone
+      installation
+    digest: d58c181deaf35d643f12fce9a587061974457b56f9b5439f2e84f9bf087bfd66
+    home: https://neic-sda.readthedocs.io
+    icon: https://neic.no/assets/images/logo.png
+    name: sda-orch
+    sources:
+    - https://github.com/neicnordic/sda-helm
+    urls:
+    - https://github.com/neicnordic/sda-helm/releases/download/sda-orch-0.7.3/sda-orch-0.7.3.tgz
+    version: 0.7.3
+  - apiVersion: v2
     created: "2022-09-19T07:26:01.774095718Z"
     description: Orchestrate component for Sensitive Data Archive (SDA) standalone
       installation
@@ -502,4 +515,4 @@ entries:
     urls:
     - https://github.com/neicnordic/sda-helm/releases/download/sda-svc-0.1/sda-svc-0.1.tgz
     version: "0.1"
-generated: "2022-11-01T14:27:25.179319393Z"
+generated: "2022-11-01T14:28:24.876715252Z"
