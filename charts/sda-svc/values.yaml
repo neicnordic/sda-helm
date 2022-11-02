@@ -470,7 +470,7 @@ mapper:
 s3Inbox:
   name: s3Inbox
   repository: ghcr.io/neicnordic/sda-s3proxy
-  imageTag: v0.1.122
+  imageTag: v0.1.124
   imagePullPolicy: IfNotPresent
   replicaCount: 2
   resources:
