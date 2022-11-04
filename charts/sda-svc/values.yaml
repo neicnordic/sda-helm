@@ -307,7 +307,7 @@ auth:
   name: auth
   replicaCount: 2
   repository: ghcr.io/neicnordic/sda-auth
-  imageTag: v0.6.45
+  imageTag: v0.6.46
   imagePullPolicy: IfNotPresent
   resources:
     requests:
