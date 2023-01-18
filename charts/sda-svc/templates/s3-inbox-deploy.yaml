@@ -211,6 +211,7 @@ spec:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
         - name: tls
           projected:
+            defaultMode: 256
             sources:
             - secret:
           {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
