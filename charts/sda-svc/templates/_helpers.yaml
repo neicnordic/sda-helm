@@ -255,7 +255,7 @@ Create chart name and version as used by the chart label.
 {{- ternary "lega_in" .Values.credentials.verify.dbUser (empty .Values.credentials.verify.dbUser) -}}
 {{- end -}}
 {{- define "dbPassVerify" -}}
-{{- ternary .Values.global.db.passIngest .Values.credentials.verify.dbPassword (empty .Values.credentials.verify.dbPassword) -}}
+{{- ternary .Values.global.db.passVerify .Values.credentials.verify.dbPassword (empty .Values.credentials.verify.dbPassword) -}}
 {{- end -}}
 {{- define "mqUserVerify" -}}
 {{- ternary .Values.global.broker.username .Values.credentials.verify.mqUser (empty .Values.credentials.verify.mqUser) -}}

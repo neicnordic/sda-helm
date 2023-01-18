@@ -85,6 +85,16 @@ spec:
                 key: mqPassword
         - name: BROKER_USER
           value: {{ include "mqUserInbox" . | quote }}
+        - name: DB_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-inbox
+                key: dbPassword
+        - name: DB_USER
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-inbox
+                key: dbUser
       {{- else }}
         - name: SERVER_CONFFILE
           value: {{ include "confFile" .}}
@@ -129,6 +139,24 @@ spec:
           value: {{ include "tlsPath" . }}/tls.key
         {{- end }}
       {{- end }}
+       {{- if .Values.global.tls.enabled }}
+        - name: DB_CACERT
+          value: {{ template "tlsPath" . }}/ca.crt
+      {{- if ne "verify-none" .Values.global.db.sslMode }}
+        - name: DB_CLIENTCERT
+          value: {{ template "tlsPath" . }}/tls.crt
+        - name: DB_CLIENTKEY
+          value: {{ template "tlsPath" . }}/tls.key
+      {{- end }}
+    {{- end }}
+        - name: DB_DATABASE
+          value: {{ default "lega" .Values.global.db.name | quote }}
+        - name: DB_HOST
+          value: {{ required "A valid DB host is required" .Values.global.db.host | quote }}
+        - name: DB_PORT
+          value: {{ .Values.global.db.port | quote }}
+        - name: DB_SSLMODE
+          value: {{ template "dbSSLmode" . }}
       {{- if .Values.global.tls.enabled }}
         - name: SERVER_CERT
           value: {{ include "tlsPath" . }}/tls.crt

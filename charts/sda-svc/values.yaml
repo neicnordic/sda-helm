@@ -249,10 +249,10 @@ global:
 # service specific credentials
 credentials:
   backup:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   doa:
     dbUser: ""
@@ -263,30 +263,32 @@ credentials:
     dbPassword: ""
 
   finalize:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   inbox:
+    dbUser: ""
+    dbPassword: ""
     mqUser: ""
     mqPassword: ""
 
   ingest:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   intercept:
     mqUser: ""
     mqPassword: ""
 
   mapper:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   releasetest:
     dbUser: ""
@@ -295,10 +297,10 @@ credentials:
     mqPassword: ""
 
   verify:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
 ##################################
 # Service specific settings
