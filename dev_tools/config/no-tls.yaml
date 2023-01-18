@@ -51,13 +51,22 @@ global:
     hostName:
       auth: sda-sda-svc-auth
       download: sda-sda-svc-download
+      s3Inbox: sda-sda-svc-inbox
   logLevel: debug
   schemaType: isolated
   tls:
     enabled: false
+auth:
+  replicaCount: 1
 backup:
   deploy: true
+doa:
+  replicaCount: 1
+download:
+  replicaCount: 1
 intercept:
   deploy: false
 releasetest:
   run: true
+s3Inbox:
+  replicaCount: 1

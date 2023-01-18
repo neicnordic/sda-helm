@@ -61,10 +61,12 @@ global:
     hostName:
       auth: sda-sda-svc-auth
       download: sda-sda-svc-download
+      s3Inbox: sda-sda-svc-inbox
   logLevel: debug
   tls:
     enabled: true
 auth:
+  replicaCount: 1
   tls:
     secretName: "auth-certs"
 backup:
@@ -72,6 +74,7 @@ backup:
   tls:
     secretName: "backup-certs"
 doa:
+  replicaCount: 1
   tls:
     secretName: "doa-certs"
 finalize:
@@ -87,12 +90,14 @@ mapper:
   tls:
     secretName: "mapper-certs"
 s3Inbox:
+  replicaCount: 1
   tls:
     secretName: "inbox-certs"
 verify:
   tls:
     secretName: "verify-certs"
 download:
+  replicaCount: 1
   tls:
     secretName: "download-certs"
 releasetest:
