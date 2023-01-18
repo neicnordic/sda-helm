@@ -39,7 +39,7 @@ global:
     password: 3iSGc5loLN7hu2EwT2Z2CzCT26iUrk3t
   db:
     host: "postgres-sda-db"
-    sslMode: "verify-ca"
+    sslMode: "verify-full"
   c4gh:
     secretName: c4gh
     keyFile: c4gh.sec.pem
