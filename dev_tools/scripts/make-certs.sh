@@ -26,7 +26,7 @@ openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyo
 openssl x509 -req -in "./${basedir}/client.csr" -days "${days}" -CA "./${basedir}/ca.crt" -CAkey "./${basedir}/ca.key" -set_serial 01 -out "./${basedir}/client.crt" -extensions client_cert -extfile "$(dirname "$0")"/ssl.cnf
 
 # Create certificate for inbox
-openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyout "./${basedir}/inbox.key" -out "./${basedir}/inbox.csr" -extensions inbox_cert -subj "/CN=admin" 
+openssl req -config "$(dirname "$0")"/ssl.cnf -new -nodes -newkey rsa:4096 -keyout "./${basedir}/inbox.key" -out "./${basedir}/inbox.csr" -extensions inbox_cert -subj "/CN=lega_in/CN=admin/" 
 openssl x509 -req -in "./${basedir}/inbox.csr" -days "${days}" -CA "./${basedir}/ca.crt" -CAkey "./${basedir}/ca.key" -set_serial 01 -out "./${basedir}/inbox.crt" -extensions inbox_cert -extfile "$(dirname "$0")"/ssl.cnf
 
 # Create certificate for ingest
