@@ -57,6 +57,23 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
+    {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
+      initContainers:
+      - name: tls-init
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args: ["/bin/cp /tls-certs/* /tls/ && chown 65534:65534 /tls/* && chmod 0600 /tls/*"]
+        securityContext:
+          allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /tls-certs
+        - name: tls
+          mountPath: /tls
+    {{- end }}
       containers:
       - name: s3inbox
         image: "{{ .Values.s3Inbox.repository }}:{{ .Values.s3Inbox.imageTag }}"
@@ -209,7 +226,7 @@ spec:
       {{- end }}
       volumes:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
-        - name: tls
+        - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           projected:
             defaultMode: 256
             sources:
@@ -219,6 +236,12 @@ spec:
           {{- else }}
                 name: {{ required "An certificate issuer or a TLS secret name is required for S3Inbox" .Values.s3Inbox.tls.secretName }}
           {{- end }}
+        {{- if .Values.global.pkiPermissions }}
+        - name: tls
+          emptyDir:
+            medium: Memory
+            sizeLimit: 10Mi
+      {{- end }}
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt
