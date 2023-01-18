@@ -45,7 +45,7 @@ global:
     keyFile: c4gh.sec.pem
     publicFile: c4gh.sec.pub
   elixir:
-    oidcdHost: "http://oidc-server:8080"
+    provider: "http://oidc-server:8080"
     jwkPath: ""
   inbox:
     storageType: s3

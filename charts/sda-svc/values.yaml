@@ -225,7 +225,7 @@ global:
           jku: "https://login.elixir-czech.org/oidc/jwk"
 
   elixir:
-    oidcdHost: "https://login.elixir-czech.org/oidc/"
+    provider: "https://login.elixir-czech.org/oidc/"
     jwkPath: "jwk"
 
   inbox:

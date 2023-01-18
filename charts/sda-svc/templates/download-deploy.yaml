@@ -106,7 +106,7 @@ spec:
           value: "{{ .Values.global.archive.volumePath }}"
       {{- end }}
         - name: OIDC_CONFIGURATION_URL
-          value: "{{ .Values.global.elixir.oidcdHost }}/.well-known/openid-configuration"
+          value: "{{ .Values.global.elixir.provider }}/.well-known/openid-configuration"
       {{- if .Values.global.download.trusted.iss }}
         - name: OIDC_TRUSTED_ISS
           value: {{ include "trustedIssPath" . }}/{{ default "iss.json" .Values.global.download.trusted.configFile }}
