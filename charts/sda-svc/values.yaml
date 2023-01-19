@@ -221,11 +221,12 @@ global:
       configPath: "iss"
       configFile: "iss.json"
       iss:
-        - iss: "https://login.elixir-czech.org/oidc/"
-          jku: "https://login.elixir-czech.org/oidc/jwk"
+        - iss: " https://profile.aai.lifescience-ri.eu/"
+          jku: " https://profile.aai.lifescience-ri.eu/jwk"
 
   elixir:
-    provider: "https://login.elixir-czech.org/oidc/"
+    oidcConfig: "https://proxy.aai.lifescience-ri.eu"
+    provider:  "https://profile.aai.lifescience-ri.eu/"
     jwkPath: "jwk"
 
   inbox:
