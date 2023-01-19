@@ -57,6 +57,23 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
+    {{- if and .Values.global.pkiPermissions .Values.global.tls.enabled }}
+      initContainers:
+      - name: tls-init
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args: ["/bin/cp /tls-certs/* /tls/ && chown 65534:65534 /tls/* && chmod 0600 /tls/*"]
+        securityContext:
+          allowPrivilegeEscalation: false
+{{- if .Values.global.extraSecurityContext }}
+{{- toYaml .Values.global.extraSecurityContext | nindent 10 -}}
+{{- end }}
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /tls-certs
+        - name: tls
+          mountPath: /tls
+    {{- end }}
       containers:
       - name: s3inbox
         image: "{{ .Values.s3Inbox.repository }}:{{ .Values.s3Inbox.imageTag }}"
@@ -85,6 +102,16 @@ spec:
                 key: mqPassword
         - name: BROKER_USER
           value: {{ include "mqUserInbox" . | quote }}
+        - name: DB_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-inbox
+                key: dbPassword
+        - name: DB_USER
+          valueFrom:
+              secretKeyRef:
+                name: {{ template "sda.fullname" . }}-inbox
+                key: dbUser
       {{- else }}
         - name: SERVER_CONFFILE
           value: {{ include "confFile" .}}
@@ -129,6 +156,24 @@ spec:
           value: {{ include "tlsPath" . }}/tls.key
         {{- end }}
       {{- end }}
+       {{- if .Values.global.tls.enabled }}
+        - name: DB_CACERT
+          value: {{ template "tlsPath" . }}/ca.crt
+      {{- if ne "verify-none" .Values.global.db.sslMode }}
+        - name: DB_CLIENTCERT
+          value: {{ template "tlsPath" . }}/tls.crt
+        - name: DB_CLIENTKEY
+          value: {{ template "tlsPath" . }}/tls.key
+      {{- end }}
+    {{- end }}
+        - name: DB_DATABASE
+          value: {{ default "lega" .Values.global.db.name | quote }}
+        - name: DB_HOST
+          value: {{ required "A valid DB host is required" .Values.global.db.host | quote }}
+        - name: DB_PORT
+          value: {{ .Values.global.db.port | quote }}
+        - name: DB_SSLMODE
+          value: {{ template "dbSSLmode" . }}
       {{- if .Values.global.tls.enabled }}
         - name: SERVER_CERT
           value: {{ include "tlsPath" . }}/tls.crt
@@ -181,8 +226,9 @@ spec:
       {{- end }}
       volumes:
       {{- if and (not .Values.global.pkiService) .Values.global.tls.enabled }}
-        - name: tls
+        - name: {{ ternary "tls" "tls-certs" (empty .Values.global.pkiPermissions) }}
           projected:
+            defaultMode: 256
             sources:
             - secret:
           {{- if or .Values.global.tls.clusterIssuer .Values.global.tls.issuer }}
@@ -190,6 +236,12 @@ spec:
           {{- else }}
                 name: {{ required "An certificate issuer or a TLS secret name is required for S3Inbox" .Values.s3Inbox.tls.secretName }}
           {{- end }}
+        {{- if .Values.global.pkiPermissions }}
+        - name: tls
+          emptyDir:
+            medium: Memory
+            sizeLimit: 10Mi
+      {{- end }}
       {{- end }}
       {{- if .Values.global.auth.jwtPub }}
         - name: jwt

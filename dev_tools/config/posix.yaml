@@ -25,7 +25,7 @@ global:
     keyFile: c4gh.sec.pem
     publicFile: c4gh.pub.pem
   cega:
-    host: "cega-users/lega/v1/legas/users"
+    host: "cega-users"
     user: "legatest"
   db:
     host: "postgres-sda-db"

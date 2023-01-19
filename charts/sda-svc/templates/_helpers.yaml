@@ -198,6 +198,12 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/**/}}
+{{- define "dbUserInbox" -}}
+{{- ternary "lega_in" .Values.credentials.inbox.dbUser (empty .Values.credentials.inbox.dbUser) -}}
+{{- end -}}
+{{- define "dbPassInbox" -}}
+{{- ternary .Values.global.db.passIngest .Values.credentials.inbox.dbPassword (empty .Values.credentials.inbox.dbPassword) -}}
+{{- end -}}
 {{- define "mqUserInbox" -}}
 {{- ternary .Values.global.broker.username .Values.credentials.inbox.mqUser (empty .Values.credentials.inbox.mqUser) -}}
 {{- end -}}

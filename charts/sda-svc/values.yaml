@@ -221,11 +221,12 @@ global:
       configPath: "iss"
       configFile: "iss.json"
       iss:
-        - iss: "https://login.elixir-czech.org/oidc/"
-          jku: "https://login.elixir-czech.org/oidc/jwk"
+        - iss: " https://profile.aai.lifescience-ri.eu/"
+          jku: " https://profile.aai.lifescience-ri.eu/jwk"
 
   elixir:
-    oidcdHost: "https://login.elixir-czech.org/oidc/"
+    oidcConfig: "https://proxy.aai.lifescience-ri.eu"
+    provider:  "https://profile.aai.lifescience-ri.eu/"
     jwkPath: "jwk"
 
   inbox:
@@ -249,10 +250,10 @@ global:
 # service specific credentials
 credentials:
   backup:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   doa:
     dbUser: ""
@@ -263,30 +264,32 @@ credentials:
     dbPassword: ""
 
   finalize:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   inbox:
+    dbUser: ""
+    dbPassword: ""
     mqUser: ""
     mqPassword: ""
 
   ingest:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   intercept:
     mqUser: ""
     mqPassword: ""
 
   mapper:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
   releasetest:
     dbUser: ""
@@ -295,10 +298,10 @@ credentials:
     mqPassword: ""
 
   verify:
-    mqUser: ""
-    mqPassword: ""
     dbUser: ""
     dbPassword: ""
+    mqUser: ""
+    mqPassword: ""
 
 ##################################
 # Service specific settings
@@ -307,7 +310,7 @@ auth:
   name: auth
   replicaCount: 2
   repository: ghcr.io/neicnordic/sda-auth
-  imageTag: v0.6.46
+  imageTag: v0.6.54
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -328,7 +331,7 @@ backup:
   deploy: false
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.3.67
+  imageTag: v0.3.94
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -347,7 +350,7 @@ backup:
 doa:
   name: doa
   repository: ghcr.io/neicnordic/sda-doa
-  imageTag: v1.6.43
+  imageTag: v1.6.46
   imagePullPolicy: IfNotPresent
   replicaCount: 2
   resources:
@@ -371,7 +374,7 @@ download:
   name: download
   replicaCount: 2
   repository: ghcr.io/neicnordic/sda-download
-  imageTag: v1.6.94
+  imageTag: v1.6.117
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -391,7 +394,7 @@ finalize:
   name: finalize
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.3.67
+  imageTag: v0.3.94
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -411,7 +414,7 @@ ingest:
   name: ingest
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.3.67
+  imageTag: v0.3.94
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -432,7 +435,7 @@ intercept:
   name: ingest
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.3.67
+  imageTag: v0.3.94
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -451,7 +454,7 @@ intercept:
 mapper:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.3.67
+  imageTag: v0.3.94
   imagePullPolicy: IfNotPresent
   resources:
     requests:
@@ -470,7 +473,7 @@ mapper:
 s3Inbox:
   name: s3Inbox
   repository: ghcr.io/neicnordic/sda-s3proxy
-  imageTag: v0.1.124
+  imageTag: v0.1.153
   imagePullPolicy: IfNotPresent
   replicaCount: 2
   resources:
@@ -491,7 +494,7 @@ s3Inbox:
 sftpInbox:
   name: sftpInbox
   repository: ghcr.io/neicnordic/sda-inbox-sftp
-  imageTag: v1.7.63
+  imageTag: v1.10.4
   imagePullPolicy: IfNotPresent
   replicaCount: 2
   resources:
@@ -524,7 +527,7 @@ releasetest:
 verify:
   replicaCount: 1
   repository: ghcr.io/neicnordic/sda-pipeline
-  imageTag: v0.3.67
+  imageTag: v0.3.94
   imagePullPolicy: IfNotPresent
   resources:
     requests:
