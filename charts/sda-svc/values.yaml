@@ -493,7 +493,7 @@ s3Inbox:
 sftpInbox:
   name: sftpInbox
   repository: ghcr.io/neicnordic/sda-inbox-sftp
-  imageTag: v1.9.3
+  imageTag: v1.10.4
   imagePullPolicy: IfNotPresent
   replicaCount: 2
   resources:

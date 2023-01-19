@@ -125,7 +125,7 @@ spec:
         - name: BROKER_VHOST
           value: {{ .Values.global.broker.vhost | quote }}
         - name: CEGA_ENDPOINT
-          value: {{ printf "%s%s" (.Values.global.cega.host) "/%s?idType=username" | quote }}
+          value: {{ printf "%s%s" (.Values.global.cega.host) "/username/%s" | quote }}
         - name: CEGA_ENDPOINT_CREDS
           valueFrom:
             secretKeyRef:
