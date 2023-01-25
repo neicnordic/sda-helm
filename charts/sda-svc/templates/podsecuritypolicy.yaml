@@ -1,3 +1,4 @@
+{{- if semverCompare "<v1.25.0" .Capabilities.KubeVersion.Version }}
 {{- if and .Values.global.rbacEnabled .Values.global.podSecurityPolicy.create }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
@@ -65,4 +66,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ .Release.Name }}
+{{- end }}
 {{- end }}
