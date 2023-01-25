@@ -7,7 +7,7 @@ elif [ "$OSTYPE" == "darwin" ]; then
   BTYPE="darwin"
 fi
 
-curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.20.0/bin/"$BTYPE"/amd64/kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.25.0/bin/"$BTYPE"/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
