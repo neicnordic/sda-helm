@@ -11,7 +11,7 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.20.0/bin/"
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
-wget https://get.helm.sh/helm-v3.4.2-"$BTYPE"-amd64.tar.gz -O - | tar -xz
+wget https://get.helm.sh/helm-v3.11.0-"$BTYPE"-amd64.tar.gz -O - | tar -xz
 sudo cp "$BTYPE"-amd64/helm /usr/local/bin/helm
 
 rm -r ./*-amd64/
