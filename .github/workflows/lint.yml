@@ -9,9 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3.3.0
     - name: Install helm3
-      run: |
-        wget https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz -O - | tar -xz
-        sudo cp linux-amd64/helm /usr/local/bin/helm
+      run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Lint sda-db
       run: helm lint charts/sda-db
 
@@ -21,9 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3.3.0
     - name: Install helm3
-      run: |
-        wget https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz -O - | tar -xz
-        sudo cp linux-amd64/helm /usr/local/bin/helm
+      run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Lint sda-mq
       run: helm lint charts/sda-mq
 
@@ -33,9 +29,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3.3.0
     - name: Install helm3
-      run: |
-        wget https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz -O - | tar -xz
-        sudo cp linux-amd64/helm /usr/local/bin/helm
+      run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Lint sda-svc
       run: helm lint charts/sda-svc
 
@@ -45,8 +39,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3.3.0
     - name: Install helm3
-      run: |
-        wget https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz -O - | tar -xz
-        sudo cp linux-amd64/helm /usr/local/bin/helm
+      run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Lint sda-orch
       run: helm lint charts/sda-orch
