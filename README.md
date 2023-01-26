@@ -8,6 +8,8 @@
 
 This repositroy contains helmcharts for deploying a Sensitive Data Archive solution that is compatible with the European Genome Archives federated archiving model.
 
+The charts are compatible with kubernetes versions >= 1.19.0 and are tested against kubernetes version 1.25.6
+
 ## sda-db
 
 This chart deploys a pre-configured database instance for Sensitive Data Archive, the schemas match European Genome Archives federated archiving model.
