@@ -186,7 +186,7 @@ global:
     passIngest: ""
     passOutgest: ""
     port: 5432
-    sslMode: "verify-ca"
+    sslMode: "verify-full"
 
   doa:
     enabled: false
