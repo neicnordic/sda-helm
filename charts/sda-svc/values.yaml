@@ -164,7 +164,7 @@ global:
     vhost: "/"
 
   cega:
-    ## @param host, URI to CEGA NSS server users endpoint 
+    ## @param host, URI to CEGA NSS server users endpoint
     host: ""
     ## @param user, usernamen for accessing the CEGA NSS host
     user: ""
@@ -258,7 +258,7 @@ credentials:
   doa:
     dbUser: ""
     dbPassword: ""
-  
+
   download:
     dbUser: ""
     dbPassword: ""

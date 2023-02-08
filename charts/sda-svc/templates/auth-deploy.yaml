@@ -107,6 +107,8 @@ spec:
           value: "{{ .Values.global.elixir.provider }}"
         - name: ELIXIR_SCOPE
           value: "ga4gh_passport_v1"
+        - name: ELIXIR_JWKPATH
+          value: {{ .Values.global.elixir.jwkPath | quote }}
         {{- if or ( eq "federated" .Values.global.schemaType) ( eq "" .Values.global.schemaType) }}
         - name: CEGA_AUTHURL
           value: {{ .Values.global.cega.host | quote }}
