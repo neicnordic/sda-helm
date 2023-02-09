@@ -76,6 +76,9 @@ Parameter | Description | Default
 `global.auth.jwtKey` | Private key used to sign the JWT. |`""`
 `global.auth.jwtPub` | Public key ues to verify the JWT. |`""`
 `global.auth.useTLS` | Run a TLS secured server. |`true`
+`global.auth.corsOrigins` | Domain name allowed for cross-domain requests. |`""`
+`global.auth.corsMethods` | Allowed cross-domain request methods. |`""`
+`global.auth.corsCreds` | Include credentials in cross-domain requests. |`false`
 `global.broker.host` | Domain name or IP address to the message broker. |`""`
 `global.broker.exchange` | Exchange to publish messages to. |`""`
 `global.broker.port` | Port for the message broker. |`5671`
