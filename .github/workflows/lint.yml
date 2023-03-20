@@ -7,7 +7,7 @@ jobs:
     name: Lint sda-db
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v3.4.0
     - name: Install helm3
       run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Lint sda-db
@@ -17,7 +17,7 @@ jobs:
     name: Lint sda-mq
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v3.4.0
     - name: Install helm3
       run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Lint sda-mq
@@ -27,7 +27,7 @@ jobs:
     name: Lint sda-svc
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v3.4.0
     - name: Install helm3
       run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Lint sda-svc
@@ -37,7 +37,7 @@ jobs:
     name: Lint sda-orch
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v3.4.0
     - name: Install helm3
       run: bash ./dev_tools/scripts/install-kube-deps.sh
     - name: Lint sda-orch
