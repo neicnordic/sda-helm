@@ -137,9 +137,9 @@ global:
     copyHeader: false
 
   auth:
-    # @param elixirID, client ID to the Elixir OIDC for the service endpoint 
+    # @param elixirID, client ID to the Elixir OIDC for the service endpoint
     elixirID:
-    # @param elixirSecret, client secret to the Elixir OIDC for the service endpoint 
+    # @param elixirSecret, client secret to the Elixir OIDC for the service endpoint
     elixirSecret:
     # @param jwtSecret, name of the secret holding the jwt signing key
     jwtSecret:
@@ -149,6 +149,12 @@ global:
     jwtKey:
     # @param jwtPub, name of the public signing key
     jwtPub:
+    # @param corsOrigins, domain name of allowed origin for cross-domain requests
+    corsOrigins: ""
+    # @param corsMethods, allowed methods for cross-domain requests
+    corsMethods: ""
+    # @param corsCreds, allow credentials in the request, cors is disabled if false
+    corsCreds: false
 
   broker:
     durable: true
@@ -164,7 +170,7 @@ global:
     vhost: "/"
 
   cega:
-    ## @param host, URI to CEGA NSS server users endpoint 
+    ## @param host, URI to CEGA NSS server users endpoint
     host: ""
     ## @param user, usernamen for accessing the CEGA NSS host
     user: ""
@@ -258,7 +264,7 @@ credentials:
   doa:
     dbUser: ""
     dbPassword: ""
-  
+
   download:
     dbUser: ""
     dbPassword: ""
