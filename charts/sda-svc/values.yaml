@@ -168,6 +168,7 @@ global:
     username: ""
     verifyPeer: true
     vhost: "/"
+    prefetchCount: 2
 
   cega:
     ## @param host, URI to CEGA NSS server users endpoint
