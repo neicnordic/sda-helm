@@ -87,6 +87,7 @@ Parameter | Description | Default
 `global.broker.password` | Shared password to the message broker. |`/`
 `global.broker.username` | Shared user to the message broker. |`/`
 `global.broker.backupRoutingKey` | routing key used to send messages to backup service |`""`
+`global.broker.prefetchCount` | Number of messages to retrieve from the broker at the time, setting this to `1` will create a round-robin behavior between consumers |`2`
 `global.cega.host` | Full URI to the EGA user authentication service. |`""`
 `global.cega.user` | Username for the EGA user authentication service. |`""`
 `global.cega.password` | Password for the EGA user authentication service. |`""`
@@ -120,7 +121,6 @@ Parameter | Description | Default
 `global.download.trusted.iss` | Array of trusted OIDC endpoints | ``
 `global.download.trusted.iss[iss]` | URI to the OIDC service | `https://login.elixir-czech.org/oidc/`
 `global.download.trusted.iss[jku]` | The URI to the OIDCs jwk endpoint | `https://login.elixir-czech.org/oidc/jwk`
-
 `global.elixir.oidcdHost` | URL to the OIDc service. | `"https://login.elixir-czech.org/oidc/"`
 `global.elixir.jwkPath` | Public key path on the OIDC host. | `jwk`
 `global.inbox.servicePort` | The port that the inbox is accessible via. | `2222`
