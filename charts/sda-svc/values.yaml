@@ -149,6 +149,8 @@ global:
     jwtKey:
     # @param jwtPub, name of the public signing key
     jwtPub:
+    # @param resignJwt, if true (or empty) the jwt will be resigned with the jwtKey
+    resignJwt: true
     # @param corsOrigins, domain name of allowed origin for cross-domain requests
     corsOrigins: ""
     # @param corsMethods, allowed methods for cross-domain requests
